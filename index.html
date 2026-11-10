@@ -45,6 +45,15 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
     height: 100dvh;
     overflow: hidden;
   }
+  /* Barre latérale masquée : le contenu occupe toute la largeur */
+  .app.side-off {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "header"
+      "main"
+      "footer";
+  }
+  .app.side-off > .side { display: none; }
   .app > header { grid-area: header; }
   .app > .side { grid-area: side; }
   .app > .main-col {
@@ -75,6 +84,12 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
   overflow: auto;
   min-height: 0;
 }
+/* Bouton d'affichage de la barre latérale : visible seulement quand elle existe (desktop) */
+#b-side-toggle { display: none; }
+#b-side-toggle[aria-pressed="true"] { color: var(--accent); border-color: rgba(34, 211, 238, .45); }
+@media (min-width: 1024px) {
+  #b-side-toggle { display: inline-flex; }
+}
 @media (min-width: 1024px) {
   .side { display: flex; }
 }
@@ -96,6 +111,19 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
   opacity: .65;
   white-space: nowrap;
 }
+.side-tabs { display: none; gap: 6px; margin: 4px 0 6px; }
+@media (min-width: 1024px) {
+  .side-tabs { display: flex; }
+}
+.side-tab {
+  flex: 1; height: 32px; border-radius: 10px; cursor: pointer; font: inherit; font-weight: 600;
+  font-size: 12.5px; color: var(--dim); background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--edge); transition: color .15s, background .15s, border-color .15s;
+}
+.side-tab[aria-selected="true"] {
+  color: var(--accent); border-color: rgba(34, 211, 238, .55);
+  background: rgba(34, 211, 238, .10);
+}
 .side > input[type=search] { height: 36px; }
 .side .chk { font-size: 12.5px; color: var(--dim); }
 .side .row { margin: 2px 0 4px; gap: 6px; }
@@ -116,11 +144,26 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
 .blist-side .empty { padding: 18px 8px; font-size: 12.5px; }
 .bar { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; }
 .brand { flex: 1; font-weight: 700; font-size: 18px; letter-spacing: .6px; }
+/* Pastille d'état de synchronisation avec l'IA */
+.sync-dot { gap: 7px; padding: 0 11px; }
+.sync-dot .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dim); box-shadow: 0 0 0 3px rgba(138, 148, 166, .18); transition: background .2s, box-shadow .2s; flex: 0 0 auto; }
+.sync-dot .sync-txt { font-size: 12px; font-weight: 600; color: var(--dim); }
+.sync-dot[data-state="ok"] .dot { background: var(--ok); box-shadow: 0 0 0 3px rgba(52, 211, 153, .22), 0 0 10px rgba(52, 211, 153, .5); }
+.sync-dot[data-state="ok"] .sync-txt { color: var(--ok); }
+.sync-dot[data-state="stale"] .dot { background: var(--warn); box-shadow: 0 0 0 3px rgba(251, 191, 36, .22), 0 0 10px rgba(251, 191, 36, .55); }
+.sync-dot[data-state="stale"] .sync-txt { color: var(--warn); }
+.sync-dot[data-state="none"] .dot { background: var(--dim); }
+@media (max-width: 480px) {
+  .sync-dot .sync-txt { display: none; }
+  .sync-dot { min-width: 36px; padding: 0 9px; }
+}
 .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .code { flex: 1 1 auto; min-height: 130px; max-height: 46vh; max-height: 46dvh; display: flex; padding: 6px; }
 #src { flex: 1; min-width: 0; height: auto; align-self: stretch; resize: none; border: 0; outline: 0; background: transparent; color: var(--text);
   font: 12px/1.5 var(--mono); padding: 8px; white-space: pre; overflow: auto; tab-size: 2; }
 #src::placeholder { color: var(--dim); }
+/* Zoom de police de l'éditeur (piloté par une variable CSS) */
+#src { font-size: var(--src-fs, 12px); }
 .meta { display: flex; align-items: center; gap: 8px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; height: 44px; border-radius: 14px; font-size: 13px; color: var(--dim); white-space: nowrap; }
 .chip b { color: var(--text); font-weight: 600; }
@@ -132,6 +175,29 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
 .center { display: flex; justify-content: center; }
 .center.first { margin-top: auto; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* Barre d'actions principale : boutons à taille naturelle, centrés */
+.main-col > .row#2,
+.main-col > .grid {
+  justify-content: center;
+}
+.main-col > .row#2 > .btn,
+.main-col > .grid > .btn {
+  flex: 0 0 auto;
+}
+.main-col > .row#2 > .btn.hero {
+  width: auto;
+  min-width: 200px;
+  padding: 0 26px;
+}
+.main-col > .grid {
+  display: flex;
+  gap: 10px;
+}
+.main-col > .grid > .btn.small {
+  width: auto;
+  min-width: 140px;
+  padding: 0 20px;
+}
 .sig { text-align: center; font-size: 11px; letter-spacing: .5px; color: var(--dim); opacity: .55; padding: 2px 0 0; user-select: none; }
 
 /* Boutons : verre, filet lumineux, retour au toucher */
@@ -191,6 +257,24 @@ button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-
   padding-bottom: env(safe-area-inset-bottom); animation: rise .22s ease-out; }
 @keyframes rise { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 .ph { display: flex; align-items: center; gap: 8px; padding: 14px 14px 8px 18px; }
+#resp-inline { display: none; }
+@media (min-width: 1400px) {
+  #resp-inline {
+    display: flex; flex-direction: column; gap: 8px; padding: 10px;
+    position: fixed; top: 14px; right: 14px; width: 420px;
+    max-height: calc(100vh - 90px); z-index: 30;
+  }
+  #resp-inline[hidden] { display: none; }
+  #resp-inline .ri-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  #resp-inline .ri-h b { font-size: 13px; color: var(--dim); }
+  #resp-inline .ta { flex: 1 1 auto; height: auto; min-height: 180px; }
+  #resp-inline #result-inline { max-height: 40%; overflow: auto; }
+  /* 2 colonnes pour l'éditeur au-delà de 1800 px */
+  @media (min-width: 1800px) {
+    .main-col > .code { flex: 1 1 auto; }
+    .app { max-width: 1800px; }
+  }
+}
 .ph h2 { flex: 1; margin: 0; font-size: 16px; word-break: break-all; }
 .pb { overflow: auto; padding: 4px 12px 14px; -webkit-overflow-scrolling: touch; }
 
@@ -215,6 +299,18 @@ label.chk input { width: 18px; height: 18px; }
 .card { background: rgba(255, 255, 255, .06); border: 1px solid var(--edge); border-radius: 14px; padding: 10px 12px; margin: 8px 0; }
 .card .nm { font: 600 13px var(--mono); word-break: break-all; }
 .card .meta2 { color: var(--dim); font-size: 12px; margin: 2px 0 8px; }
+/* Badge d'état dans les entrées d'historique */
+.hist-badge {
+  display: inline-block; font: 600 10.5px/1 var(--mono); padding: 3px 7px; border-radius: 99px;
+  margin-right: 6px; vertical-align: middle;
+  border: 1px solid var(--edge); background: rgba(255, 255, 255, .06); color: var(--dim);
+}
+.hist-badge.ok { color: var(--ok); border-color: rgba(52, 211, 153, .5); background: rgba(52, 211, 153, .12); }
+.hist-badge.err { color: var(--err); border-color: rgba(255, 107, 122, .5); background: rgba(255, 107, 122, .12); }
+.hist-badge.mark { color: var(--warn); border-color: rgba(251, 191, 36, .5); background: rgba(251, 191, 36, .12); }
+/* Bouton de rapport d'erreur dans l'historique */
+.sm.danger { color: #ffd7dc; background: rgba(255, 107, 122, .18); border-color: rgba(255, 107, 122, .5); }
+.sm.danger:hover { border-color: rgba(255, 107, 122, .8); }
 .pick { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
 .pick input { width: 18px; height: 18px; flex: 0 0 auto; margin: 0; }
 .chipc { display: inline-block; font: 11px var(--mono); padding: 1px 7px; border-radius: 99px; background: rgba(255, 255, 255, .08); border: 1px solid var(--edge); margin-right: 6px; color: var(--dim); }
@@ -287,6 +383,7 @@ label.chk input { width: 18px; height: 18px; }
     <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
     <symbol id="i-maximize" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-panel-left" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></symbol>
   </defs>
 </svg>
 
@@ -295,16 +392,23 @@ label.chk input { width: 18px; height: 18px; }
     <div class="brand">Bcode</div>
     <button class="iconbtn" id="b-undo-top" aria-label="Annuler la dernière action"><svg class="ic"><use href="#i-undo"/></svg></button>
     <button class="iconbtn" id="b-adv"><svg class="ic"><use href="#i-sliders"/></svg>Avancé</button>
+    <button class="iconbtn sync-dot" id="b-sync-dot" aria-label="État de synchronisation IA" title="Synchronisation IA"><span class="dot"></span><span class="sync-txt"></span></button>
+    <button class="iconbtn" id="b-side-toggle" aria-pressed="false" aria-label="Masquer la liste des blocs" title="Masquer la liste des blocs"><svg class="ic"><use href="#i-panel-left"/></svg></button>
   </header>
 <aside class="glass side" id="side">
   <div class="side-h"><span>Blocs <b id="nb-side"></b></span><span class="side-hint">Ctrl+Entrée · Ctrl+S · /</span></div>
   <input type="search" id="q-side" placeholder="Rechercher un bloc…" autocomplete="off" title="Filtrer les blocs (raccourci /)">
+  <div class="side-tabs" role="tablist" aria-label="Sections de la barre latérale">
+    <button class="side-tab" role="tab" data-tab="blocs" aria-selected="true">Blocs</button>
+    <button class="side-tab" role="tab" data-tab="hist" aria-selected="false">Historique</button>
+  </div>
   <label class="chk"><input type="checkbox" id="subs-side" checked> Afficher les sous-blocs</label>
   <div class="row">
     <button class="sm primary" id="b-send-sel-side" title="Copier prompt + index + blocs cochés">Copier prompt + cochés</button>
     <button class="sm" id="b-unpick-side" title="Décocher tous les blocs">Tout décocher</button>
   </div>
   <div id="blist-side" class="blist-side"></div>
+  <div id="hlist-side" class="blist-side" hidden></div>
 </aside>
 
   <div class="main-col">
@@ -332,6 +436,7 @@ label.chk input { width: 18px; height: 18px; }
     <div class="grid">
       <button class="btn small" id="b-test"><svg class="ic"><use href="#i-play"/></svg>Tester</button>
       <button class="btn small" id="b-copy-clean"><svg class="ic"><use href="#i-file"/></svg>Code final</button>
+      <button class="iconbtn" id="b-help" aria-label="Raccourcis clavier" title="Raccourcis clavier (?)">?</button>
     </div>
 
     <div id="notifs"></div>
@@ -422,6 +527,15 @@ label.chk input { width: 18px; height: 18px; }
     </div>
   </div>
 </div>
+<aside id="resp-inline" class="glass" hidden>
+  <div class="ri-h"><b>Réponse de l'IA</b><button class="iconbtn" id="ri-close" aria-label="Masquer">×</button></div>
+  <textarea id="resp-inline-ta" class="ta" spellcheck="false" autocapitalize="off" wrap="off" placeholder="Réponse de l'IA (blocs #BLOC … #FIN)…"></textarea>
+  <div class="row">
+    <button class="sm" id="ri-paste">Coller</button>
+    <button class="sm primary" id="ri-apply">Appliquer</button>
+  </div>
+  <div id="result-inline" class="log"></div>
+</aside>
 
 <!-- ===== Voir / remplacer un bloc ===== -->
 <div class="ov" id="dlg">
@@ -432,6 +546,22 @@ label.chk input { width: 18px; height: 18px; }
       <div class="row">
         <button class="sm" id="dlg-copy">Copier</button>
         <button class="sm primary" id="dlg-ok">Remplacer</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="ov" id="help">
+  <div class="panel">
+    <div class="ph"><h2>Raccourcis & astuces</h2><button class="iconbtn" id="help-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="pb">
+      <div class="note">
+        <b>Ctrl/⌘ + Entrée</b> — Analyser ou Coller & appliquer<br>
+        <b>Ctrl/⌘ + S</b> — Télécharger le code propre<br>
+        <b>Ctrl/⌘ + Maj + S</b> — Copier le code balisé<br>
+        <b>/</b> — Chercher un bloc (focus sidebar sur desktop)<br>
+        <b>?</b> — Cette aide<br>
+        <b>Ctrl + molette</b> sur l'éditeur — Taille de police<br>
+        <b>Double-clic</b> sur une poignée — Réinitialiser la taille
       </div>
     </div>
   </div>
@@ -1558,13 +1688,25 @@ function lostSubs(oldText, newText) {
 /* Vérification du document entier : doublons de déclarations et syntaxe de chaque script */
 function checkGlobal(text) {
   const out = [];
-  const seen = new Set();
-  parseMarks(text).blocks.forEach(b => {
+  const byParent = new Map();
+  /* Un « doublon » n'en est un que si deux blocs de même nom partagent le même parent.
+     Deux sous-blocs homonymes dans des fonctions différentes sont dans des portées séparées. */
+  const all = parseMarks(text).blocks;
+  all.forEach((b, i) => {
     const m = /^(fn|class|const|let|var):(.+)#\d+$/.exec(b.name);
-    if (m && !seen.has(m[1] + ':' + m[2])) {
-      seen.add(m[1] + ':' + m[2]);
-      out.push('Doublon probable : « ' + m[2] + ' » semble déclaré plusieurs fois (' + b.name + ')');
+    if (!m) return;
+    /* Parent = bloc englobant le plus proche dans la liste (par intervalle) */
+    let parentStart = -1, parentEnd = Infinity;
+    for (const o of all) {
+      if (o === b) continue;
+      if (o.outerStart <= b.outerStart && b.outerEnd <= o.outerEnd && o.outerStart > parentStart) { parentStart = o.outerStart; parentEnd = o.outerEnd; }
     }
+    const key = m[1] + ':' + m[2] + '@' + parentStart;
+    if (!byParent.has(key)) byParent.set(key, []);
+    byParent.get(key).push(b.name);
+  });
+  byParent.forEach(names => {
+    if (names.length > 1) out.push('Doublon probable : « ' + names[0].replace(/#\d+$/, '').replace(/^[a-z]+:/, '') + ' » semble déclaré plusieurs fois (' + names.join(', ') + ')');
   });
   const src = stripMarks(text);
   let n = 0;
@@ -1655,12 +1797,14 @@ function snapMark(text, names) {
     if (!roots || roots.some(t => t.outerStart <= b.outerStart && b.outerEnd <= t.outerEnd)) aiSnap[b.name] = ownHash(text, b, A);
   });
   saveSnap();
+  if (typeof updateSyncDot === 'function') updateSyncDot();
 }
 /* Après application d'une réponse : l'IA connaît les blocs qu'elle a écrits ; ceux qui ont disparu sont oubliés */
 function snapApply(before, after, names) {
   const now = new Set(parseMarks(after).blocks.map(b => b.name));
   parseMarks(before).blocks.forEach(b => { if (!now.has(b.name)) delete aiSnap[b.name]; });
   snapMark(after, names);
+  if (typeof updateSyncDot === 'function') updateSyncDot();
 }
 /* Blocs modifiés ou ajoutés depuis ce que l'IA connaît, et blocs disparus */
 function changedBlocks(text) {
@@ -1867,11 +2011,44 @@ function refresh() {
   lastMarkErr = sig;
   renderBlocks(pm);
   renderHistory();
+  updateSyncDot();
 }
 /* Bouton principal : « Analyser » tant que le code n'est pas balisé, puis « Coller & appliquer » */
 function syncMainBtn(nBlocks) {
   $('b-main-t').textContent = nBlocks ? 'Coller & appliquer' : 'Analyser';
 }
+/* Pastille d'état : à jour (ok), modifs en attente (stale), jamais envoyé (none) */
+function updateSyncDot() {
+  const btn = $('b-sync-dot');
+  if (!btn) return;
+  const txt = btn.querySelector('.sync-txt');
+  const src = $('src').value;
+  const hasCode = parseMarks(src).blocks.length > 0;
+  let state = 'none', label = '';
+  if (!hasCode) {
+    state = 'none'; label = 'Aucun code balisé';
+  } else if (!Object.keys(aiSnap).length) {
+    state = 'none'; label = 'Jamais envoyé à l\'IA — cliquez pour copier';
+  } else {
+    const { changed, gone } = changedBlocks(src);
+    const n = topBlocks(changed).length + gone.length;
+    if (n === 0) { state = 'ok'; label = 'IA à jour'; }
+    else { state = 'stale'; label = n + ' bloc' + (n > 1 ? 's' : '') + ' modifié' + (n > 1 ? 's' : '') + ' — cliquez pour synchroniser'; }
+  }
+  btn.dataset.state = state;
+  btn.title = label;
+  btn.setAttribute('aria-label', label);
+  if (txt) txt.textContent = state === 'ok' ? 'À jour' : state === 'stale' ? 'Modifs' : 'IA';
+}
+$('b-sync-dot').addEventListener('click', () => {
+  const src = $('src').value;
+  if (!parseMarks(src).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'warn' }); return; }
+  if (!Object.keys(aiSnap).length) { copyAllForAI(); return; }
+  const { changed, gone } = changedBlocks(src);
+  if (!topBlocks(changed).length && !gone.length) { notify('L\'IA est à jour ✓', { kind: 'ok' }); return; }
+  copyChanged();
+});
+updateSyncDot();
 
 function renderBlocks(pm) {
   pm = pm || parseMarks($('src').value);
@@ -1945,11 +2122,13 @@ function renderBlocksSide(pm) {
 function renderHistory() {
   const box = $('hlist');
   if (!hist.length) { box.innerHTML = '<div class="empty">Aucune version enregistrée.</div>'; return; }
-  box.innerHTML = hist.map((h, i) => ({ h, i })).reverse().map(({ h, i }) =>
-    '<div class="card"><div class="nm">' + esc(h.label) + '</div><div class="meta2">' +
-    new Date(h.t).toLocaleString('fr-FR') + ' · ' + h.text.split('\n').length + ' lignes · ' + Math.round(h.text.length / 1024) + ' Ko</div>' +
-    '<div class="acts" data-i="' + i + '"><button class="sm primary" data-a="restore">Restaurer</button>' +
-    '<button class="sm" data-a="hcopy">Copier</button></div></div>').join('');
+  box.innerHTML = hist.map((h, i) => ({ h, i })).reverse().map(({ h, i }) => {
+    const st = histStatus(h);
+    return '<div class="card"><div class="nm">' + esc(h.label) + '</div><div class="meta2">' +
+      '<span class="hist-badge ' + st.kind + '"' + (st.title ? ' title="' + esc(st.title) + '"' : '') + '>' + esc(st.label) + '</span>' +
+      new Date(h.t).toLocaleString('fr-FR') + ' · ' + h.text.split('\n').length + ' lignes · ' + Math.round(h.text.length / 1024) + ' Ko</div>' +
+      histActions(h, i) + '</div>';
+  }).join('');
 }
 
 /* ---------- Diff ---------- */
@@ -2386,14 +2565,15 @@ function init() {
   });
   $('b-send-sel').onclick = copyPicked;
   $('b-unpick').onclick = () => { picked.clear(); renderBlocks(); };
-  $('hlist').addEventListener('click', e => {
-    const btn = e.target.closest('button[data-a]');
-    if (!btn) return;
-    const h = hist[+btn.parentElement.dataset.i];
-    if (!h) return;
-    if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
-    else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); }
-  });
+$('hlist').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-a]');
+  if (!btn) return;
+  const h = hist[+btn.parentElement.dataset.i];
+  if (!h) return;
+  if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
+  else if (btn.dataset.a === 'report') copyText(histReport(h), 'Rapport d\'erreurs copié — collez-le à l\'IA ✓');
+  else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); }
+});
 
   /* Avancé › Outils */
   $('snd').checked = soundOn;
@@ -2544,6 +2724,179 @@ $('b-test').addEventListener('click', () => {
 });
 try { $('copyfinal').checked = localStorage.getItem('blocs.copyfinal') === '1'; } catch (_) { }
 $('copyfinal').addEventListener('change', e => { try { localStorage.setItem('blocs.copyfinal', e.target.checked ? '1' : '0'); } catch (_) { } });
+/* ---------- Onglets de la sidebar : Blocs / Historique ---------- */
+function initSideTabs() {
+  const bar = document.querySelector('.side-tabs');
+  if (!bar) return;
+  const blist = $('blist-side'), hlist = $('hlist-side');
+  const tabs = bar.querySelectorAll('.side-tab');
+  const show = which => {
+    tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.tab === which ? 'true' : 'false'));
+    if (blist) blist.hidden = which !== 'blocs';
+    if (hlist) hlist.hidden = which !== 'hist';
+    if (which === 'hist') renderHistSide();
+  };
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+  show('blocs');
+}
+/* Rendu de l'historique dans la sidebar desktop */
+function renderHistSide() {
+  const box = $('hlist-side');
+  if (!box) return;
+  if (!hist.length) { box.innerHTML = '<div class="empty">Aucune version enregistrée.</div>'; return; }
+  box.innerHTML = hist.map((h, i) => ({ h, i })).reverse().map(({ h, i }) => {
+    const st = histStatus(h);
+    return '<div class="card"><div class="nm">' + esc(h.label) + '</div>' +
+      '<div class="meta2"><span class="hist-badge ' + st.kind + '"' + (st.title ? ' title="' + esc(st.title) + '"' : '') + '>' + esc(st.label) + '</span>' +
+      new Date(h.t).toLocaleString('fr-FR') + ' · ' + h.text.split('\n').length + ' lignes</div>' +
+      histActions(h, i) + '</div>';
+  }).join('');
+}
+/* État d'une version d'historique : null si OK, sinon message ; plus les marqueurs incohérents */
+function histStatus(h) {
+  const text = h.text || '';
+  const pm = parseMarks(text);
+  const markBad = pm.errors.length > 0;
+  const codes = checkGlobal(text);
+  if (!markBad && !codes.length) return { kind: 'ok', label: 'OK' };
+  const parts = [];
+  if (markBad) parts.push('marqueurs');
+  if (codes.length) parts.push(codes.length + ' erreur' + (codes.length > 1 ? 's' : ''));
+  return { kind: markBad ? 'mark' : 'err', label: parts.join(' · '), title: (markBad ? 'Marqueurs incohérents · ' : '') + codes.slice(0, 3).join(' — ') };
+}
+/* Construit un rapport d'erreurs prêt à coller dans l'IA pour une version de l'historique */
+function histReport(h) {
+  const text = h.text || '';
+  const pm = parseMarks(text);
+  const codes = checkGlobal(text);
+  const lines = [];
+  lines.push('Version d\'historique « ' + h.label + ' » (' + new Date(h.t).toLocaleString('fr-FR') + ') en erreur.');
+  if (pm.errors.length) {
+    lines.push('');
+    lines.push('Marqueurs incohérents :');
+    pm.errors.forEach(e => lines.push('- ' + e));
+  }
+  if (codes.length) {
+    lines.push('');
+    lines.push('Erreurs JS détectées :');
+    codes.slice(0, 6).forEach(c => lines.push('- ' + c));
+    if (codes.length > 6) lines.push('- … (' + (codes.length - 6) + ' autres)');
+  }
+  lines.push('');
+  lines.push('Corrige uniquement ce qui provoque ces erreurs, sans refactoriser, et renvoie seulement les blocs modifiés, complets, avec les mêmes marqueurs #BLOC/#FIN, dans un seul bloc de code.');
+  lines.push('');
+  lines.push(buildIndex(text));
+  return lines.join('\n');
+}
+/* Renvoie le HTML des boutons d'action d'une entrée d'historique (avec bouton de rapport si erreurs) */
+function histActions(h, i) {
+  const st = histStatus(h);
+  let html = '<div class="acts" data-i="' + i + '">' +
+    '<button class="sm primary" data-a="restore">Restaurer</button>' +
+    '<button class="sm" data-a="hcopy">Copier</button>';
+  if (st.kind !== 'ok') html += '<button class="sm danger" data-a="report">📨 Rapport IA</button>';
+  html += '</div>';
+  return html;
+}
+$('hlist-side').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-a]');
+  if (!btn) return;
+  const h = hist[+btn.parentElement.dataset.i];
+  if (!h) return;
+  if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
+  else if (btn.dataset.a === 'report') copyText(histReport(h), 'Rapport d\'erreurs copié — collez-le à l\'IA ✓');
+  else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); renderHistSide(); }
+});
+/* ---------- Aide raccourcis ---------- */
+function initHelp() {
+  const btn = $('b-help');
+  if (btn) btn.addEventListener('click', () => openOv('help'));
+  const x = $('help-x');
+  if (x) x.addEventListener('click', () => closeOv('help'));
+  const ov = $('help');
+  if (ov) ov.addEventListener('click', e => { if (e.target === ov) closeOv('help'); });
+  document.addEventListener('keydown', e => {
+    if (e.key !== '?' || e.ctrlKey || e.metaKey) return;
+    const ae = document.activeElement, tag = (ae && ae.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (ae && ae.isContentEditable)) return;
+    e.preventDefault();
+    openOv('help');
+  });
+}
+/* ---------- Réponse IA en colonne latérale (grand écran) ---------- */
+function initRespInline() {
+  const pane = $('resp-inline');
+  if (!pane) return;
+  const KEY = 'blocs.splitresp', ta = $('resp-inline-ta');
+  let on = false;
+  try { on = localStorage.getItem(KEY) === '1'; } catch (e) { /* stockage indisponible */ }
+  const apply = v => {
+    pane.hidden = !v;
+    const cb = $('split-resp');
+    if (cb) cb.checked = v;
+  };
+  apply(on);
+  const cb = $('split-resp');
+  if (cb) cb.addEventListener('change', e => {
+    on = e.target.checked;
+    apply(on);
+    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (err) { }
+  });
+  const x = $('ri-close');
+  if (x) x.addEventListener('click', () => { apply(false); try { localStorage.setItem(KEY, '0'); } catch (e) { } });
+  const paste = $('ri-paste');
+  if (paste) paste.addEventListener('click', async () => {
+    const t = await readClip(); if (t !== null) { ta.value = t; notify('Collé ✓', { kind: 'ok' }); }
+  });
+  const apply2 = $('ri-apply');
+  if (apply2) apply2.addEventListener('click', () => {
+    $('resp').value = ta.value;
+    runResponse(true);
+  });
+}
+/* ---------- Zoom de police de l'éditeur (Ctrl + molette) ---------- */
+function initEditorZoom() {
+  const ta = $('src');
+  if (!ta) return;
+  const KEY = 'blocs.srcfs';
+  let fs = 12;
+  try { const v = parseFloat(localStorage.getItem(KEY)); if (v >= 10 && v <= 22) fs = v; } catch (e) { /* stockage indisponible */ }
+  const apply = v => { fs = Math.max(10, Math.min(22, v)); ta.style.setProperty('--src-fs', fs + 'px'); };
+  apply(fs);
+  ta.addEventListener('wheel', e => {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    e.preventDefault();
+    apply(fs + (e.deltaY < 0 ? 1 : -1));
+    try { localStorage.setItem(KEY, String(fs)); } catch (err) { }
+  }, { passive: false });
+}
+initSideTabs();
+initHelp();
+initRespInline();
+initEditorZoom();
+/* ---------- Barre latérale masquable (desktop) ---------- */
+function initSideToggle() {
+  const app = document.querySelector('.app');
+  const btn = $('b-side-toggle');
+  if (!app || !btn) return;
+  const KEY = 'blocs.sideoff';
+  let off = false;
+  try { off = localStorage.getItem(KEY) === '1'; } catch (e) { /* stockage indisponible */ }
+  const apply = v => {
+    app.classList.toggle('side-off', v);
+    const label = v ? 'Afficher la liste des blocs' : 'Masquer la liste des blocs';
+    btn.setAttribute('aria-pressed', v ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  };
+  apply(off);
+  btn.addEventListener('click', () => {
+    off = !off;
+    apply(off);
+    try { localStorage.setItem(KEY, off ? '1' : '0'); } catch (e) { /* stockage indisponible */ }
+  });
+}
+initSideToggle();
 
 </script>
 <script>
