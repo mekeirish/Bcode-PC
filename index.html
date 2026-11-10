@@ -27,67 +27,201 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
 .app { min-height: 100vh; min-height: 100dvh; max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px;
   padding: max(10px, env(safe-area-inset-top)) 12px max(8px, env(safe-area-inset-bottom)); }
 .main-col { display: contents; }
-
-/* ---------- Notifications : tiroir mobile / colonne desktop ---------- */
-#npane {
-  display: none;
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  max-height: 60vh;
-  z-index: 45;
-  flex-direction: column;
-  background: rgba(14, 17, 25, .96);
-  border: 1px solid var(--edge);
-  border-bottom: 0;
-  border-top-color: rgba(34, 211, 238, .30);
-  border-radius: 16px 16px 0 0;
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
-  backdrop-filter: blur(22px) saturate(150%);
-  box-shadow: 0 -8px 28px rgba(0, 0, 0, .5);
-  padding-bottom: env(safe-area-inset-bottom);
-  animation: npane-rise .2s ease-out;
+@media (min-width: 1024px) {
+  .app {
+    max-width: 1440px;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "header header"
+      "side   main"
+      "footer footer";
+    column-gap: 14px;
+    row-gap: 12px;
+    padding: 14px;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  /* Barre latérale masquée : le contenu occupe toute la largeur */
+  .app.side-off {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "header"
+      "main"
+      "footer";
+  }
+  .app.side-off > .side { display: none; }
+  .app > header { grid-area: header; }
+  .app > .side { grid-area: side; }
+  .app > .main-col {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    overflow: auto;
+    padding-right: 2px;
+  }
+  .app > footer { grid-area: footer; }
+  .main-col > .code {
+    flex: 1 1 auto;
+    min-height: 200px;
+    max-height: none;
+  }
+  .main-col > .row,
+  .main-col > .grid { flex: 0 0 auto; }
+  .main-col > #notifs { flex: 0 0 auto; }
+.main-col > #npane { display: none; }
+@media (min-width: 1024px) {
+  .app {
+    max-width: 1440px;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr) 300px;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "header header header"
+      "side   main   npane"
+      "footer footer footer";
+    column-gap: 14px;
+    row-gap: 12px;
+    padding: 14px;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  .app.side-off {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-areas:
+      "header header"
+      "main   npane"
+      "footer footer";
+  }
+  .app > header { grid-area: header; }
+  .app > .side { grid-area: side; }
+  .app > .main-col {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    overflow: auto;
+    padding-right: 2px;
+  }
+  .app > footer { grid-area: footer; }
+  .main-col > .code {
+    flex: 1 1 auto;
+    min-height: 200px;
+    max-height: none;
+  }
+  .main-col > .row,
+  .main-col > .grid { flex: 0 0 auto; }
+  .main-col > #notifs { flex: 0 0 auto; }
+  .main-col > #npane { display: none; }
+  .app > #npane {
+    grid-area: npane;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    align-self: stretch;
+    background: var(--glass);
+    border: 1px solid var(--edge);
+    border-top-color: rgba(34, 211, 238, .30);
+    border-radius: 16px;
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .08);
+  }
+  .app.side-off > .main-col { grid-area: main; }
 }
-#npane.open { display: flex; }
-@keyframes npane-rise { from { transform: translateY(100%); } to { transform: none; } }
-
-.npane-h { display: flex; align-items: center; gap: 8px; padding: 12px 12px 10px 16px; border-bottom: 1px solid var(--edge); flex: 0 0 auto; }
+.npane-h {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 12px 10px 16px;
+  border-bottom: 1px solid var(--edge);
+  flex: 0 0 auto;
+}
 .npane-h b { flex: 1; font-size: 14px; }
-.npane-body { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 6px; padding: 10px; -webkit-overflow-scrolling: touch; }
+.npane-body {
+  flex: 1 1 auto; min-height: 0; overflow: auto;
+  display: flex; flex-direction: column; gap: 6px; padding: 10px;
+  -webkit-overflow-scrolling: touch;
+}
 .npane-body .empty { padding: 22px 8px; font-size: 12.5px; }
-
-/* Bouton de notifications (mobile uniquement) */
-#b-notif-toggle { display: inline-flex; gap: 6px; }
-#b-notif-toggle .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dim); box-shadow: 0 0 0 3px rgba(138, 148, 166, .18); transition: background .2s, box-shadow .2s; flex: 0 0 auto; }
-#b-notif-toggle[data-state="has"] .dot { background: var(--warn); box-shadow: 0 0 0 3px rgba(251, 191, 36, .22), 0 0 10px rgba(251, 191, 36, .55); }
-#b-notif-toggle .nt-count { font-size: 12px; font-weight: 600; color: var(--dim); }
-#b-notif-toggle[data-state="has"] .nt-count { color: var(--warn); }
-
+}
 /* ---------- Sidebar (desktop) ---------- */
-.side { display: none; flex-direction: column; gap: 8px; padding: 12px; overflow: auto; min-height: 0; }
+.side {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  overflow: auto;
+  min-height: 0;
+}
+/* Bouton d'affichage de la barre latérale : visible seulement quand elle existe (desktop) */
 #b-side-toggle { display: none; }
 #b-side-toggle[aria-pressed="true"] { color: var(--accent); border-color: rgba(34, 211, 238, .45); }
-
-.side-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-weight: 600; font-size: 14px; padding: 2px 2px 8px; border-bottom: 1px solid var(--edge); }
+@media (min-width: 1024px) {
+  #b-side-toggle { display: inline-flex; }
+}
+@media (min-width: 1024px) {
+  .side { display: flex; }
+}
+.side-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 2px 2px 8px;
+  border-bottom: 1px solid var(--edge);
+}
 .side-h b { color: var(--dim); font-weight: 500; font-size: 12px; }
-.side-hint { color: var(--dim); font-size: 10.5px; font-weight: 400; opacity: .65; white-space: nowrap; }
+.side-hint {
+  color: var(--dim);
+  font-size: 10.5px;
+  font-weight: 400;
+  opacity: .65;
+  white-space: nowrap;
+}
 .side-tabs { display: none; gap: 6px; margin: 4px 0 6px; }
-.side-tab { flex: 1; height: 32px; border-radius: 10px; cursor: pointer; font: inherit; font-weight: 600; font-size: 12.5px; color: var(--dim); background: rgba(255, 255, 255, .06); border: 1px solid var(--edge); transition: color .15s, background .15s, border-color .15s; }
-.side-tab[aria-selected="true"] { color: var(--accent); border-color: rgba(34, 211, 238, .55); background: rgba(34, 211, 238, .10); }
+@media (min-width: 1024px) {
+  .side-tabs { display: flex; }
+}
+.side-tab {
+  flex: 1; height: 32px; border-radius: 10px; cursor: pointer; font: inherit; font-weight: 600;
+  font-size: 12.5px; color: var(--dim); background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--edge); transition: color .15s, background .15s, border-color .15s;
+}
+.side-tab[aria-selected="true"] {
+  color: var(--accent); border-color: rgba(34, 211, 238, .55);
+  background: rgba(34, 211, 238, .10);
+}
 .side > input[type=search] { height: 36px; }
 .side .chk { font-size: 12.5px; color: var(--dim); }
 .side .row { margin: 2px 0 4px; gap: 6px; }
 .side .sm { height: 34px; font-size: 12px; padding: 0 10px; }
-.blist-side { display: flex; flex-direction: column; gap: 6px; overflow: auto; min-height: 0; flex: 1 1 auto; padding-right: 2px; }
+.blist-side {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding-right: 2px;
+}
 .blist-side .card { margin: 0; padding: 8px 10px; }
 .blist-side .card .nm { font-size: 12px; }
 .blist-side .card .meta2 { margin: 2px 0 6px; font-size: 11px; }
 .blist-side .sm { height: 30px; padding: 0 8px; font-size: 11.5px; }
 .blist-side .empty { padding: 18px 8px; font-size: 12.5px; }
-
 .bar { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; }
 .brand { flex: 1; font-weight: 700; font-size: 18px; letter-spacing: .6px; }
-
-/* Pastille de synchronisation IA */
+/* Pastille d'état de synchronisation avec l'IA */
 .sync-dot { gap: 7px; padding: 0 11px; }
 .sync-dot .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dim); box-shadow: 0 0 0 3px rgba(138, 148, 166, .18); transition: background .2s, box-shadow .2s; flex: 0 0 auto; }
 .sync-dot .sync-txt { font-size: 12px; font-weight: 600; color: var(--dim); }
@@ -105,6 +239,7 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
 #src { flex: 1; min-width: 0; height: auto; align-self: stretch; resize: none; border: 0; outline: 0; background: transparent; color: var(--text);
   font: 12px/1.5 var(--mono); padding: 8px; white-space: pre; overflow: auto; tab-size: 2; }
 #src::placeholder { color: var(--dim); }
+/* Zoom de police de l'éditeur (piloté par une variable CSS) */
 #src { font-size: var(--src-fs, 12px); }
 .meta { display: flex; align-items: center; gap: 8px; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; height: 44px; border-radius: 14px; font-size: 13px; color: var(--dim); white-space: nowrap; }
@@ -118,15 +253,15 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
 .center.first { margin-top: auto; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 /* Barre d'actions principale : boutons à taille naturelle, centrés */
-.main-col > .row,
+.main-col > .row#2,
 .main-col > .grid {
   justify-content: center;
 }
-.main-col > .row > .btn,
+.main-col > .row#2 > .btn,
 .main-col > .grid > .btn {
   flex: 0 0 auto;
 }
-.main-col > .row > .btn.hero {
+.main-col > .row#2 > .btn.hero {
   width: auto;
   min-width: 200px;
   padding: 0 26px;
@@ -174,12 +309,18 @@ button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-
   background: rgba(24, 27, 40, .78); border: 1px solid var(--edge); border-left: 3px solid var(--accent);
   -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%);
   box-shadow: 0 6px 18px rgba(0, 0, 0, .4); opacity: 0; transform: translateY(-6px) scale(.98); transition: .2s; }
+/* ---------- Notifications (sous les boutons, au-dessus de la signature) ---------- */
 #notifs { display: flex; flex-direction: column; gap: 6px; }
+@media (min-width: 1024px) {
+  .main-col > #notifs { display: none; }
+}
+/* Rapport déjà copié : notification discrète et validée */
 .notif.done { border-left-color: var(--ok); opacity: .62; }
 .app:has(.tpane.open.fullscreen) #npane { display: none; }
 .notif.done .nmsg::before { content: "✓ "; color: var(--ok); font-weight: 700; }
 .notif.done .nact { opacity: .7; }
 #notifs:empty { display: none; }
+/* Test plein écran : les notifications repassent en haut de l'écran */
 .app:has(.tpane.open.fullscreen) #notifs { position: fixed; z-index: 100; top: max(10px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
   width: min(94vw, 540px); }
 .notif.in { opacity: 1; transform: none; }
@@ -201,21 +342,26 @@ button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-
   padding-bottom: env(safe-area-inset-bottom); animation: rise .22s ease-out; }
 @keyframes rise { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 .ph { display: flex; align-items: center; gap: 8px; padding: 14px 14px 8px 18px; }
-.ph h2 { flex: 1; margin: 0; font-size: 16px; word-break: break-all; }
-.pb { overflow: auto; padding: 4px 12px 14px; -webkit-overflow-scrolling: touch; }
-
 #resp-inline { display: none; }
 @media (min-width: 1400px) {
-  #resp-inline:not([hidden]) {
+  #resp-inline {
     display: flex; flex-direction: column; gap: 8px; padding: 10px;
     position: fixed; top: 14px; right: 14px; width: 420px;
     max-height: calc(100vh - 90px); z-index: 30;
   }
+  #resp-inline[hidden] { display: none; }
   #resp-inline .ri-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   #resp-inline .ri-h b { font-size: 13px; color: var(--dim); }
   #resp-inline .ta { flex: 1 1 auto; height: auto; min-height: 180px; }
   #resp-inline #result-inline { max-height: 40%; overflow: auto; }
+  /* 2 colonnes pour l'éditeur au-delà de 1800 px */
+  @media (min-width: 1800px) {
+    .main-col > .code { flex: 1 1 auto; }
+    .app { max-width: 1800px; }
+  }
 }
+.ph h2 { flex: 1; margin: 0; font-size: 16px; word-break: break-all; }
+.pb { overflow: auto; padding: 4px 12px 14px; -webkit-overflow-scrolling: touch; }
 
 .acc { margin: 8px 0; border: 1px solid var(--edge); border-radius: 16px; background: rgba(255, 255, 255, .05); }
 .acc > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; font-weight: 600; }
@@ -238,11 +384,16 @@ label.chk input { width: 18px; height: 18px; }
 .card { background: rgba(255, 255, 255, .06); border: 1px solid var(--edge); border-radius: 14px; padding: 10px 12px; margin: 8px 0; }
 .card .nm { font: 600 13px var(--mono); word-break: break-all; }
 .card .meta2 { color: var(--dim); font-size: 12px; margin: 2px 0 8px; }
-.hist-badge { display: inline-block; font: 600 10.5px/1 var(--mono); padding: 3px 7px; border-radius: 99px; margin-right: 6px; vertical-align: middle;
-  border: 1px solid var(--edge); background: rgba(255, 255, 255, .06); color: var(--dim); }
+/* Badge d'état dans les entrées d'historique */
+.hist-badge {
+  display: inline-block; font: 600 10.5px/1 var(--mono); padding: 3px 7px; border-radius: 99px;
+  margin-right: 6px; vertical-align: middle;
+  border: 1px solid var(--edge); background: rgba(255, 255, 255, .06); color: var(--dim);
+}
 .hist-badge.ok { color: var(--ok); border-color: rgba(52, 211, 153, .5); background: rgba(52, 211, 153, .12); }
 .hist-badge.err { color: var(--err); border-color: rgba(255, 107, 122, .5); background: rgba(255, 107, 122, .12); }
 .hist-badge.mark { color: var(--warn); border-color: rgba(251, 191, 36, .5); background: rgba(251, 191, 36, .12); }
+/* Bouton de rapport d'erreur dans l'historique */
 .sm.danger { color: #ffd7dc; background: rgba(255, 107, 122, .18); border-color: rgba(255, 107, 122, .5); }
 .sm.danger:hover { border-color: rgba(255, 107, 122, .8); }
 .pick { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
@@ -266,10 +417,12 @@ label.chk input { width: 18px; height: 18px; }
 #tframe { width: 100%; height: 46vh; border: 1px solid var(--edge); border-radius: 12px; background: #fff; margin-top: 8px; }
 .tpane { display: none; }
 .tpane.open { display: block; }
+/* Test en plein écran */
 .tpane.open.fullscreen { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; border-radius: 0; background: var(--bg);
   padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
 .tpane.open.fullscreen .pb { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .tpane.open.fullscreen #tframe { flex: 1; height: auto; min-height: 0; }
+/* Test immersif : plein écran sans aucune bordure (comme dans la PWA réelle) */
 .tpane.open.fullscreen.immersive { border: 0; border-radius: 0; box-shadow: none; padding: 0; background: #000;
   -webkit-backdrop-filter: none; backdrop-filter: none; }
 .tpane.open.fullscreen.immersive .pb { padding: 0; }
@@ -281,84 +434,24 @@ label.chk input { width: 18px; height: 18px; }
 .tpane.open.fullscreen.immersive .ph h2 { display: none; }
 .tpane.open.fullscreen.immersive .ph .iconbtn { opacity: .35; height: 36px; min-width: 36px; padding: 0 8px; border-radius: 50%; }
 .tpane.open.fullscreen.immersive .ph #t-fs { display: none; }
-
-/* ---------- Desktop (>= 1024px) : grille 3 colonnes ---------- */
-@media (min-width: 1024px) {
-  #b-notif-toggle { display: none; }
-
-  .app {
-    max-width: 1440px;
-    min-height: 0;
-    display: grid;
-    grid-template-columns: 320px minmax(0, 1fr) 300px;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      "header header header"
-      "side   main   npane"
-      "footer footer footer";
-    column-gap: 14px;
-    row-gap: 12px;
-    padding: 14px;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-  }
-  .app.side-off {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    grid-template-areas:
-      "header header"
-      "main   npane"
-      "footer footer";
-  }
-  .app > header { grid-area: header; }
-  .app > .side { grid-area: side; display: flex; }
-  .app > .main-col {
-    grid-area: main;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-height: 0;
-    overflow: auto;
-    padding-right: 2px;
-  }
-  .app > footer { grid-area: footer; }
-  .app.side-off > .side { display: none; }
-  .main-col > .code { flex: 1 1 auto; min-height: 200px; max-height: none; }
-  .main-col > .row,
-  .main-col > .grid { flex: 0 0 auto; }
-  .main-col > #notifs { display: none; }
-
-  /* Notifications : colonne droite, toujours visible */
-  .app > #npane,
-  .app > #npane.open {
-    position: static;
-    display: flex;
-    max-height: none;
-    padding-bottom: 0;
-    animation: none;
-    grid-area: npane;
-    min-height: 0;
-    overflow: hidden;
-    align-self: stretch;
-    background: var(--glass);
-    border: 1px solid var(--edge);
-    border-top-color: rgba(34, 211, 238, .30);
-    border-radius: 16px;
-    box-shadow: 0 8px 28px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .08);
-  }
-
-  #b-side-toggle { display: inline-flex; }
-  .side-tabs { display: flex; }
-}
-@media (min-width: 1800px) {
-  .app { max-width: 1800px; }
-}
 </style>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="manifest" href="./manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="./icon.png">
+<link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./splash-1242x2208.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./splash-750x1334.png">
+<link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./splash-640x1136.png">
 </head>
 <body>
 
@@ -385,7 +478,7 @@ label.chk input { width: 18px; height: 18px; }
     <button class="iconbtn" id="b-undo-top" aria-label="Annuler la dernière action"><svg class="ic"><use href="#i-undo"/></svg></button>
     <button class="iconbtn" id="b-adv"><svg class="ic"><use href="#i-sliders"/></svg>Avancé</button>
     <button class="iconbtn sync-dot" id="b-sync-dot" aria-label="État de synchronisation IA" title="Synchronisation IA"><span class="dot"></span><span class="sync-txt"></span></button>
-    <button class="iconbtn" id="b-notif-toggle" aria-label="Notifications" title="Notifications"><span class="dot"></span><span class="nt-count"></span></button>
+<button class="iconbtn" id="b-notif-toggle" aria-pressed="false" aria-label="Notifications" title="Notifications"><span class="dot"></span><span class="nt-count"></span></button>
     <button class="iconbtn" id="b-side-toggle" aria-pressed="false" aria-label="Masquer la liste des blocs" title="Masquer la liste des blocs"><svg class="ic"><use href="#i-panel-left"/></svg></button>
   </header>
 <aside class="glass side" id="side">
@@ -559,26 +652,33 @@ label.chk input { width: 18px; height: 18px; }
         <b>Ctrl/⌘ + Maj + S</b> — Copier le code balisé<br>
         <b>/</b> — Chercher un bloc (focus sidebar sur desktop)<br>
         <b>?</b> — Cette aide<br>
-        <b>Ctrl + molette</b> sur l'éditeur — Taille de police
+        <b>Ctrl + molette</b> sur l'éditeur — Taille de police<br>
+        <b>Double-clic</b> sur une poignée — Réinitialiser la taille
       </div>
     </div>
   </div>
 </div>
 
+<!-- ===== Test de l'appli ===== -->
+
 <script>
 /* ================================================================
    01 — Utilitaires + lexer JavaScript léger
+   (gère chaînes, templates imbriqués, regex, commentaires)
    ================================================================ */
 'use strict';
 
+/* ---------- Marqueurs ---------- */
 const MARK_SRC = '(?:\\/\\*|<!--)#(?:BLOC|FIN):[^\\s*<>]+?(?:\\*\\/|-->)';
 
+/* Retire tous les marqueurs BLOC/FIN et restitue le texte d'origine à l'identique */
 function stripMarks(text) {
   return text
     .replace(new RegExp('^[ \\t]*' + MARK_SRC + '[ \\t]*\\r?\\n', 'gm'), '')
     .replace(new RegExp(MARK_SRC, 'g'), '');
 }
 
+/* ---------- Noms ---------- */
 function sanitizeName(s, max = 44) {
   s = String(s)
     .replace(/\s+/g, '_')
@@ -590,6 +690,7 @@ function sanitizeName(s, max = 44) {
   return s || 'x';
 }
 
+/* Rend les noms uniques (parcours dans l'ordre du document) : nom, nom#2, nom#3 … */
 function uniqueNames(blocks) {
   const seen = new Map();
   (function walk(list) {
@@ -602,6 +703,9 @@ function uniqueNames(blocks) {
   })(blocks);
 }
 
+/* ---------- Commentaires attachés au-dessus d'un bloc ----------
+   Un commentaire sur sa propre ligne, collé au bloc (pas de ligne vide entre
+   les deux), fait partie du bloc. Retourne la position de début. */
 function attachLead(src, from, to, js) {
   const pieces = [];
   let i = from;
@@ -642,9 +746,10 @@ function attachLead(src, from, to, js) {
   return lead;
 }
 
+/* ---------- Lexer JS ---------- */
 const KW_BEFORE_REGEX = new Set(['return', 'typeof', 'case', 'in', 'of', 'delete', 'void', 'throw', 'new', 'else', 'do', 'yield', 'await', 'instanceof']);
 const RE_PUNCT = /=>|\.\.\.|\?\?=?|\?\.|\|\|=?|&&=?|\*\*=?|[=!]==?|<<=?|>>>?=?|\+\+|--|[-+*\/%&|^<>]=?|[?:.,;~!=@{}()\[\]]/y;
-const RE_IDENT = /#?[\p{L}_$][\p{L}\p{N}_$]*/uy;
+const RE_IDENT = /#?[\p{L}_$][\p{L}\p{N}_$‌‍]*/uy;
 const RE_NUM = /\d[\w.]*/y;
 
 function regexAllowed(prev) {
@@ -684,6 +789,7 @@ function skipTemplate(src, i, end) {
   return end;
 }
 
+/* Découpe src[i..end) en tokens. inTpl = on est dans un ${ … } : on s'arrête à l'accolade fermante. */
 function lex(src, i, end, inTpl) {
   const toks = [];
   let depth = 0, prev = null;
@@ -753,6 +859,7 @@ function lex(src, i, end, inTpl) {
   return { toks, pos: i };
 }
 
+/* Tokens significatifs + table d'appariement des (), [], {} */
 function buildSig(toks) {
   const sig = [];
   let nl = false;
@@ -777,9 +884,8 @@ function buildSig(toks) {
   });
   return { sig, mt, unbalanced: st.length + stray };
 }
-
 /* ================================================================
-   02 — Découpage du JavaScript
+   02 — Découpage du JavaScript en instructions / blocs
    ================================================================ */
 
 const NO_END = new Set(['typeof', 'new', 'delete', 'void', 'in', 'instanceof', 'of', 'await', 'yield', 'extends', 'case', 'throw', 'else', 'do', 'return']);
@@ -791,6 +897,7 @@ function closeOf(ctx, k) {
   return m >= 0 ? m : ctx.sig.length - 1;
 }
 
+/* Le jeton précédent peut-il terminer une instruction ? */
 function canEnd(t) {
   if (!t) return false;
   if (t.t === 'id') return !NO_END.has(t.v);
@@ -799,6 +906,8 @@ function canEnd(t) {
   return false;
 }
 
+/* Le jeton suivant (sur une nouvelle ligne) peut-il commencer une instruction ?
+   Règles JS : ( [ ` . + - etc. continuent l'instruction précédente. */
 function canStart(t) {
   if (t.t === 'id') return !NO_START.has(t.v);
   if (t.t === 'num' || t.t === 'str') return true;
@@ -806,6 +915,7 @@ function canStart(t) {
   return false;
 }
 
+/* Fin d'une instruction « simple » (expression, déclaration de variable…) */
 function genericEnd(ctx, j, b) {
   const { sig } = ctx;
   let k = j;
@@ -819,6 +929,7 @@ function genericEnd(ctx, j, b) {
   return Math.min(k, b);
 }
 
+/* Premier « { » de corps (fonction/classe) en sautant les groupes ( ) [ ] */
 function bodyBrace(ctx, k, b) {
   const { sig } = ctx;
   while (k < b && !(sig[k].t === 'p' && sig[k].v === '{')) {
@@ -828,6 +939,7 @@ function bodyBrace(ctx, k, b) {
   return k < b ? k : -1;
 }
 
+/* Fin de l'instruction qui commence au jeton i (jetons < b) */
 function stmtEnd(ctx, i, b) {
   const { sig } = ctx;
   let j = i;
@@ -889,6 +1001,9 @@ function stmtEnd(ctx, i, b) {
   return genericEnd(ctx, j, b);
 }
 
+/* ---------- Analyse d'une instruction ---------- */
+
+/* À partir du jeton m : fonction, fonction fléchée ou async ? */
 function fnLike(ctx, m, j) {
   const { sig } = ctx;
   if (sig[m] && sig[m].v === 'async') m++;
@@ -903,6 +1018,7 @@ function fnLike(ctx, m, j) {
   return false;
 }
 
+/* Position du « = » d'une déclaration (const x = …) ou -1 */
 function initIndex(ctx, k, j) {
   const { sig } = ctx;
   let m = k;
@@ -934,6 +1050,7 @@ function importName(ctx, k, j) {
   return 'module';
 }
 
+/* Nom/type d'une instruction-expression (appel, affectation, écouteur…) */
 function exprInfo(ctx, k, j) {
   const { sig, src } = ctx;
   const t = sig[k];
@@ -967,6 +1084,7 @@ function exprInfo(ctx, k, j) {
   return { kind: 'code', name: src.slice(sig[k].s, sig[j - 1].e).replace(/\s+/g, '').slice(0, 28) };
 }
 
+/* Premier corps de fonction (=> { } ou function(){ }) dans l'instruction : enveloppe type IIFE / DOMContentLoaded */
 function findWrapperBody(ctx, i, j) {
   const { sig } = ctx;
   for (let k = i; k < j; k++) {
@@ -987,6 +1105,7 @@ function findWrapperBody(ctx, i, j) {
 
 function countLines(src, s, e) { return (src.slice(s, e).match(/\n/g) || []).length + 1; }
 
+/* Membres d'une classe ou d'un objet littéral */
 function membersOf(ctx, open, close, owner, level, mode) {
   const { sig, src } = ctx, out = [];
   let i = open + 1;
@@ -1024,6 +1143,7 @@ function membersOf(ctx, open, close, owner, level, mode) {
     const s = attachLead(src, sig[start - 1].e, sig[start].s, true);
     const e = sig[end - 1].e;
     if (isFn || countLines(src, s, e) >= 3) {
+      /* Niveau 4 : le corps d'une méthode de classe est découpé en instructions */
       let kids = [];
       if (bodyOpen >= 0 && level < ctx.maxLevel && ctx.maxLevel >= 4) {
         const bc = closeOf(ctx, bodyOpen);
@@ -1095,6 +1215,7 @@ function describe(ctx, i, j, level) {
       }
     }
   }
+  /* Niveau 4 : le corps des fonctions est découpé en instructions */
   if (isFn && level < ctx.maxLevel && ctx.maxLevel >= 4) {
     const w = findWrapperBody(ctx, k, j);
     if (w && countLines(src, sig[w.open].s, sig[w.close].e) >= 6) {
@@ -1104,6 +1225,7 @@ function describe(ctx, i, j, level) {
   return blk;
 }
 
+/* Fusionne les instructions d'une seule ligne consécutives en une « zone » */
 function mergeTiny(items, src, ctx) {
   const out = [];
   let run = [];
@@ -1137,17 +1259,18 @@ function parseRange(ctx, from, to, level) {
   return mergeTiny(items, ctx.src, ctx);
 }
 
+/* Point d'entrée : blocs JS de src[a..b) */
 function jsBlocks(src, a, b, maxLevel) {
   const { toks } = lex(src, a, b, false);
   const B = buildSig(toks);
   const ctx = { src, sig: B.sig, mt: B.mt, a, maxLevel };
   return { blocks: parseRange(ctx, 0, B.sig.length, 1), unbalanced: B.unbalanced };
 }
-
 /* ================================================================
-   03 — CSS, HTML, analyse globale
+   03 — CSS, HTML, analyse globale et pose des marqueurs
    ================================================================ */
 
+/* ---------- CSS ---------- */
 function cssSkipStr(src, j, b) {
   const q = src[j];
   j++;
@@ -1171,7 +1294,7 @@ function cssMatchBrace(src, open, b) {
 function cssBlocks(src, a, b, maxLevel, level) {
   level = level || 1;
   const out = [];
-  let i = a;
+  let i = a, prevEnd = a;
   while (i < b) {
     while (i < b) {
       if (/\s/.test(src[i])) i++;
@@ -1203,6 +1326,7 @@ function cssBlocks(src, a, b, maxLevel, level) {
     let e, prelude, cl = -1;
     if (open >= 0) { cl = cssMatchBrace(src, open, b); e = Math.min(cl + 1, b); prelude = src.slice(st, open); }
     else { e = j; prelude = src.slice(st, j); }
+    prevEnd = e;
     const p = prelude.replace(/\s+/g, ' ').trim();
     if (!p || p === '}' || p === ';') { i = e; continue; }
     const blk = { s: attachLead(src, out.length ? out[out.length - 1].e : a, st, false), e, lang: 'css', kind: 'css', name: 'css:' + sanitizeName(p), children: [] };
@@ -1215,6 +1339,7 @@ function cssBlocks(src, a, b, maxLevel, level) {
   return out;
 }
 
+/* ---------- HTML ---------- */
 const VOID_TAGS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
 const RAW_TAGS = new Set(['script', 'style', 'textarea', 'title']);
 
@@ -1320,6 +1445,7 @@ function htmlBlocks(root, src, maxLevel) {
   return out;
 }
 
+/* ---------- Analyse globale ---------- */
 function flatten(list, acc) {
   for (const b of list) { acc.push(b); flatten(b.children || [], acc); b.children = []; }
   return acc;
@@ -1348,6 +1474,7 @@ function insertMarks(src, flat) {
   return out + src.slice(last);
 }
 
+/* Analyse un code HTML complet et renvoie { text (balisé), blocks, warnings } */
 function analyze(srcRaw, opt) {
   const maxLevel = (opt && opt.level) || 2;
   const src = stripMarks(srcRaw);
@@ -1369,6 +1496,7 @@ function analyze(srcRaw, opt) {
   }
   let flat = flatten(all, []);
   flat.sort((x, y) => x.s - y.s || y.e - x.e);
+  /* Vérifie l'imbrication (aucun chevauchement partiel) */
   const ok = [], stack = [];
   for (const b of flat) {
     while (stack.length && b.s >= stack[stack.length - 1].e) stack.pop();
@@ -1384,13 +1512,14 @@ function analyze(srcRaw, opt) {
   }
   return { text, blocks: flat, warnings };
 }
-
 /* ================================================================
-   04 — Marqueurs, remplacements, diff, validation, prompt
+   04 — Lecture des marqueurs, application des remplacements,
+        diff, validation, prompt, index
    ================================================================ */
 
 const RE_AFTER = /[ \t]*(\r?\n|$)/y;
 
+/* Géométrie d'un marqueur trouvé à l'index idx (longueur len) */
 function markGeom(text, idx, len) {
   const ls = text.lastIndexOf('\n', idx - 1) + 1;
   const before = /^[ \t]*$/.test(text.slice(ls, idx));
@@ -1404,6 +1533,7 @@ function markGeom(text, idx, len) {
   };
 }
 
+/* ---------- Lire les blocs d'un texte balisé ---------- */
 function parseMarks(text) {
   const re = /(?:\/\*|<!--)#(BLOC|FIN):([^\s*<>]+?)(?:\*\/|-->)/g;
   const blocks = [], stack = [], errors = [];
@@ -1440,6 +1570,7 @@ function parseMarks(text) {
   return { blocks: done, errors };
 }
 
+/* Retrouve un bloc par son nom (tolère l'oubli du préfixe ou la casse) */
 function findBlock(blocks, name) {
   let b = blocks.find(x => x.name === name);
   if (b) return { block: b, exact: true };
@@ -1451,6 +1582,7 @@ function findBlock(blocks, name) {
   return null;
 }
 
+/* ---------- Lire la réponse de l'IA ---------- */
 function parseResponse(resp) {
   const re = /(?:\/\*|<!--)#(BLOC|FIN|APRES|AVANT|SUPPRIMER):([^\s*<>]+?)(?:\*\/|-->)/g;
   const ops = [], errors = [], stack = [];
@@ -1479,6 +1611,7 @@ function parseResponse(resp) {
   return { ops, errors };
 }
 
+/* Réécrit le premier #BLOC et le dernier #FIN d'un texte (nom + style de commentaire) */
 function normalizeOuter(nt, name, html) {
   const re = /(?:\/\*|<!--)#(BLOC|FIN):([^\s*<>]+?)(?:\*\/|-->)/g;
   let first = null, last = null, m;
@@ -1499,6 +1632,7 @@ function fixEnds(nt, region) {
   return nt;
 }
 
+/* ---------- Appliquer une liste d'opérations ---------- */
 function applyOps(state, ops) {
   let text = state;
   const eol = text.includes('\r\n') ? '\r\n' : '\n';
@@ -1506,6 +1640,8 @@ function applyOps(state, ops) {
   let lastAdded = null;
   for (let o of ops) {
     const { blocks } = parseMarks(text);
+    /* Plusieurs blocs à la suite d'un seul #APRES / #AVANT : un « remplacement » dont le nom
+       n'existe pas, juste après une insertion, est inséré après le bloc précédemment ajouté */
     const prevAdded = lastAdded;
     lastAdded = null;
     if (o.op === 'replace' && prevAdded && !findBlock(blocks, o.name)) {
@@ -1537,6 +1673,7 @@ function applyOps(state, ops) {
       const nm = o.name;
       const dup = blocks.find(x => x.name === nm);
       if (dup) {
+        /* Nom déjà pris : jamais de renommage silencieux (l'IA ne le saurait pas) */
         if (stripMarks(text.slice(dup.outerStart, dup.outerEnd)).trim() === stripMarks(nt).trim()) {
           lastAdded = nm;
           log.push({ ok: true, name: nm, msg: 'Déjà présent (identique, ignoré) : ' + nm });
@@ -1562,6 +1699,7 @@ function applyOps(state, ops) {
   return { text, log };
 }
 
+/* Remplacer un bloc par du code brut (sans marqueurs) collé à la main */
 function replaceBlockRaw(state, name, code) {
   const { blocks } = parseMarks(state);
   const hit = findBlock(blocks, name);
@@ -1576,6 +1714,7 @@ function replaceBlockRaw(state, name, code) {
   return applyOps(state, [{ op: 'replace', name: b.name, text: nt }]);
 }
 
+/* ---------- Diff par lignes ---------- */
 function diffLines(a, b) {
   const A = a.split('\n'), B = b.split('\n');
   let s = 0;
@@ -1606,6 +1745,7 @@ function diffLines(a, b) {
   return out;
 }
 
+/* ---------- Validation (renvoie null si OK, sinon un message) ---------- */
 function checkCode(lang, code) {
   if (lang === 'css') {
     let d = 0;
@@ -1630,25 +1770,28 @@ function checkCode(lang, code) {
   }
   return 'Syntaxe JS douteuse : ' + (first && first.message);
 }
-
+/* Sous-blocs présents dans l'ancien bloc mais absents du nouveau */
 function lostSubs(oldText, newText) {
   const names = t => parseMarks(t).blocks.filter(b => b.depth > 0).map(b => b.name);
   const has = new Set(names(newText));
   const miss = names(oldText).filter(n => !has.has(n));
   return miss.length ? 'Sous-blocs absents de la réponse : ' + miss.slice(0, 5).join(', ') + (miss.length > 5 ? ' …' : '') : null;
 }
-
+/* Vérification du document entier : doublons de déclarations et syntaxe de chaque script */
 function checkGlobal(text) {
   const out = [];
   const byParent = new Map();
+  /* Un « doublon » n'en est un que si deux blocs de même nom partagent le même parent.
+     Deux sous-blocs homonymes dans des fonctions différentes sont dans des portées séparées. */
   const all = parseMarks(text).blocks;
-  all.forEach((b) => {
+  all.forEach((b, i) => {
     const m = /^(fn|class|const|let|var):(.+)#\d+$/.exec(b.name);
     if (!m) return;
-    let parentStart = -1;
+    /* Parent = bloc englobant le plus proche dans la liste (par intervalle) */
+    let parentStart = -1, parentEnd = Infinity;
     for (const o of all) {
       if (o === b) continue;
-      if (o.outerStart <= b.outerStart && b.outerEnd <= o.outerEnd && o.outerStart > parentStart) { parentStart = o.outerStart; }
+      if (o.outerStart <= b.outerStart && b.outerEnd <= o.outerEnd && o.outerStart > parentStart) { parentStart = o.outerStart; parentEnd = o.outerEnd; }
     }
     const key = m[1] + ':' + m[2] + '@' + parentStart;
     if (!byParent.has(key)) byParent.set(key, []);
@@ -1669,6 +1812,7 @@ function checkGlobal(text) {
   return out;
 }
 
+/* ---------- Prompt et index ---------- */
 const PROMPT_TEXT = `Nous travaillons avec la MÉTHODE PAR BLOCS sur un projet HTML monolithique (HTML + CSS + JS dans un seul fichier).
 
 Le code que je te donne est découpé en blocs délimités par des marqueurs en commentaires :
@@ -1696,9 +1840,8 @@ function buildIndex(text) {
   return 'INDEX DES BLOCS (nom — nombre de lignes) :\n' +
     blocks.map(b => '  '.repeat(b.depth) + b.name + ' — ' + b.lines + ' l.').join('\n');
 }
-
 /* ================================================================
-   05 — Interface
+   05 — Interface (écran unique, feuille « Avancé », notifications flottantes)
    ================================================================ */
 
 const $ = id => document.getElementById(id);
@@ -1706,12 +1849,14 @@ const STORE_KEY = 'blocs.v1';
 const MAX_HIST = 30;
 let hist = [];
 let dlgMode = null, dlgName = null, lastMarkErr = '';
+/* ---------- État historique (IndexedDB) et sélection de blocs ---------- */
 let idbOK = true, lastHistSig = '', idbP = null;
 const picked = new Set();
+/* ---------- Ce que l'IA connaît : empreinte du contenu propre de chaque bloc ---------- */
 const SNAP_KEY = 'blocs.snap';
 let aiSnap = {};
 try { aiSnap = JSON.parse(localStorage.getItem(SNAP_KEY) || '{}') || {}; } catch (e) { /* stockage indisponible */ }
-
+/* Empreinte rapide (FNV-1a 32 bits + longueur) */
 function hashStr(s) {
   let h = 0x811c9dc5;
   for (let i = 0; i < s.length; i++) {
@@ -1720,6 +1865,7 @@ function hashStr(s) {
   }
   return (h >>> 0).toString(36) + s.length.toString(36);
 }
+/* Empreinte du contenu propre d'un bloc (sans ses sous-blocs, pour ne pas renvoyer un parent entier) */
 function ownHash(text, b, all) {
   let out = '', pos = b.outerStart;
   all.forEach(c => {
@@ -1733,6 +1879,8 @@ function ownHash(text, b, all) {
 function saveSnap() {
   try { localStorage.setItem(SNAP_KEY, JSON.stringify(aiSnap)); } catch (e) { /* quota */ }
 }
+/* Enregistre ce que l'IA connaît. Sans names : tout le code (nouvel envoi complet, on repart de zéro).
+   Avec names : seulement ces blocs et leurs sous-blocs. */
 function snapMark(text, names) {
   const A = parseMarks(text).blocks;
   const roots = names ? A.filter(x => names.includes(x.name)) : null;
@@ -1743,12 +1891,14 @@ function snapMark(text, names) {
   saveSnap();
   if (typeof updateSyncDot === 'function') updateSyncDot();
 }
+/* Après application d'une réponse : l'IA connaît les blocs qu'elle a écrits ; ceux qui ont disparu sont oubliés */
 function snapApply(before, after, names) {
   const now = new Set(parseMarks(after).blocks.map(b => b.name));
   parseMarks(before).blocks.forEach(b => { if (!now.has(b.name)) delete aiSnap[b.name]; });
   snapMark(after, names);
   if (typeof updateSyncDot === 'function') updateSyncDot();
 }
+/* Blocs modifiés ou ajoutés depuis ce que l'IA connaît, et blocs disparus */
 function changedBlocks(text) {
   const A = parseMarks(text).blocks;
   const have = new Set(A.map(b => b.name));
@@ -1784,6 +1934,7 @@ function idbSet(key, val) {
 function histSig() {
   return hist.length + ':' + (hist.length ? hist[hist.length - 1].t : 0);
 }
+/* Secours si IndexedDB est indisponible : ancien stockage localStorage (historique réduit si quota dépassé) */
 function saveLegacy(data) {
   let h = hist.slice(-MAX_HIST);
   for (;;) {
@@ -1797,10 +1948,12 @@ function saveLegacy(data) {
     }
   }
 }
+/* Clôture markdown plus longue que toute suite de backticks du code (4 minimum) */
 function fenceFor(code) {
   const runs = code.match(/`+/g) || [];
   return '`'.repeat(Math.max(4, runs.reduce((m, r) => Math.max(m, r.length), 0) + 1));
 }
+/* Garde les blocs de plus haut niveau (retire ceux déjà contenus dans un autre), dans l'ordre du document */
 function topBlocks(list) {
   return list
     .filter(b => !list.some(o => o !== b && o.outerStart <= b.outerStart && b.outerEnd <= o.outerEnd))
@@ -1814,6 +1967,7 @@ function dismiss(el) {
   el.remove();
   updateNotifCount();
 }
+
 function dismissKey(key) {
   const body = $('npane-body');
   if (!body) return;
@@ -1845,29 +1999,59 @@ function notify(msg, o) {
   el.querySelector('.nx').onclick = () => { el.remove(); updateNotifCount(); };
   const empty = body.querySelector('.empty');
   if (empty) empty.remove();
+  /* Les notifications sans problème sont marquées traitées automatiquement (volet permanent) */
   if (o.kind !== 'err' && o.kind !== 'warn') el.classList.add('done');
   updateNotifCount();
   return el;
 }
-
 function updateNotifCount() {
   const body = $('npane-body');
-  if (!body) return;
-  const pending = body.querySelectorAll('.notif:not(.done)').length;
   const h = document.querySelector('#npane .npane-h b');
-  if (h) h.textContent = 'Notifications' + (pending ? ' (' + pending + ')' : '');
+  if (!body || !h) return;
+  const pending = body.querySelectorAll('.notif:not(.done)').length;
+  h.textContent = 'Notifications' + (pending ? ' (' + pending + ')' : '');
   if (!body.children.length) body.innerHTML = '<div class="empty">Aucune notification.</div>';
+}
+/* Marque une notification comme « traitée » : elle reste visible mais change d'apparence */
+function notifyDone(el) {
+  if (!el) return;
+  el.classList.add('done');
+  updateNotifToggle();
+}
+/* Compteur de notifications non traitées sur le bouton du volet */
+function updateNotifToggle() {
   const btn = $('b-notif-toggle');
-  if (btn) {
-    btn.dataset.state = pending ? 'has' : 'none';
-    const c = btn.querySelector('.nt-count');
-    if (c) c.textContent = pending ? String(pending) : '';
-    const label = pending ? pending + ' notification' + (pending > 1 ? 's' : '') + ' non traitée' + (pending > 1 ? 's' : '') : 'Notifications';
-    btn.setAttribute('aria-label', label);
-    btn.title = label;
-  }
+  const body = $('np-body');
+  if (!btn || !body) return;
+  const pending = body.querySelectorAll('.notif:not(.done)').length;
+  btn.dataset.state = pending ? 'has' : 'none';
+  const c = btn.querySelector('.nt-count');
+  if (c) c.textContent = pending ? String(pending) : '';
+  btn.setAttribute('aria-label', pending ? pending + ' notification(s) non traitée(s)' : 'Notifications');
+  btn.title = btn.getAttribute('aria-label');
+  if (!body.children.length) body.innerHTML = '<div class="np-empty">Aucune notification.</div>';
 }
 
+const toast = (msg, kind) => notify(msg, { kind });
+/* Copie un rapport vers l'IA et marque la notification comme traitée (couleur) */
+async function copyReport(text, el) {
+  await copyText(text, 'Rapport copié — collez-le à l\'IA ✓');
+  if (el) notifyDone(el);
+}
+
+/* ---------- Feuilles (overlays) ---------- */
+const isOpen = id => $(id).classList.contains('open');
+function openOv(id) { $(id).classList.add('open'); }
+function closeOv(id) {
+  $(id).classList.remove('open');
+  if (id === 'tdlg') stopTest();
+}
+function openAdv(accId) {
+  if (accId) document.querySelectorAll('#adv details.acc').forEach(d => { d.open = d.id === accId; });
+  openOv('adv');
+}
+
+/* ---------- Presse-papiers ---------- */
 async function copyText(text, okMsg) {
   try {
     await navigator.clipboard.writeText(text);
@@ -1896,6 +2080,7 @@ async function readClip() {
   }
 }
 
+/* ---------- Persistance et historique ---------- */
 function save() {
   hist = hist.slice(-MAX_HIST);
   const data = { text: $('src').value, level: $('level').value };
@@ -1927,9 +2112,10 @@ function undoLast() {
   hist.pop();
   setText(h.text);
   $('result').innerHTML = '';
-  notify('↶ Version précédente restaurée', { kind: 'ok', actions: [{ label: 'Synchroniser l\'IA', fn: copyChanged }] });
+  notify('↶ Version précédente restaurée', { kind: 'ok', ms: 8000, actions: [{ label: 'Synchroniser l\'IA', fn: copyChanged }] });
 }
 
+/* ---------- Rafraîchissement ---------- */
 function refresh() {
   const text = $('src').value;
   const pm = parseMarks(text);
@@ -1943,16 +2129,18 @@ function refresh() {
   $('b-undo-top').disabled = !hist.length;
   syncMainBtn(pm.blocks.length);
   const sig = pm.errors.slice(0, 3).join(' · ');
-  if (sig && sig !== lastMarkErr) notify('Marqueurs incohérents : ' + sig, { kind: 'warn', key: 'marks' });
+  if (sig && sig !== lastMarkErr) notify('Marqueurs incohérents : ' + sig, { kind: 'warn', key: 'marks', ms: 0 });
   if (!sig) dismissKey('marks');
   lastMarkErr = sig;
   renderBlocks(pm);
   renderHistory();
   updateSyncDot();
 }
+/* Bouton principal : « Analyser » tant que le code n'est pas balisé, puis « Coller & appliquer » */
 function syncMainBtn(nBlocks) {
   $('b-main-t').textContent = nBlocks ? 'Coller & appliquer' : 'Analyser';
 }
+/* Pastille d'état : à jour (ok), modifs en attente (stale), jamais envoyé (none) */
 function updateSyncDot() {
   const btn = $('b-sync-dot');
   if (!btn) return;
@@ -1983,9 +2171,13 @@ $('b-sync-dot').addEventListener('click', () => {
   if (!topBlocks(changed).length && !gone.length) { notify('L\'IA est à jour ✓', { kind: 'ok' }); return; }
   copyChanged();
 });
+updateSyncDot();
 
 function renderBlocks(pm) {
   pm = pm || parseMarks($('src').value);
+  const q = $('q').value.trim().toLowerCase(), subs = $('subs').checked;
+  const list = pm.blocks.filter(b => (subs || b.depth === 0) && (!q || b.name.toLowerCase().includes(q)));
+  const box = $('blist');
   const renderInto = (listId, searchId, subsId) => {
     const target = $(listId);
     if (!target) return;
@@ -2008,8 +2200,46 @@ function renderBlocks(pm) {
       '<button class="sm" data-a="goto">Aller</button></div></div>'
     ).join('') + (sList.length > 500 ? '<div class="empty">… ' + (sList.length - 500) + ' autres (affinez la recherche)</div>' : '');
   };
-  renderInto('blist', 'q', 'subs');
+  if (!list.length) {
+    box.innerHTML = '<div class="empty">' + (pm.blocks.length ? 'Aucun bloc ne correspond.' : 'Aucun bloc. Touchez « Analyser ».') + '</div>';
+    renderInto('blist-side', 'q-side', 'subs-side');
+    return;
+  }
+  box.innerHTML = list.slice(0, 500).map(b =>
+    '<div class="card" style="margin-left:' + Math.min(b.depth, 4) * 12 + 'px">' +
+    '<div class="nm"><label class="pick"><input type="checkbox" data-p="' + esc(b.name) + '"' + (picked.has(b.name) ? ' checked' : '') + '><span>' + esc(b.name) + '</span></label></div>' +
+    '<div class="meta2"><span class="chipc ' + b.lang + '">' + b.lang + '</span>' + b.lines + ' ligne' + (b.lines > 1 ? 's' : '') + '</div>' +
+    '<div class="acts" data-n="' + esc(b.name) + '">' +
+    '<button class="sm" data-a="copy">Copier</button>' +
+    '<button class="sm" data-a="view">Voir</button>' +
+    '<button class="sm primary" data-a="rep">Remplacer…</button>' +
+    '<button class="sm" data-a="goto">Aller</button></div></div>'
+  ).join('') + (list.length > 500 ? '<div class="empty">… ' + (list.length - 500) + ' autres (affinez la recherche)</div>' : '');
   renderInto('blist-side', 'q-side', 'subs-side');
+}
+/* Rendu de la liste latérale (desktop) */
+function renderBlocksSide(pm) {
+  const box = $('blist-side');
+  if (!box) return;
+  pm = pm || parseMarks($('src').value);
+  const qEl = $('q-side'), subsEl = $('subs-side');
+  const q = qEl ? qEl.value.trim().toLowerCase() : '';
+  const subs = subsEl ? subsEl.checked : true;
+  const list = pm.blocks.filter(b => (subs || b.depth === 0) && (!q || b.name.toLowerCase().includes(q)));
+  if (!list.length) {
+    box.innerHTML = '<div class="empty">' + (pm.blocks.length ? 'Aucun bloc ne correspond.' : 'Aucun bloc. Touchez « Analyser ».') + '</div>';
+    return;
+  }
+  box.innerHTML = list.slice(0, 500).map(b =>
+    '<div class="card" style="margin-left:' + Math.min(b.depth, 4) * 12 + 'px">' +
+    '<div class="nm"><label class="pick"><input type="checkbox" data-p="' + esc(b.name) + '"' + (picked.has(b.name) ? ' checked' : '') + '><span>' + esc(b.name) + '</span></label></div>' +
+    '<div class="meta2"><span class="chipc ' + b.lang + '">' + b.lang + '</span>' + b.lines + ' ligne' + (b.lines > 1 ? 's' : '') + '</div>' +
+    '<div class="acts" data-n="' + esc(b.name) + '">' +
+    '<button class="sm" data-a="copy">Copier</button>' +
+    '<button class="sm" data-a="view">Voir</button>' +
+    '<button class="sm primary" data-a="rep">Remplacer…</button>' +
+    '<button class="sm" data-a="goto">Aller</button></div></div>'
+  ).join('') + (list.length > 500 ? '<div class="empty">… ' + (list.length - 500) + ' autres (affinez la recherche)</div>' : '');
 }
 
 function renderHistory() {
@@ -2024,6 +2254,7 @@ function renderHistory() {
   }).join('');
 }
 
+/* ---------- Diff ---------- */
 function renderDiff(a, b) {
   const d = diffLines(a, b), keep = new Array(d.length).fill(false);
   d.forEach((x, i) => { if (x.t !== '=') for (let k = i - 2; k <= i + 2; k++) if (k >= 0 && k < d.length) keep[k] = true; });
@@ -2038,6 +2269,7 @@ function renderDiff(a, b) {
   return '<div class="diff">' + out + '</div>';
 }
 
+/* ---------- Messages prêts à renvoyer à l'IA ---------- */
 const REMIND_TEXT = 'Rappel : réponds uniquement avec les blocs modifiés (même format #BLOC/#FIN, blocs complets, noms inchangés), dans un seul bloc de code. Ne change rien d\'autre que ce que je demande.\n\nMa demande : ';
 
 function fixMessage(bad) {
@@ -2048,14 +2280,15 @@ function fixMessage(bad) {
     'Renvoie uniquement le(s) bloc(s) corrigé(s), complet(s), avec les mêmes marqueurs #BLOC/#FIN, dans un seul bloc de code. Ne change rien d\'autre.';
 }
 
+/* ---------- Appliquer la réponse de l'IA ---------- */
 function runResponse(apply) {
   const resp = $('resp').value;
   const box = $('result');
   const details = { label: 'Détails', fn: () => openAdv('acc-resp') };
   if (!resp.trim()) { notify('Collez d\'abord la réponse de l\'IA', { kind: 'err' }); return; }
   if (!/#(BLOC|APRES|AVANT|SUPPRIMER):/.test(resp)) {
-    box.innerHTML = '<div class="note err">Aucun marqueur trouvé. La réponse doit contenir <code>/*\u0023BLOC:nom*/ … /*\u0023FIN:nom*/</code>.</div>';
-    notify('Aucun marqueur #BLOC dans la réponse', { kind: 'err', actions: [details] });
+    box.innerHTML = '<div class="note err">Aucun marqueur trouvé. La réponse doit contenir <code>/*\u0023BLOC:nom*/ … /*\u0023FIN:nom*/</code>. Pour remplacer un bloc avec du code brut, utilisez « Remplacer… » dans Avancé › Blocs.</div>';
+    notify('Aucun marqueur #BLOC dans la réponse', { kind: 'err', ms: 0, actions: [details] });
     return;
   }
   const cur = $('src').value;
@@ -2065,6 +2298,7 @@ function runResponse(apply) {
   const okN = res.log.filter(l => l.ok).length, koN = res.log.length - okN;
   const bad = res.log.filter(l => !l.ok || l.warn);
   if (okN) {
+    /* Vérification globale : on ne signale que les problèmes nouveaux */
     const before = checkGlobal(cur);
     checkGlobal(res.text).filter(g => !before.includes(g))
       .forEach(g => bad.push({ ok: true, glob: true, name: '(global)', msg: g, warn: g }));
@@ -2083,11 +2317,11 @@ function runResponse(apply) {
 
   if (!apply) {
     notify('Aperçu : ' + okN + ' OK' + (koN ? ' · ' + koN + ' erreur(s)' : '') + ' — rien n\'est modifié',
-      { kind: koN ? 'warn' : 'ok', actions: bad.length ? [details, fix] : [details] });
+      { kind: koN ? 'warn' : 'ok', ms: 0, actions: bad.length ? [details, fix] : [details] });
     return;
   }
   if (!okN) {
-    notify('Rien n\'a été appliqué : ' + (res.log[0] ? res.log[0].msg : 'réponse vide'), { kind: 'err', actions: [details, fix] });
+    notify('Rien n\'a été appliqué : ' + (res.log[0] ? res.log[0].msg : 'réponse vide'), { kind: 'err', ms: 0, actions: [details, fix] });
     return;
   }
   pushHistory('Avant application (' + okN + ' bloc' + (okN > 1 ? 's' : '') + ')');
@@ -2098,10 +2332,11 @@ function runResponse(apply) {
   const after = parseMarks(res.text).errors;
   notify('✓ ' + okN + ' bloc' + (okN > 1 ? 's' : '') + ' appliqué' + (okN > 1 ? 's' : '') +
     (bad.length ? ' · ' + bad.length + ' à vérifier' : '') + (after.length ? ' · marqueurs incohérents' : ''),
-    { kind: bad.length || after.length ? 'warn' : 'ok', key: 'apply', actions: acts });
+    { kind: bad.length || after.length ? 'warn' : 'ok', ms: bad.length || after.length ? 0 : 8000, key: 'apply', actions: acts });
   if ($('autotest').checked) runTest(true);
 }
 
+/* ---------- Gestes principaux ---------- */
 function analyseNow(silent) {
   const text = $('src').value;
   if (!text.trim()) { notify('Collez d\'abord du code', { kind: 'err' }); return false; }
@@ -2110,7 +2345,7 @@ function analyseNow(silent) {
   const r = analyze(text, { level: +$('level').value });
   setText(r.text);
   $('src').scrollTop = 0;
-  if (r.warnings.length) notify(r.warnings.join(' '), { kind: 'warn' });
+  if (r.warnings.length) notify(r.warnings.join(' '), { kind: 'warn', ms: 0 });
   if (!silent) notify('✓ ' + r.blocks.length + ' blocs · ' + Math.round(performance.now() - t0) + ' ms', { kind: 'ok' });
   return true;
 }
@@ -2124,7 +2359,7 @@ function copyAllForAI() {
   copyText(head + '\n\nVoici mon code balisé. Réponds simplement « Prêt », puis attends ma demande.\n\n' + f + 'html\n' + code + '\n' + f,
     'Prompt + code copiés ✓ — collez-les dans l\'IA');
 }
-
+/* Colle la demande de l'IA (qui cite des noms de blocs) et copie ces blocs prêts à renvoyer */
 async function copyRequested() {
   if (!parseMarks($('src').value).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'err' }); return; }
   const t = await readClip();
@@ -2149,7 +2384,7 @@ async function copyRequested() {
   copyText('Voici les blocs demandés :\n\n' + f + 'html\n' + code + '\n' + f,
     list.length + ' bloc' + (list.length > 1 ? 's' : '') + ' copié' + (list.length > 1 ? 's' : '') + ' ✓');
 }
-
+/* Envoi partiel : prompt + index complet + seulement les blocs cochés */
 function copyPicked() {
   const src = $('src').value;
   const { blocks } = parseMarks(src);
@@ -2159,15 +2394,15 @@ function copyPicked() {
   const head = PROMPT_TEXT.replace(/\n\nJe vais maintenant[\s\S]*$/, '');
   const code = list.map(b => src.slice(b.outerStart, b.outerEnd)).join('').replace(/\n$/, '');
   const f = fenceFor(code);
-  copyText(head + '\n\nVoici l\'index complet des blocs, puis seulement les blocs utiles à ma demande.\n\n' +
+  copyText(head + '\n\nVoici l\'index complet des blocs, puis seulement les blocs utiles à ma demande. Si un autre bloc t\'est nécessaire, demande-le-moi par son nom. Réponds simplement « Prêt », puis attends ma demande.\n\n' +
     buildIndex(src) + '\n\n' + f + 'html\n' + code + '\n' + f,
     'Index + ' + list.length + ' bloc' + (list.length > 1 ? 's' : '') + ' copiés ✓');
 }
-
+/* Resynchronise l'IA : renvoie uniquement les blocs qui ont changé depuis ce qu'elle connaît */
 function copyChanged() {
   const src = $('src').value;
   if (!parseMarks(src).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'err' }); return; }
-  if (!Object.keys(aiSnap).length) { notify('Aucun envoi enregistré : envoyez d\'abord le code', { kind: 'warn' }); return; }
+  if (!Object.keys(aiSnap).length) { notify('Aucun envoi enregistré : envoyez d\'abord le code (« Analyser » ou « Copier balisé »)', { kind: 'warn' }); return; }
   const { changed, gone } = changedBlocks(src);
   const list = topBlocks(changed);
   if (!list.length && !gone.length) { notify('L\'IA est à jour ✓', { kind: 'ok' }); return; }
@@ -2204,9 +2439,10 @@ function clearCode() {
   if (!$('src').value) return;
   pushHistory('Avant vidage');
   setText('');
-  notify('Code vidé', { actions: [{ label: '↶ Annuler', fn: undoLast }] });
+  notify('Code vidé', { ms: 7000, actions: [{ label: '↶ Annuler', fn: undoLast }] });
 }
 
+/* ---------- Voir / remplacer un bloc ---------- */
 function openBlockDlg(mode, name) {
   const { blocks } = parseMarks($('src').value);
   const hit = findBlock(blocks, name);
@@ -2237,7 +2473,7 @@ function dlgReplace() {
   setText(res.text);
   closeOv('dlg');
   const w = ok.find(l => l.warn);
-  notify(w ? '⚠ Bloc remplacé, mais : ' + w.warn : '✓ Bloc remplacé', { kind: w ? 'warn' : 'ok', actions: [{ label: '↶ Annuler', fn: undoLast }] });
+  notify(w ? '⚠ Bloc remplacé, mais : ' + w.warn : '✓ Bloc remplacé', { kind: w ? 'warn' : 'ok', actions: [{ label: '↶ Annuler', fn: undoLast }], ms: w ? 0 : 6000 });
 }
 
 function gotoBlock(name) {
@@ -2260,20 +2496,8 @@ function download(name, text) {
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
 }
 
-/* ---------- Overlays ---------- */
-const isOpen = id => $(id).classList.contains('open');
-function openOv(id) { $(id).classList.add('open'); }
-function closeOv(id) {
-  $(id).classList.remove('open');
-  if (id === 'tdlg') stopTest();
-}
-function openAdv(accId) {
-  if (accId) document.querySelectorAll('#adv details.acc').forEach(d => { d.open = d.id === accId; });
-  openOv('adv');
-}
-
 /* ---------- Test d'exécution ---------- */
-let testErrors = [], testListener = null;
+let testErrors = [], testListener = null, testWarned = false;
 
 const PROBE = '<script>(function(){var P=function(o){try{parent.postMessage({blocsProbe:o},"*")}catch(e){}};' +
   'window.addEventListener("error",function(e){P({m:String(e.message),l:e.lineno})});' +
@@ -2318,10 +2542,16 @@ function runTest(auto) {
   testErrors = [];
   showTest(false);
   openOv('tdlg');
+  /* Aperçu automatique activé : test en plein écran sans bordure */
   const imm = $('autotest').checked;
   $('tdlg').classList.toggle('immersive', imm);
   if (imm) $('tdlg').classList.add('fullscreen');
   $('t-fs').innerHTML = '<svg class="ic"><use href="#' + ($('tdlg').classList.contains('fullscreen') ? 'i-x' : 'i-maximize') + '"/></svg>';
+  /* Plein écran : les notifications de succès déjà affichées disparaissent vite */
+  if ($('tdlg').classList.contains('fullscreen')) {
+    document.querySelectorAll('#notifs .notif.ok').forEach(n => { clearTimeout(n._t); n._t = setTimeout(() => dismiss(n), 1500); });
+  }
+  $('tdlg').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   const frame = $('tframe');
   testListener = ev => {
     if (ev.source !== frame.contentWindow || !ev.data || !ev.data.blocsProbe) return;
@@ -2339,7 +2569,7 @@ function runTest(auto) {
     showTest(true);
     if ((auto === true || imm) && testErrors.length) {
       notify(testErrors.length + ' erreur(s) au test après application', {
-        kind: 'err', key: 'autotest',
+        kind: 'err', ms: 0, key: 'autotest',
         actions: [
           { label: '↶ Annuler', fn: undoLast },
           { label: '📨 Correction IA', fn: () => copyText(testMessage(), 'Message copié ✓ — collez-le à l\'IA') }
@@ -2349,7 +2579,7 @@ function runTest(auto) {
   }, 4000);
 }
 
-/* ---------- Son ---------- */
+/* ---------- Son discret au toucher ---------- */
 let audioCtx = null, soundOn = true;
 try { soundOn = localStorage.getItem('blocs.sound') !== '0'; } catch (e) { /* stockage indisponible */ }
 
@@ -2377,64 +2607,139 @@ document.addEventListener('pointerdown', e => {
   if (b && !b.disabled) tick(b.classList.contains('hero'));
 }, true);
 
-/* ---------- Historique : helpers ---------- */
-function renderHistSide() {
-  const box = $('hlist-side');
-  if (!box) return;
-  if (!hist.length) { box.innerHTML = '<div class="empty">Aucune version enregistrée.</div>'; return; }
-  box.innerHTML = hist.map((h, i) => ({ h, i })).reverse().map(({ h, i }) => {
-    const st = histStatus(h);
-    return '<div class="card"><div class="nm">' + esc(h.label) + '</div>' +
-      '<div class="meta2"><span class="hist-badge ' + st.kind + '"' + (st.title ? ' title="' + esc(st.title) + '"' : '') + '>' + esc(st.label) + '</span>' +
-      new Date(h.t).toLocaleString('fr-FR') + ' · ' + h.text.split('\n').length + ' lignes</div>' +
-      histActions(h, i) + '</div>';
-  }).join('');
-}
-function histStatus(h) {
-  const text = h.text || '';
-  const pm = parseMarks(text);
-  const markBad = pm.errors.length > 0;
-  const codes = checkGlobal(text);
-  if (!markBad && !codes.length) return { kind: 'ok', label: 'OK' };
-  const parts = [];
-  if (markBad) parts.push('marqueurs');
-  if (codes.length) parts.push(codes.length + ' erreur' + (codes.length > 1 ? 's' : ''));
-  return { kind: markBad ? 'mark' : 'err', label: parts.join(' · '), title: (markBad ? 'Marqueurs incohérents · ' : '') + codes.slice(0, 3).join(' — ') };
-}
-function histReport(h) {
-  const text = h.text || '';
-  const pm = parseMarks(text);
-  const codes = checkGlobal(text);
-  const lines = [];
-  lines.push('Version d\'historique « ' + h.label + ' » (' + new Date(h.t).toLocaleString('fr-FR') + ') en erreur.');
-  if (pm.errors.length) {
-    lines.push('');
-    lines.push('Marqueurs incohérents :');
-    pm.errors.forEach(e => lines.push('- ' + e));
-  }
-  if (codes.length) {
-    lines.push('');
-    lines.push('Erreurs JS détectées :');
-    codes.slice(0, 6).forEach(c => lines.push('- ' + c));
-    if (codes.length > 6) lines.push('- … (' + (codes.length - 6) + ' autres)');
-  }
-  lines.push('');
-  lines.push('Corrige uniquement ce qui provoque ces erreurs, sans refactoriser, et renvoie seulement les blocs modifiés, complets, avec les mêmes marqueurs #BLOC/#FIN, dans un seul bloc de code.');
-  lines.push('');
-  lines.push(buildIndex(text));
-  return lines.join('\n');
-}
-function histActions(h, i) {
-  const st = histStatus(h);
-  let html = '<div class="acts" data-i="' + i + '">' +
-    '<button class="sm primary" data-a="restore">Restaurer</button>' +
-    '<button class="sm" data-a="hcopy">Copier</button>';
-  if (st.kind !== 'ok') html += '<button class="sm danger" data-a="report">📨 Rapport IA</button>';
-  html += '</div>';
-  return html;
-}
+/* ---------- Initialisation ---------- */
+function init() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+    if (s) {
+      $('src').value = s.text || '';
+      hist = Array.isArray(s.hist) ? s.hist : [];
+      if (s.level) $('level').value = s.level;
+    }
+  } catch (e) { /* stockage indisponible */ }
 
-/* ---------- Tooltips ---------- */
+  /* écran principal */
+  let tm;
+  $('src').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(() => { refresh(); save(); }, 400); });
+  $('level').addEventListener('change', save);
+  
+  /* Bouton unique : Analyser (Coller -> Baliser -> Copier IA), puis Coller & appliquer */
+  $('b-main').onclick = async () => {
+    if (parseMarks($('src').value).blocks.length) { pasteAndApply(); return; }
+    const t = await readClip();
+    if (t === null) return;
+    pushHistory('Avant analyse globale unique');
+    setText(t);
+    if (!analyseNow(true)) return;
+    copyAllForAI();
+  };
+
+  $('b-test').onclick = runTest;
+  $('b-copy-clean').onclick = () => copyText(stripMarks($('src').value), 'Code final copié ✓');
+  $('b-clear').onclick = clearCode;
+  $('b-undo-top').onclick = undoLast;
+  $('b-adv').onclick = () => openAdv();
+
+  /* feuilles */
+  $('adv-close').onclick = () => closeOv('adv');
+  $('dlg-x').onclick = () => closeOv('dlg');
+  $('t-x').onclick = () => { $('tdlg').classList.remove('fullscreen'); closeOv('tdlg'); };
+  $('t-fs').onclick = () => {
+    const pane = $('tdlg');
+    pane.classList.toggle('fullscreen');
+    const isFs = pane.classList.contains('fullscreen');
+    $('t-fs').innerHTML = isFs ? '<svg class="ic"><use href="#i-x"/></svg>' : '<svg class="ic"><use href="#i-maximize"/></svg>';
+  };
+
+  document.querySelectorAll('.ov').forEach(ov => ov.addEventListener('click', e => { if (e.target === ov) { $('tdlg').classList.remove('fullscreen'); closeOv(ov.id); } }));
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (isOpen('tdlg') && $('tdlg').classList.contains('fullscreen')) {
+      $('tdlg').classList.remove('fullscreen');
+      $('t-fs').innerHTML = '<svg class="ic"><use href="#i-maximize"/></svg>';
+      return;
+    }
+    for (const id of ['tdlg', 'dlg', 'adv']) if (isOpen(id)) { closeOv(id); break; }
+  });
+
+  /* Avancé › Réponse de l'IA */
+  $('b-rpaste').onclick = async () => { const t = await readClip(); if (t !== null) { $('resp').value = t; notify('Collé ✓', { kind: 'ok' }); } };
+  $('b-preview').onclick = () => runResponse(false);
+  $('b-apply').onclick = () => runResponse(true);
+
+  /* Avancé › Blocs, Historique */
+  $('q').addEventListener('input', () => renderBlocks());
+  $('subs').addEventListener('change', () => renderBlocks());
+  $('blist').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-a]');
+    if (!btn) return;
+    const name = btn.parentElement.dataset.n, a = btn.dataset.a;
+    if (a === 'copy') {
+      const { blocks } = parseMarks($('src').value), hit = findBlock(blocks, name);
+      if (hit) copyText($('src').value.slice(hit.block.outerStart, hit.block.outerEnd), 'Bloc copié ✓');
+    } else if (a === 'view') openBlockDlg('view', name);
+    else if (a === 'rep') openBlockDlg('rep', name);
+    else if (a === 'goto') gotoBlock(name);
+  });
+  $('blist').addEventListener('change', e => {
+    const c = e.target.closest('input[data-p]');
+    if (!c) return;
+    if (c.checked) picked.add(c.dataset.p); else picked.delete(c.dataset.p);
+  });
+  $('b-send-sel').onclick = copyPicked;
+  $('b-unpick').onclick = () => { picked.clear(); renderBlocks(); };
+$('hlist').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-a]');
+  if (!btn) return;
+  const h = hist[+btn.parentElement.dataset.i];
+  if (!h) return;
+  if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
+  else if (btn.dataset.a === 'report') copyText(histReport(h), 'Rapport d\'erreurs copié — collez-le à l\'IA ✓');
+  else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); }
+});
+
+  /* Avancé › Outils */
+  $('snd').checked = soundOn;
+  $('snd').onchange = e => { soundOn = e.target.checked; try { localStorage.setItem('blocs.sound', soundOn ? '1' : '0'); } catch (_) { } if (soundOn) tick(false); };
+  try { $('autotest').checked = localStorage.getItem('blocs.autotest') === '1'; } catch (_) { }
+  $('autotest').onchange = e => { try { localStorage.setItem('blocs.autotest', e.target.checked ? '1' : '0'); } catch (_) { } };
+  $('b-prompt').onclick = () => copyText(PROMPT_TEXT, 'Prompt copié ✓');
+  $('b-remind').onclick = () => copyText(REMIND_TEXT, 'Rappel copié ✓');
+  $('b-index').onclick = () => copyText(buildIndex($('src').value), 'Index copié ✓');
+  $('b-copy-marked').onclick = () => copyText($('src').value, 'Code balisé copié ✓');
+  $('b-need').onclick = copyRequested;
+  $('b-strip').onclick = () => { pushHistory('Avant retrait des marqueurs'); setText(stripMarks($('src').value)); notify('Marqueurs retirés', { kind: 'ok', actions: [{ label: '↶ Annuler', fn: undoLast }] }); };
+  $('b-dl-clean').onclick = () => download('projet.html', stripMarks($('src').value));
+  $('b-dl-marked').onclick = () => download('projet.balise.html', $('src').value);
+  $('b-open').onclick = () => $('file').click();
+  $('file').onchange = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { pushHistory('Avant ouverture de fichier'); setText(String(r.result)); notify('Fichier chargé : ' + f.name, { kind: 'ok' }); };
+    r.readAsText(f);
+    e.target.value = '';
+  };
+
+  /* dialogue bloc, test */
+  $('dlg-copy').onclick = () => copyText($('dlg-text').value);
+  $('dlg-ok').onclick = dlgReplace;
+  $('t-rerun').onclick = runTest;
+  $('t-copy').onclick = () => copyText(testMessage(), 'Message copié ✓ — collez-le à l\'IA');
+
+  /* historique : IndexedDB, fusionné avec l'ancien historique localStorage éventuel */
+  idbGet('hist').then(h => {
+    const old = Array.isArray(h) ? h : [];
+    const cur = hist.filter(x => !old.some(y => y.t === x.t));
+    hist = old.concat(cur).sort((a, b) => a.t - b.t).slice(-MAX_HIST);
+    lastHistSig = '';
+    refresh();
+    save();
+  }).catch(() => { idbOK = false; });
+
+  refresh();
+}
+/* ---------- Tooltips sur les boutons-icônes (ergonomie souris) ---------- */
 function addTooltips() {
   const tips = {
     'b-undo-top': 'Annuler la dernière action',
@@ -2470,8 +2775,7 @@ function addTooltips() {
     if (el && !el.title) el.title = tips[id];
   }
 }
-
-/* ---------- Sidebar desktop ---------- */
+/* ---------- Sidebar desktop : recherche, actions, synchronisation des cases ---------- */
 function wireSidebar() {
   addTooltips();
   const qs = $('q-side');
@@ -2491,6 +2795,7 @@ function wireSidebar() {
   });
   $('b-send-sel-side').onclick = copyPicked;
   $('b-unpick-side').onclick = () => { picked.clear(); renderBlocks(); };
+  /* Sync des cases à cocher entre les deux conteneurs (#blist et #blist-side) */
   document.addEventListener('change', e => {
     const c = e.target && e.target.closest && e.target.closest('input[data-p]');
     if (!c) return;
@@ -2501,143 +2806,130 @@ function wireSidebar() {
   });
 }
 
-/* ---------- Initialisation ---------- */
-function init() {
-  try {
-    const s = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
-    if (s) {
-      $('src').value = s.text || '';
-      hist = Array.isArray(s.hist) ? s.hist : [];
-      if (s.level) $('level').value = s.level;
+init();
+wireSidebar();
+/* ---------- Raccourcis clavier globaux ---------- */
+document.addEventListener('keydown', e => {
+  const mod = e.ctrlKey || e.metaKey;
+  if (mod && e.key === 'Enter') {
+    e.preventDefault();
+    $('b-main').click();
+    return;
+  }
+  if (mod && (e.key === 's' || e.key === 'S')) {
+    e.preventDefault();
+    if (e.shiftKey) $('b-copy-marked').click();
+    else $('b-dl-clean').click();
+    return;
+  }
+  const ae = document.activeElement;
+  const tag = (ae && ae.tagName) || '';
+  const inField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (ae && ae.isContentEditable);
+  /* Focus rapide sur la recherche de blocs */
+  if (!mod && !inField && e.key === '/') {
+    e.preventDefault();
+    if (window.innerWidth >= 1024) {
+      const qs = $('q-side');
+      if (qs) qs.focus();
+    } else {
+      openAdv('acc-blocs');
+      setTimeout(() => { const q = $('q'); if (q) q.focus(); }, 100);
     }
-  } catch (e) { /* stockage indisponible */ }
-
-  let tm;
-  $('src').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(() => { refresh(); save(); }, 400); });
-  $('level').addEventListener('change', save);
-
-  $('b-main').onclick = async () => {
-    if (parseMarks($('src').value).blocks.length) { pasteAndApply(); return; }
-    const t = await readClip();
-    if (t === null) return;
-    pushHistory('Avant analyse globale unique');
-    setText(t);
-    if (!analyseNow(true)) return;
-    copyAllForAI();
+  }
+});
+/* Synchronisation de l'IA : bouton (Avancé › Outils) et mémorisation de l'envoi « Copier balisé » */
+$('b-sync').onclick = copyChanged;
+$('b-copy-marked').addEventListener('click', () => { const v = $('src').value; if (parseMarks(v).blocks.length) snapMark(v); });
+/* Option « Copier le code final en cliquant sur Tester » */
+$('b-test').addEventListener('click', () => {
+  const v = $('src').value;
+  if ($('copyfinal').checked && v.trim()) copyText(stripMarks(v), 'Code final copié ✓');
+});
+try { $('copyfinal').checked = localStorage.getItem('blocs.copyfinal') === '1'; } catch (_) { }
+$('copyfinal').addEventListener('change', e => { try { localStorage.setItem('blocs.copyfinal', e.target.checked ? '1' : '0'); } catch (_) { } });
+/* ---------- Onglets de la sidebar : Blocs / Historique ---------- */
+function initSideTabs() {
+  const bar = document.querySelector('.side-tabs');
+  if (!bar) return;
+  const blist = $('blist-side'), hlist = $('hlist-side');
+  const tabs = bar.querySelectorAll('.side-tab');
+  const show = which => {
+    tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.tab === which ? 'true' : 'false'));
+    if (blist) blist.hidden = which !== 'blocs';
+    if (hlist) hlist.hidden = which !== 'hist';
+    if (which === 'hist') renderHistSide();
   };
-
-  $('b-test').onclick = () => {
-    const v = $('src').value;
-    if ($('copyfinal').checked && v.trim()) copyText(stripMarks(v), 'Code final copié ✓');
-    runTest(false);
-  };
-  $('b-copy-clean').onclick = () => copyText(stripMarks($('src').value), 'Code final copié ✓');
-  $('b-clear').onclick = clearCode;
-  $('b-undo-top').onclick = undoLast;
-  $('b-adv').onclick = () => openAdv();
-
-  $('adv-close').onclick = () => closeOv('adv');
-  $('dlg-x').onclick = () => closeOv('dlg');
-  $('t-x').onclick = () => { $('tdlg').classList.remove('fullscreen'); closeOv('tdlg'); };
-  $('t-fs').onclick = () => {
-    const pane = $('tdlg');
-    pane.classList.toggle('fullscreen');
-    const isFs = pane.classList.contains('fullscreen');
-    $('t-fs').innerHTML = isFs ? '<svg class="ic"><use href="#i-x"/></svg>' : '<svg class="ic"><use href="#i-maximize"/></svg>';
-  };
-
-  document.querySelectorAll('.ov').forEach(ov => ov.addEventListener('click', e => { if (e.target === ov) { $('tdlg').classList.remove('fullscreen'); closeOv(ov.id); } }));
-  document.addEventListener('keydown', e => {
-    if (e.key !== 'Escape') return;
-    if (isOpen('tdlg') && $('tdlg').classList.contains('fullscreen')) {
-      $('tdlg').classList.remove('fullscreen');
-      $('t-fs').innerHTML = '<svg class="ic"><use href="#i-maximize"/></svg>';
-      return;
-    }
-    for (const id of ['tdlg', 'dlg', 'adv', 'help']) if (isOpen(id)) { closeOv(id); break; }
-  });
-
-  $('b-rpaste').onclick = async () => { const t = await readClip(); if (t !== null) { $('resp').value = t; notify('Collé ✓', { kind: 'ok' }); } };
-  $('b-preview').onclick = () => runResponse(false);
-  $('b-apply').onclick = () => runResponse(true);
-
-  $('q').addEventListener('input', () => renderBlocks());
-  $('subs').addEventListener('change', () => renderBlocks());
-  $('blist').addEventListener('click', e => {
-    const btn = e.target.closest('button[data-a]');
-    if (!btn) return;
-    const name = btn.parentElement.dataset.n, a = btn.dataset.a;
-    if (a === 'copy') {
-      const { blocks } = parseMarks($('src').value), hit = findBlock(blocks, name);
-      if (hit) copyText($('src').value.slice(hit.block.outerStart, hit.block.outerEnd), 'Bloc copié ✓');
-    } else if (a === 'view') openBlockDlg('view', name);
-    else if (a === 'rep') openBlockDlg('rep', name);
-    else if (a === 'goto') gotoBlock(name);
-  });
-  $('b-send-sel').onclick = copyPicked;
-  $('b-unpick').onclick = () => { picked.clear(); renderBlocks(); };
-  $('hlist').addEventListener('click', e => {
-    const btn = e.target.closest('button[data-a]');
-    if (!btn) return;
-    const h = hist[+btn.parentElement.dataset.i];
-    if (!h) return;
-    if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
-    else if (btn.dataset.a === 'report') copyText(histReport(h), 'Rapport d\'erreurs copié — collez-le à l\'IA ✓');
-    else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); }
-  });
-  $('hlist-side').addEventListener('click', e => {
-    const btn = e.target.closest('button[data-a]');
-    if (!btn) return;
-    const h = hist[+btn.parentElement.dataset.i];
-    if (!h) return;
-    if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
-    else if (btn.dataset.a === 'report') copyText(histReport(h), 'Rapport d\'erreurs copié — collez-le à l\'IA ✓');
-    else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); renderHistSide(); }
-  });
-
-  $('snd').checked = soundOn;
-  $('snd').onchange = e => { soundOn = e.target.checked; try { localStorage.setItem('blocs.sound', soundOn ? '1' : '0'); } catch (_) { } if (soundOn) tick(false); };
-  try { $('autotest').checked = localStorage.getItem('blocs.autotest') === '1'; } catch (_) { }
-  $('autotest').onchange = e => { try { localStorage.setItem('blocs.autotest', e.target.checked ? '1' : '0'); } catch (_) { } };
-  try { $('copyfinal').checked = localStorage.getItem('blocs.copyfinal') === '1'; } catch (_) { }
-  $('copyfinal').onchange = e => { try { localStorage.setItem('blocs.copyfinal', e.target.checked ? '1' : '0'); } catch (_) { } };
-
-  $('b-prompt').onclick = () => copyText(PROMPT_TEXT, 'Prompt copié ✓');
-  $('b-remind').onclick = () => copyText(REMIND_TEXT, 'Rappel copié ✓');
-  $('b-index').onclick = () => copyText(buildIndex($('src').value), 'Index copié ✓');
-  $('b-copy-marked').onclick = () => { const v = $('src').value; if (parseMarks(v).blocks.length) snapMark(v); copyText(v, 'Code balisé copié ✓'); };
-  $('b-sync').onclick = copyChanged;
-  $('b-need').onclick = copyRequested;
-  $('b-strip').onclick = () => { pushHistory('Avant retrait des marqueurs'); setText(stripMarks($('src').value)); notify('Marqueurs retirés', { kind: 'ok', actions: [{ label: '↶ Annuler', fn: undoLast }] }); };
-  $('b-dl-clean').onclick = () => download('projet.html', stripMarks($('src').value));
-  $('b-dl-marked').onclick = () => download('projet.balise.html', $('src').value);
-  $('b-open').onclick = () => $('file').click();
-  $('file').onchange = e => {
-    const f = e.target.files[0];
-    if (!f) return;
-    const r = new FileReader();
-    r.onload = () => { pushHistory('Avant ouverture de fichier'); setText(String(r.result)); notify('Fichier chargé : ' + f.name, { kind: 'ok' }); };
-    r.readAsText(f);
-    e.target.value = '';
-  };
-
-  $('dlg-copy').onclick = () => copyText($('dlg-text').value);
-  $('dlg-ok').onclick = dlgReplace;
-  $('t-rerun').onclick = () => runTest(false);
-  $('t-copy').onclick = () => copyText(testMessage(), 'Message copié ✓ — collez-le à l\'IA');
-
-  idbGet('hist').then(h => {
-    const old = Array.isArray(h) ? h : [];
-    const cur = hist.filter(x => !old.some(y => y.t === x.t));
-    hist = old.concat(cur).sort((a, b) => a.t - b.t).slice(-MAX_HIST);
-    lastHistSig = '';
-    refresh();
-    save();
-  }).catch(() => { idbOK = false; });
-
-  refresh();
+  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+  show('blocs');
 }
-
+/* Rendu de l'historique dans la sidebar desktop */
+function renderHistSide() {
+  const box = $('hlist-side');
+  if (!box) return;
+  if (!hist.length) { box.innerHTML = '<div class="empty">Aucune version enregistrée.</div>'; return; }
+  box.innerHTML = hist.map((h, i) => ({ h, i })).reverse().map(({ h, i }) => {
+    const st = histStatus(h);
+    return '<div class="card"><div class="nm">' + esc(h.label) + '</div>' +
+      '<div class="meta2"><span class="hist-badge ' + st.kind + '"' + (st.title ? ' title="' + esc(st.title) + '"' : '') + '>' + esc(st.label) + '</span>' +
+      new Date(h.t).toLocaleString('fr-FR') + ' · ' + h.text.split('\n').length + ' lignes</div>' +
+      histActions(h, i) + '</div>';
+  }).join('');
+}
+/* État d'une version d'historique : null si OK, sinon message ; plus les marqueurs incohérents */
+function histStatus(h) {
+  const text = h.text || '';
+  const pm = parseMarks(text);
+  const markBad = pm.errors.length > 0;
+  const codes = checkGlobal(text);
+  if (!markBad && !codes.length) return { kind: 'ok', label: 'OK' };
+  const parts = [];
+  if (markBad) parts.push('marqueurs');
+  if (codes.length) parts.push(codes.length + ' erreur' + (codes.length > 1 ? 's' : ''));
+  return { kind: markBad ? 'mark' : 'err', label: parts.join(' · '), title: (markBad ? 'Marqueurs incohérents · ' : '') + codes.slice(0, 3).join(' — ') };
+}
+/* Construit un rapport d'erreurs prêt à coller dans l'IA pour une version de l'historique */
+function histReport(h) {
+  const text = h.text || '';
+  const pm = parseMarks(text);
+  const codes = checkGlobal(text);
+  const lines = [];
+  lines.push('Version d\'historique « ' + h.label + ' » (' + new Date(h.t).toLocaleString('fr-FR') + ') en erreur.');
+  if (pm.errors.length) {
+    lines.push('');
+    lines.push('Marqueurs incohérents :');
+    pm.errors.forEach(e => lines.push('- ' + e));
+  }
+  if (codes.length) {
+    lines.push('');
+    lines.push('Erreurs JS détectées :');
+    codes.slice(0, 6).forEach(c => lines.push('- ' + c));
+    if (codes.length > 6) lines.push('- … (' + (codes.length - 6) + ' autres)');
+  }
+  lines.push('');
+  lines.push('Corrige uniquement ce qui provoque ces erreurs, sans refactoriser, et renvoie seulement les blocs modifiés, complets, avec les mêmes marqueurs #BLOC/#FIN, dans un seul bloc de code.');
+  lines.push('');
+  lines.push(buildIndex(text));
+  return lines.join('\n');
+}
+/* Renvoie le HTML des boutons d'action d'une entrée d'historique (avec bouton de rapport si erreurs) */
+function histActions(h, i) {
+  const st = histStatus(h);
+  let html = '<div class="acts" data-i="' + i + '">' +
+    '<button class="sm primary" data-a="restore">Restaurer</button>' +
+    '<button class="sm" data-a="hcopy">Copier</button>';
+  if (st.kind !== 'ok') html += '<button class="sm danger" data-a="report">📨 Rapport IA</button>';
+  html += '</div>';
+  return html;
+}
+$('hlist-side').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-a]');
+  if (!btn) return;
+  const h = hist[+btn.parentElement.dataset.i];
+  if (!h) return;
+  if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
+  else if (btn.dataset.a === 'report') copyText(histReport(h), 'Rapport d\'erreurs copié — collez-le à l\'IA ✓');
+  else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); renderHistSide(); }
+});
 /* ---------- Aide raccourcis ---------- */
 function initHelp() {
   const btn = $('b-help');
@@ -2654,24 +2946,38 @@ function initHelp() {
     openOv('help');
   });
 }
-
-/* ---------- Onglets sidebar ---------- */
-function initSideTabs() {
-  const bar = document.querySelector('.side-tabs');
-  if (!bar) return;
-  const blist = $('blist-side'), hlist = $('hlist-side');
-  const tabs = bar.querySelectorAll('.side-tab');
-  const show = which => {
-    tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.tab === which ? 'true' : 'false'));
-    if (blist) blist.hidden = which !== 'blocs';
-    if (hlist) hlist.hidden = which !== 'hist';
-    if (which === 'hist') renderHistSide();
+/* ---------- Réponse IA en colonne latérale (grand écran) ---------- */
+function initRespInline() {
+  const pane = $('resp-inline');
+  if (!pane) return;
+  const KEY = 'blocs.splitresp', ta = $('resp-inline-ta');
+  let on = false;
+  try { on = localStorage.getItem(KEY) === '1'; } catch (e) { /* stockage indisponible */ }
+  const apply = v => {
+    pane.hidden = !v;
+    const cb = $('split-resp');
+    if (cb) cb.checked = v;
   };
-  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
-  show('blocs');
+  apply(on);
+  const cb = $('split-resp');
+  if (cb) cb.addEventListener('change', e => {
+    on = e.target.checked;
+    apply(on);
+    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (err) { }
+  });
+  const x = $('ri-close');
+  if (x) x.addEventListener('click', () => { apply(false); try { localStorage.setItem(KEY, '0'); } catch (e) { } });
+  const paste = $('ri-paste');
+  if (paste) paste.addEventListener('click', async () => {
+    const t = await readClip(); if (t !== null) { ta.value = t; notify('Collé ✓', { kind: 'ok' }); }
+  });
+  const apply2 = $('ri-apply');
+  if (apply2) apply2.addEventListener('click', () => {
+    $('resp').value = ta.value;
+    runResponse(true);
+  });
 }
-
-/* ---------- Zoom éditeur ---------- */
+/* ---------- Zoom de police de l'éditeur (Ctrl + molette) ---------- */
 function initEditorZoom() {
   const ta = $('src');
   if (!ta) return;
@@ -2687,7 +2993,10 @@ function initEditorZoom() {
     try { localStorage.setItem(KEY, String(fs)); } catch (err) { }
   }, { passive: false });
 }
-
+initSideTabs();
+initHelp();
+initRespInline();
+initEditorZoom();
 /* ---------- Barre latérale masquable (desktop) ---------- */
 function initSideToggle() {
   const app = document.querySelector('.app');
@@ -2710,8 +3019,6 @@ function initSideToggle() {
     try { localStorage.setItem(KEY, off ? '1' : '0'); } catch (e) { /* stockage indisponible */ }
   });
 }
-
-/* ---------- Panneau de notifications ---------- */
 function initNotifPanel() {
   const clr = $('np-clear');
   if (clr) clr.addEventListener('click', () => {
@@ -2720,72 +3027,9 @@ function initNotifPanel() {
     body.querySelectorAll('.notif.done').forEach(n => n.remove());
     updateNotifCount();
   });
-  const tgl = $('b-notif-toggle');
-  if (tgl) tgl.addEventListener('click', () => {
-    if (window.innerWidth < 1024) $('npane').classList.toggle('open');
-  });
   updateNotifCount();
 }
 
-/* ---------- Réponse IA en colonne latérale ---------- */
-function initRespInline() {
-  const pane = $('resp-inline');
-  if (!pane) return;
-  const KEY = 'blocs.splitresp', ta = $('resp-inline-ta');
-  let on = false;
-  try { on = localStorage.getItem(KEY) === '1'; } catch (e) { /* stockage indisponible */ }
-  const apply = v => { pane.hidden = !v; };
-  apply(on);
-  const x = $('ri-close');
-  if (x) x.addEventListener('click', () => { apply(false); try { localStorage.setItem(KEY, '0'); } catch (e) { } });
-  const paste = $('ri-paste');
-  if (paste) paste.addEventListener('click', async () => {
-    const t = await readClip(); if (t !== null) { ta.value = t; notify('Collé ✓', { kind: 'ok' }); }
-  });
-  const apply2 = $('ri-apply');
-  if (apply2) apply2.addEventListener('click', () => {
-    $('resp').value = ta.value;
-    runResponse(true);
-  });
-}
-
-init();
-wireSidebar();
-initSideTabs();
-initHelp();
-initRespInline();
-initEditorZoom();
-initSideToggle();
-initNotifPanel();
-
-/* ---------- Raccourcis clavier globaux ---------- */
-document.addEventListener('keydown', e => {
-  const mod = e.ctrlKey || e.metaKey;
-  if (mod && e.key === 'Enter') {
-    e.preventDefault();
-    $('b-main').click();
-    return;
-  }
-  if (mod && (e.key === 's' || e.key === 'S')) {
-    e.preventDefault();
-    if (e.shiftKey) $('b-copy-marked').click();
-    else $('b-dl-clean').click();
-    return;
-  }
-  const ae = document.activeElement;
-  const tag = (ae && ae.tagName) || '';
-  const inField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (ae && ae.isContentEditable);
-  if (!mod && !inField && e.key === '/') {
-    e.preventDefault();
-    if (window.innerWidth >= 1024) {
-      const qs = $('q-side');
-      if (qs) qs.focus();
-    } else {
-      openAdv('acc-blocs');
-      setTimeout(() => { const q = $('q'); if (q) q.focus(); }, 100);
-    }
-  }
-});
 </script>
 <script>
 if ('serviceWorker' in navigator) {
