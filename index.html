@@ -654,6 +654,7 @@ label.chk input { width: 18px; height: 18px; }
 .qb.cyan { background: rgba(34, 211, 238, .13); border-color: rgba(34, 211, 238, .45); color: #bdf4fc; }
 .qb.green { background: rgba(52, 211, 153, .13); border-color: rgba(52, 211, 153, .42); color: #c2f5e0; }
 .qb.warn { background: rgba(251, 191, 36, .13); border-color: rgba(251, 191, 36, .45); color: #fde8b0; }
+.qb.take { background: rgba(52, 211, 153, .13); border-color: rgba(52, 211, 153, .42); color: #c2f5e0; }
 .empty { color: var(--dim); text-align: center; padding: 26px 10px; font-size: 14px; }
 
 .log details { background: rgba(255, 255, 255, .05); border: 1px solid var(--edge); border-radius: 12px; margin: 6px 0; }
@@ -799,18 +800,10 @@ label.chk input { width: 18px; height: 18px; }
     <button class="btn hero" id="b-main"><svg class="ic"><use href="#i-zap"/></svg><span id="b-main-t">Analyser</span></button>
   </div>
 <div class="quick">
-  <div class="qb-wrap">
-    <button class="qb cyan" id="qb-marked" aria-label="Copier le code balisé"><svg class="ic"><use href="#i-braces"/></svg></button>
-    <span class="qb-lbl">Balisé</span>
-  </div>
-  <div class="qb-wrap">
-    <button class="qb" id="qb-prompt" aria-label="Copier le prompt seul"><svg class="ic"><use href="#i-copy"/></svg></button>
-    <span class="qb-lbl">Prompt</span>
-  </div>
-  <div class="qb-wrap">
-    <button class="qb cyan" id="qb-all" aria-label="Copier le prompt et le code balisé"><svg class="ic"><use href="#i-zap"/></svg></button>
-    <span class="qb-lbl">Full</span>
-  </div>
+  <button class="qb cyan" id="qb-marked" aria-label="Copier le code balisé"><svg class="ic"><use href="#i-braces"/></svg>Bal</button>
+  <button class="qb" id="qb-prompt" aria-label="Copier le prompt seul"><svg class="ic"><use href="#i-copy"/></svg>Prompt</button>
+  <button class="qb take" id="qb-take" aria-label="Répondre à l'IA : copier les blocs qu'elle demande"><svg class="ic"><use href="#i-zap"/></svg>Répondre</button>
+  <button class="qb cyan" id="qb-all" aria-label="Copier le prompt et le code balisé"><svg class="ic"><use href="#i-zap"/></svg>P+C</button>
 </div>
 
   <div class="grid">
@@ -1954,6 +1947,94 @@ function findBlock(blocks, name) {
   if (c.length === 1) return { block: c[0], exact: false };
   return null;
 }
+/* Extrait d'un texte tous les noms de blocs cités (backticks, guillemets, texte brut,
+   liste séparée par virgules, ou préfixe « ABSENT: »). */
+function extractNames(text, blocks) {
+  const found = new Set();
+  const quoted = /[`"«]\s*([A-Za-z][\w.$@%()+=,\[\]!?&|~^\-]*:[^\s`"»]+)\s*[`"»]/g;
+  let m;
+  while ((m = quoted.exec(text))) found.add(m[1]);
+  for (const b of blocks) if (text.includes(b.name)) found.add(b.name);
+  const prefixed = /\b((?:fn|method|css|html|const|ev|assign|let|call|code|zone):[\w.$@%()+=,\[\]!?&|~^\-]+)/g;
+  while ((m = prefixed.exec(text))) if (!found.has(m[1])) found.add(m[1]);
+  const absent = /ABSENT\s*:\s*([A-Za-z][^\s,;]+)/g;
+  while ((m = absent.exec(text))) found.add(m[1]);
+  const lineRe = /^\s*([A-Za-z][\w.$@%()+=,\[\]!?&|~^\-]*:[\w.$@%()+=,\[\]!?&|~^\-]+(?:\s*,\s*[A-Za-z][\w.$@%()+=,\[\]!?&|~^\-]*:[\w.$@%()+=,\[\]!?&|~^\-]+)*)\s*$/gm;
+  while ((m = lineRe.exec(text))) {
+    m[1].split(',').map(s => s.trim()).filter(Boolean).forEach(n => found.add(n));
+  }
+  return [...found];
+}
+/* Choisit le bloc voisin le plus logique pour servir d'ancre à un nouveau bloc,
+   en se basant sur le préfixe (css:, html:, fn:, method:, const:, ev:, …). */
+function pickNeighbor(blocks, wantedName) {
+  const pref = (wantedName.match(/^([A-Za-z]+):/) || [])[1];
+  if (!pref) return { name: null, mode: null, reason: 'nom sans préfixe' };
+  const same = blocks.filter(b => b.name.startsWith(pref + ':'));
+  if (!same.length) return { name: null, mode: null, reason: 'aucun bloc « ' + pref + ': » dans l\'index' };
+  const bare = wantedName.slice(pref.length + 1).toLowerCase();
+  const score = b => {
+    const s = b.name.slice(pref.length + 1).toLowerCase();
+    if (s === bare) return 100;
+    if (s.includes(bare) || bare.includes(s)) return 60;
+    const famBare = bare.split(/[.\s_-]/)[0];
+    const famS = s.split(/[.\s_-]/)[0];
+    if (famBare && famS && famBare === famS) return 40;
+    return 0;
+  };
+  let best = same[0], bestScore = -1;
+  for (const b of same) { const sc = score(b); if (sc > bestScore) { bestScore = sc; best = b; } }
+  return {
+    name: best.name,
+    mode: 'after',
+    reason: bestScore >= 40 ? 'même famille' : 'dernier bloc du préfixe'
+  };
+}
+/* Construit le message à renvoyer à l'IA : blocs trouvés, noms mal orthographiés,
+   blocs à créer avec ancre proposée, puis l'index complet.
+   Les marqueurs #APRES / #AVANT cités dans le texte sont écrits avec \u0023
+   pour ne pas être confondus avec de vrais marqueurs par parseResponse. */
+function buildMissingMessage(src, blocks, requested) {
+  const present = [];
+  const missing = [];
+  const near = [];
+  for (const name of requested) {
+    const hit = findBlock(blocks, name);
+    if (!hit) {
+      const bare = name.includes(':') ? name.split(':').pop().toLowerCase() : name.toLowerCase();
+      const cand = blocks.find(b => b.name.toLowerCase().endsWith(':' + bare) || b.name.toLowerCase() === name.toLowerCase());
+      if (cand) near.push({ asked: name, real: cand.name });
+      else missing.push(name);
+      continue;
+    }
+    const b = hit.block;
+    if (!present.includes(b)) present.push(b);
+  }
+  const top = topBlocks(present);
+  const eol = '\n';
+  let msg = 'Voici une partie des blocs demandés' + (top.length ? ' (' + top.length + ')' : '') + ', dans leur état actuel :' + eol + eol;
+  if (top.length) {
+    const code = top.map(b => src.slice(b.outerStart, b.outerEnd)).join('').replace(/\n$/, '');
+    const f = fenceFor(code);
+    msg += f + 'html' + eol + code + eol + f + eol + eol;
+  }
+  if (near.length) {
+    msg += 'Attention à l\'orthographe : certains noms que tu as cités n\'existent pas, mais un nom proche existe dans mon code :' + eol;
+    near.forEach(n => { msg += '- « ' + n.asked + ' » → « ' + n.real + ' »' + eol; });
+    msg += 'Utilise le nom exact à partir de maintenant.' + eol + eol;
+  }
+  if (missing.length) {
+    msg += 'Blocs absents de mon code : tu peux les CRÉER. Pour chacun, préfixe-le d\'une ancre `/*\u0023APRES:…*/` ou `/*\u0023AVANT:…*/` avec un nom voisin valide pris dans l\'index ci-dessous. Ne touche à aucun autre bloc.' + eol;
+    for (const name of missing) {
+      const nb = pickNeighbor(blocks, name);
+      if (nb.name) msg += '- ' + name + ' → ancre proposée : /*\u0023' + nb.mode.toUpperCase() + ':' + nb.name + '*/ (' + nb.reason + ')' + eol;
+      else msg += '- ' + name + ' → aucune ancre automatique (' + nb.reason + ') : choisis toi-même dans l\'index.' + eol;
+    }
+    msg += eol;
+  }
+  msg += 'Index complet des blocs (nom — lignes) :' + eol + buildIndex(src) + eol;
+  return { msg, present: top, near, missing };
+}
 
 /* ---------- Lire la réponse de l'IA ---------- */
 function parseResponse(resp) {
@@ -2229,6 +2310,10 @@ function exemple() { return 1; }
 Avant d'envoyer, vérifie : un seul bloc de code pour toute la réponse ; aucun texte entre les blocs ; chaque #APRES / #AVANT vise un nom présent dans l'index, et chaque nom ajouté n'y figure pas ; aucun « … » ni « reste inchangé ».
 
 Je vais maintenant donner le code balisé. Réponds simplement « Prêt », puis attends ma demande.`;
+/* Phrase d'introduction du prompt « quels blocs te faut-il ? » (le format et l'index sont ajoutés par copyWhat) */
+const WHAT_TEXT = 'Pour pouvoir continuer, dis-moi UNIQUEMENT les noms des blocs de mon code dont tu as besoin pour répondre à ma demande.';
+/* Suffixe du prompt « quels blocs te faut-il ? » : format de réponse strict + index. */
+const WHAT_INDEX_TAIL = '\n\nRéponds simplement « Prêt » puis attends ma demande.\n\nQuand tu auras besoin de blocs, utilise EXACTEMENT ce format :\n- une seule ligne, séparés par des virgules ;\n- pour un bloc existant : son nom exact (avec préfixe fn:, css:, html:, method:, const:, ev:, assign:, let:, call:, code: ou zone:, et #2, #3… si présent) ;\n- pour un bloc qui n\'existe pas encore : préfixe la ligne par « ABSENT: nom:préfixe:nom-court » ;\n- aucune phrase autour, aucun markdown, aucune puce.\n\nExemple :\nfn:recordSegmentToStream, css:.panel, ABSENT:css:studioPremium\n\nVoici l\'index complet des blocs de mon code :\n';
 
 function buildIndex(text) {
   const { blocks } = parseMarks(text);
@@ -3039,30 +3124,24 @@ function copyAllForAI() {
   copyText(head + '\n\nVoici mon code balisé. Réponds simplement « Prêt », puis attends ma demande.\n\n' + f + 'html\n' + code + '\n' + f,
     'Prompt + code copiés ✓ — collez-les dans l\'IA');
 }
-/* Colle la demande de l'IA (qui cite des noms de blocs) et copie ces blocs prêts à renvoyer */
+/* Copie le prompt « quels blocs te faut-il ? » avec l'index complet joint. */
+function copyWhat() {
+  const src = $('src').value;
+  const idx = parseMarks(src).blocks.length ? buildIndex(src) : '(le code n\'est pas encore balisé)';
+  copyText(WHAT_TEXT + WHAT_INDEX_TAIL + idx, 'Demande de blocs copiée ✓ — collez-la à l\'IA');
+}
+/* Réponse à l'IA : lit sa demande dans le presse-papiers, prépare un message prêt à coller
+   (blocs trouvés + ancres pour les blocs à créer), et confirme brièvement. */
 async function copyRequested() {
   if (!parseMarks($('src').value).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'err' }); return; }
   const t = await readClip();
   if (t === null) return;
   const src = $('src').value;
   const { blocks } = parseMarks(src);
-  let work = t;
-  const hit = [];
-  blocks.slice().sort((a, b) => b.name.length - a.name.length).forEach(b => {
-    let i = work.indexOf(b.name);
-    if (i < 0) return;
-    hit.push(b);
-    while (i >= 0) {
-      work = work.slice(0, i) + ' '.repeat(b.name.length) + work.slice(i + b.name.length);
-      i = work.indexOf(b.name);
-    }
-  });
-  const list = topBlocks(hit);
-  if (!list.length) { notify('Aucun nom de bloc reconnu dans le texte collé', { kind: 'err' }); return; }
-  const code = list.map(b => src.slice(b.outerStart, b.outerEnd)).join('').replace(/\n$/, '');
-  const f = fenceFor(code);
-  copyText('Voici les blocs demandés :\n\n' + f + 'html\n' + code + '\n' + f,
-    list.length + ' bloc' + (list.length > 1 ? 's' : '') + ' copié' + (list.length > 1 ? 's' : '') + ' ✓');
+  const requested = extractNames(t, blocks);
+  if (!requested.length) { notify('Aucun nom de bloc reconnu dans le texte collé', { kind: 'err' }); return; }
+  const { msg, present, near, missing } = buildMissingMessage(src, blocks, requested);
+  copyText(msg, 'Message prêt ✓ — collez-le à l\'IA');
 }
 document.addEventListener('keydown', e => {
   if (isOpen('shortcutdlg')) {
@@ -3760,8 +3839,7 @@ $('qb-marked').onclick = () => {
 };
 $('qb-prompt').onclick = () => copyText(PROMPT_TEXT, 'Prompt copié ✓');
 $('qb-all').onclick = () => copyAllForAI();
-/* Ouvre une modale dédiée à la gestion des projets */
-$('qb-proj').onclick = () => { closeOv('adv'); renderProjects(); openOv('projdlg'); };
+$('qb-take').onclick = copyRequested;
 /* Dessine la liste des projets dans la modale de sélection (cartes cliquables) */
 function renderProjSel() {
   $('plist3').innerHTML = projects.list.map(p =>
