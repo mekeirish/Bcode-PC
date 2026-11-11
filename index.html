@@ -20,228 +20,316 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
   font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
 
 .glass { background: var(--glass); border: 1px solid var(--edge); border-top-color: rgba(34, 211, 238, .30); border-radius: 16px;
-  -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
   box-shadow: 0 8px 28px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .08); }
 
 /* ---------- Écran principal ---------- */
 .app { min-height: 100vh; min-height: 100dvh; max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px;
   padding: max(10px, env(safe-area-inset-top)) 12px max(8px, env(safe-area-inset-bottom)); }
-.main-col { display: contents; }
-@media (min-width: 1024px) {
+/* PC : 3 colonnes */
+@media (min-width: 1000px) {
   .app {
-    max-width: 1440px;
-    min-height: 0;
     display: grid;
-    grid-template-columns: 320px minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      "header header"
-      "side   main"
-      "footer footer";
-    column-gap: 14px;
-    row-gap: 12px;
-    padding: 14px;
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(220px, 280px);
+    grid-template-rows: auto auto auto auto 1fr auto;
+    max-width: 1500px;
     height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-  }
-  /* Barre latérale masquée : le contenu occupe toute la largeur */
-  .app.side-off {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "header"
-      "main"
-      "footer";
-  }
-  .app.side-off > .side { display: none; }
-  .app > header { grid-area: header; }
-  .app > .side { grid-area: side; }
-  .app > .main-col {
-    grid-area: main;
-    display: flex;
-    flex-direction: column;
+    align-items: start;
     gap: 10px;
-    min-height: 0;
-    overflow: auto;
-    padding-right: 2px;
   }
-  .app > footer { grid-area: footer; }
-  .main-col > .code {
-    flex: 1 1 auto;
-    min-height: 200px;
-    max-height: none;
-  }
-  .main-col > .row,
-  .main-col > .grid { flex: 0 0 auto; }
-  .main-col > #notifs { flex: 0 0 auto; }
-.main-col > #npane { display: none; }
-@media (min-width: 1024px) {
-  .app {
-    max-width: 1440px;
-    min-height: 0;
-    display: grid;
-    grid-template-columns: 320px minmax(0, 1fr) 300px;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      "header header header"
-      "side   main   npane"
-      "footer footer footer";
-    column-gap: 14px;
-    row-gap: 12px;
-    padding: 14px;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-  }
-  .app.side-off {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    grid-template-areas:
-      "header header"
-      "main   npane"
-      "footer footer";
-  }
-  .app > header { grid-area: header; }
-  .app > .side { grid-area: side; }
-  .app > .main-col {
-    grid-area: main;
+  
+  /* Colonne centrale */
+  .app > header.bar {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    height: 58px !important;
+    border-radius: 16px !important;
+    padding: 0 16px !important;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-height: 0;
-    overflow: auto;
-    padding-right: 2px;
+    align-items: center;
   }
-  .app > footer { grid-area: footer; }
-  .main-col > .code {
-    flex: 1 1 auto;
-    min-height: 200px;
-    max-height: none;
-  }
-  .main-col > .row,
-  .main-col > .grid { flex: 0 0 auto; }
-  .main-col > #notifs { flex: 0 0 auto; }
-  .main-col > #npane { display: none; }
-  .app > #npane {
-    grid-area: npane;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
+  .app > section.code {
+    grid-column: 2;
+    grid-row: 2 / span 4;
     align-self: stretch;
-    background: var(--glass);
-    border: 1px solid var(--edge);
-    border-top-color: rgba(34, 211, 238, .30);
-    border-radius: 16px;
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
-    backdrop-filter: blur(18px) saturate(140%);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .08);
+    max-height: calc(100dvh - 170px);
+    margin: 0 0 90px 0;
   }
-  .app.side-off > .main-col { grid-area: main; }
+  .app > #notifs {
+    grid-column: 2;
+    grid-row: 5;
+    align-self: end;
+    margin: 0;
+    max-height: 80px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .app > footer.sig {
+    grid-column: 2;
+    grid-row: 6;
+    margin: 0;
+  }
+
+  /* Colonne de droite */
+  .app > div.meta:nth-of-type(1) {
+    grid-column: 3;
+    grid-row: 1;
+    margin: 0;
+    height: 58px !important;
+    border-radius: 16px !important;
+    padding: 0 8px 0 16px !important;
+    display: flex;
+    align-items: center;
+  }
+  .app > div.meta:nth-of-type(2) {
+    grid-column: 3;
+    grid-row: 2;
+    margin: 0;
+  }
+  .app > .level-wrap {
+    grid-column: 3;
+    grid-row: 3;
+    margin: 0;
+  }
+  .app > .toggles {
+    grid-column: 3;
+    grid-row: 4;
+  }
+  .app > .clear-wrap {
+    grid-column: 3;
+    grid-row: 5;
+    margin: 0;
+  }
+
+  /* Colonne de gauche */
+  .app > .row {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    height: 58px !important;
+  }
+  .app > .quick {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0;
+  }
+  .app > .grid {
+    grid-column: 1;
+    grid-row: 3;
+    margin: 0;
+  }
+  .app > #tdlg {
+    grid-column: 1;
+    grid-row: 4;
+    margin: 0;
+  }
+  
+  /* La console prend la place restante (ligne 5) et s'aligne avec la marge du code */
+  .app > #activity-log {
+    grid-column: 1;
+    grid-row: 5;
+    align-self: stretch;
+    margin: 0 0 90px 0;
+    min-height: 0; /* Permet au flex interne de limiter la hauteur et d'activer le scroll */
+    max-height: none;
+  }
 }
-.npane-h {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px 12px 10px 16px;
-  border-bottom: 1px solid var(--edge);
-  flex: 0 0 auto;
+/* PC : toggles en rangée verticale — bouton à gauche, brève explication à droite */
+@media (min-width: 1000px) {
+  .toggles {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: flex-start !important;
+    margin: 2px 0 16px 0 !important;
+  }
+  .tg-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100%;
+  }
+  .tg-row .tg {
+    margin: 0 !important;
+    flex-shrink: 0;
+  }
+  .tg-row .tglbl {
+    display: block !important;
+    margin: 0 !important;
+    font-size: 13.5px !important;
+    line-height: 1.3 !important;
+    color: var(--text) !important;
+    opacity: 0.85;
+    white-space: normal;
+  }
 }
-.npane-h b { flex: 1; font-size: 14px; }
-.npane-body {
-  flex: 1 1 auto; min-height: 0; overflow: auto;
-  display: flex; flex-direction: column; gap: 6px; padding: 10px;
-  -webkit-overflow-scrolling: touch;
+@media (min-width: 1000px) {
+  .app > .level-wrap {
+    grid-column: 3;
+    grid-row: 3;
+    margin-bottom: 0;
+  }
+  .app > .toggles {
+    grid-row: 4;
+  }
+  .app > .clear-wrap {
+    grid-column: 3;
+    grid-row: 5;
+    margin-bottom: 0;
+  }
 }
-.npane-body .empty { padding: 22px 8px; font-size: 12.5px; }
-}
-/* ---------- Sidebar (desktop) ---------- */
-.side {
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  overflow: auto;
-  min-height: 0;
-}
-/* Bouton d'affichage de la barre latérale : visible seulement quand elle existe (desktop) */
-#b-side-toggle { display: none; }
-#b-side-toggle[aria-pressed="true"] { color: var(--accent); border-color: rgba(34, 211, 238, .45); }
-@media (min-width: 1024px) {
-  #b-side-toggle { display: inline-flex; }
-}
-@media (min-width: 1024px) {
-  .side { display: flex; }
-}
-.side-h {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 2px 2px 8px;
-  border-bottom: 1px solid var(--edge);
-}
-.side-h b { color: var(--dim); font-weight: 500; font-size: 12px; }
-.side-hint {
-  color: var(--dim);
-  font-size: 10.5px;
-  font-weight: 400;
-  opacity: .65;
-  white-space: nowrap;
-}
-.side-tabs { display: none; gap: 6px; margin: 4px 0 6px; }
-@media (min-width: 1024px) {
-  .side-tabs { display: flex; }
-}
-.side-tab {
-  flex: 1; height: 32px; border-radius: 10px; cursor: pointer; font: inherit; font-weight: 600;
-  font-size: 12.5px; color: var(--dim); background: rgba(255, 255, 255, .06);
-  border: 1px solid var(--edge); transition: color .15s, background .15s, border-color .15s;
-}
-.side-tab[aria-selected="true"] {
-  color: var(--accent); border-color: rgba(34, 211, 238, .55);
-  background: rgba(34, 211, 238, .10);
-}
-.side > input[type=search] { height: 36px; }
-.side .chk { font-size: 12.5px; color: var(--dim); }
-.side .row { margin: 2px 0 4px; gap: 6px; }
-.side .sm { height: 34px; font-size: 12px; padding: 0 10px; }
-.blist-side {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow: auto;
-  min-height: 0;
-  flex: 1 1 auto;
-  padding-right: 2px;
-}
-.blist-side .card { margin: 0; padding: 8px 10px; }
-.blist-side .card .nm { font-size: 12px; }
-.blist-side .card .meta2 { margin: 2px 0 6px; font-size: 11px; }
-.blist-side .sm { height: 30px; padding: 0 8px; font-size: 11.5px; }
-.blist-side .empty { padding: 18px 8px; font-size: 12.5px; }
 .bar { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; }
+.bar-side { display: flex; align-items: center; gap: 6px; flex: 1; }
+.bar-side.right { justify-content: flex-end; }
 .brand { flex: 1; font-weight: 700; font-size: 18px; letter-spacing: .6px; }
-/* Pastille d'état de synchronisation avec l'IA */
-.sync-dot { gap: 7px; padding: 0 11px; }
-.sync-dot .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dim); box-shadow: 0 0 0 3px rgba(138, 148, 166, .18); transition: background .2s, box-shadow .2s; flex: 0 0 auto; }
-.sync-dot .sync-txt { font-size: 12px; font-weight: 600; color: var(--dim); }
-.sync-dot[data-state="ok"] .dot { background: var(--ok); box-shadow: 0 0 0 3px rgba(52, 211, 153, .22), 0 0 10px rgba(52, 211, 153, .5); }
-.sync-dot[data-state="ok"] .sync-txt { color: var(--ok); }
-.sync-dot[data-state="stale"] .dot { background: var(--warn); box-shadow: 0 0 0 3px rgba(251, 191, 36, .22), 0 0 10px rgba(251, 191, 36, .55); }
-.sync-dot[data-state="stale"] .sync-txt { color: var(--warn); }
-.sync-dot[data-state="none"] .dot { background: var(--dim); }
-@media (max-width: 480px) {
-  .sync-dot .sync-txt { display: none; }
-  .sync-dot { min-width: 36px; padding: 0 9px; }
+/* Conteneur central de la barre (undo, redo) */
+.bar-center { display: flex; align-items: center; justify-content: center; gap: 8px; flex: 0 0 auto; }
+/* Titre calé à l'extrême gauche */
+header.bar > .bar-side .brand { flex: 0 1 auto; text-align: left; margin: 0; }
+/* Boutons Undo / Redo (style premium) */
+.b-top {
+  height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top-color: rgba(255, 255, 255, 0.2) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.b-top:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%) !important;
+  transform: translateY(-1px);
+}
+.b-top:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+}
+.b-top:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+.b-top .ic {
+  width: 18px;
+  height: 18px;
+}
+.b-top.b-undo {
+  color: #bdf4fc;
+  border-color: rgba(34, 211, 238, 0.25) !important;
+  border-top-color: rgba(34, 211, 238, 0.5) !important;
+}
+.b-top.b-undo:hover:not(:disabled) {
+  box-shadow: 0 4px 14px rgba(34, 211, 238, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+.b-top.b-redo {
+  color: #c2f5e0;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+  border-top-color: rgba(52, 211, 153, 0.5) !important;
+}
+.b-top.b-redo:hover:not(:disabled) {
+  box-shadow: 0 4px 14px rgba(52, 211, 153, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+/* Bouton Avancé : même hauteur et style que Undo/Redo */
+.b-adv {
+  height: 38px !important;
+  padding: 0 12px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top-color: rgba(255, 255, 255, 0.2) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  color: var(--text);
+}
+.b-adv:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%) !important;
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,0.2) !important;
+}
+.b-adv:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+}
+.b-adv .ic {
+  width: 16px;
+  height: 16px;
 }
 .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.code { flex: 1 1 auto; min-height: 130px; max-height: 46vh; max-height: 46dvh; display: flex; padding: 6px; }
+.code { flex: 1 1 auto; min-height: 130px; max-height: 46vh; max-height: 46dvh; display: flex; padding: 6px; position: relative; }
+/* Ancien conteneur des boutons A− / A+ (vide) */
 #src { flex: 1; min-width: 0; height: auto; align-self: stretch; resize: none; border: 0; outline: 0; background: transparent; color: var(--text);
-  font: 12px/1.5 var(--mono); padding: 8px; white-space: pre; overflow: auto; tab-size: 2; }
+  font-family: var(--mono); font-size: var(--cfs, 12px); line-height: var(--clh, 18px); padding: 8px; white-space: pre; overflow: auto; tab-size: 2; }
 #src::placeholder { color: var(--dim); }
-/* Zoom de police de l'éditeur (piloté par une variable CSS) */
-#src { font-size: var(--src-fs, 12px); }
-.meta { display: flex; align-items: center; gap: 8px; }
+/* Coloration syntaxique : la couche #hl dessine seulement les lignes visibles derrière le champ */
+#hl { position: absolute; inset: 6px; margin: 0; padding: 8px; overflow: hidden; pointer-events: none;
+  font-family: var(--mono); font-size: var(--cfs, 12px); line-height: var(--clh, 18px); white-space: pre; tab-size: 2; letter-spacing: normal; color: var(--text); -webkit-text-size-adjust: 100%; }
+#hl-in { will-change: transform; }
+#src.hl-on { position: relative; z-index: 1; color: transparent; caret-color: var(--text); -webkit-text-size-adjust: 100%; }
+#src.hl-on::selection { background: rgba(34, 211, 238, .30); }
+.hl-c { color: #6a9955; }
+.hl-mk { color: #5b6b80; }
+.hl-s, .hl-val { color: #ce9178; }
+.hl-n { color: #b5cea8; }
+.hl-k, .hl-tag { color: #569cd6; }
+.hl-kc { color: #c586c0; }
+.hl-f { color: #dcdcaa; }
+.hl-t { color: #4ec9b0; }
+.hl-v, .hl-p { color: #9cdcfe; }
+.hl-r { color: #d16969; }
+.hl-tp { color: #808080; }
+.hl-sel { color: #d7ba7d; }
+.meta { display: flex; align-items: center; gap: 8px; justify-content: center; }
+/* Conteneur du bouton de découpage, placé sous les statistiques */
+.level-wrap {
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+/* Conteneur des boutons de droite (Vider, Projets) */
+.clear-wrap {
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+  justify-content: flex-start;
+  gap: 12px;
+}
+/* Rangée de boutons carrés toggle au-dessus du code, centrée */
+.toggles { display: flex; gap: 6px; justify-content: center; margin: 2px 2px 0; }
+/* Explication à droite de chaque toggle (visible seulement en disposition PC) */
+.tglbl { display: none; }
+.tg { width: 38px; height: 38px; padding: 0; border-radius: 12px; font: inherit; font-size: 16px; font-weight: 700;
+  color: var(--dim); background: var(--glass); border: 1px solid var(--edge);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s, box-shadow .15s;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.tg.on { color: #bdf4fc; background: rgba(34, 211, 238, .15); border-color: rgba(34, 211, 238, .55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10), 0 0 14px rgba(34, 211, 238, .22); }
+.tg:active { transform: translateY(1px) scale(.96); }
+.tg.help { color: var(--accent); font-size: 17px; }
+/* Aide des toggles : réutilise .ov / .panel */
+#help { align-items: center; padding: 16px; z-index: 90; }
+#help .panel { max-width: 460px; border-radius: 22px; border-bottom: 1px solid var(--edge); padding-bottom: 0; }
+.hrow { display: flex; gap: 10px; align-items: flex-start; padding: 10px 2px; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+.hrow:last-child { border-bottom: 0; }
+.hkey { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #bdf4fc; background: rgba(34, 211, 238, .15); border: 1px solid rgba(34, 211, 238, .45); }
+.htxt { flex: 1; min-width: 0; font-size: 13.5px; line-height: 1.35; }
+.htxt b { color: var(--text); font-weight: 600; }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; height: 44px; border-radius: 14px; font-size: 13px; color: var(--dim); white-space: nowrap; }
 .chip b { color: var(--text); font-weight: 600; }
 .chip b:first-child { color: var(--warn); }
@@ -252,29 +340,6 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
 .center { display: flex; justify-content: center; }
 .center.first { margin-top: auto; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-/* Barre d'actions principale : boutons à taille naturelle, centrés */
-.main-col > .row#2,
-.main-col > .grid {
-  justify-content: center;
-}
-.main-col > .row#2 > .btn,
-.main-col > .grid > .btn {
-  flex: 0 0 auto;
-}
-.main-col > .row#2 > .btn.hero {
-  width: auto;
-  min-width: 200px;
-  padding: 0 26px;
-}
-.main-col > .grid {
-  display: flex;
-  gap: 10px;
-}
-.main-col > .grid > .btn.small {
-  width: auto;
-  min-width: 140px;
-  padding: 0 20px;
-}
 .sig { text-align: center; font-size: 11px; letter-spacing: .5px; color: var(--dim); opacity: .55; padding: 2px 0 0; user-select: none; }
 
 /* Boutons : verre, filet lumineux, retour au toucher */
@@ -290,8 +355,8 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
 .btn.tbtn { flex-direction: column; gap: 5px; height: 62px; padding: 0 6px; font-size: 12.5px; }
 .btn.cyan { background: rgba(34, 211, 238, .13); border-color: rgba(34, 211, 238, .45); color: #bdf4fc; }
 .btn.green { background: rgba(52, 211, 153, .13); border-color: rgba(52, 211, 153, .42); color: #c2f5e0; }
-.btn.hero { width: 78%; height: 60px; font-size: 15.5px; background: var(--accent); border-color: rgba(255, 255, 255, .28); color: #021014;
-  box-shadow: 0 0 22px rgba(34, 211, 238, .34), inset 0 1px 0 rgba(255, 255, 255, .45); }
+.btn.hero { width: 100% !important; height: 58px !important; padding: 0 20px !important; font-size: 15.5px; border-radius: 16px !important; background: var(--accent); border-color: rgba(255, 255, 255, .28); color: #021014;
+  box-shadow: 0 0 22px rgba(34, 211, 238, .34), inset 0 1px 0 rgba(255, 255, 255, .45); display: flex; align-items: center; justify-content: center; gap: 8px; }
 .btn.hero:hover { border-color: #fff; }
 .btn.hero:active { background: #67e8f9; box-shadow: 0 0 30px rgba(34, 211, 238, .6), inset 0 1px 0 rgba(255, 255, 255, .3); }
 .btn.small { height: 48px; font-size: 13.5px; border-radius: 14px; }
@@ -300,66 +365,190 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
   font-size: 13.5px; font-weight: 600; }
 .ic { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 #b-clear { color: #ff3b5c; }
+/* Style commun pour la corbeille, projets et raccourcis (format carré 88x88) */
+.b-clear {
+  flex: 0 0 88px !important;
+  height: 88px !important;
+  width: 88px !important;
+  min-width: 88px !important;
+  max-width: 88px !important;
+  padding: 0 !important;
+  border-radius: 22px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  display: inline-flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+  color: #ff3b5c !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.b-clear:hover {
+  background: rgba(255, 59, 92, 0.1) !important;
+  border-color: rgba(255, 59, 92, 0.4) !important;
+}
+
+#qb-proj.b-clear {
+  color: #fde8b0 !important;
+}
+
+#qb-proj.b-clear:hover {
+  background: rgba(251, 191, 36, 0.1) !important;
+  border-color: rgba(251, 191, 36, 0.4) !important;
+}
+
+#b-shortcuts-open.b-clear {
+  color: #d8b4fe !important; /* Violet clair */
+}
+
+#b-shortcuts-open.b-clear:hover {
+  background: rgba(168, 85, 247, 0.1) !important;
+  border-color: rgba(168, 85, 247, 0.4) !important;
+}
+
+.b-clear .ic {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+#b-clear .ic {
+  filter: drop-shadow(0 0 8px rgba(255, 59, 92, 0.8)) !important;
+}
+
+#qb-proj .ic {
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.8)) !important;
+}
+
+#b-shortcuts-open .ic {
+  filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.8)) !important;
+}
 #b-clear .ic { filter: drop-shadow(0 0 4px rgba(255, 59, 92, .65)); }
 #b-copy-clean .ic { stroke: var(--ok); filter: drop-shadow(0 0 4px rgba(52, 211, 153, .65)); }
 #b-test .ic { stroke: var(--warn); filter: drop-shadow(0 0 4px rgba(251, 191, 36, .65)); }
+#b-hl[aria-pressed="true"] .ic { stroke: var(--accent); filter: drop-shadow(0 0 4px rgba(34, 211, 238, .65)); }
+#b-hl[aria-pressed="false"] { opacity: .5; }
 button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-.notif { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 6px 6px 6px 10px; border-radius: 12px;
-  background: rgba(24, 27, 40, .78); border: 1px solid var(--edge); border-left: 3px solid var(--accent);
-  -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .4); opacity: 0; transform: translateY(-6px) scale(.98); transition: .2s; }
+/* Cartes de notification (style verre premium) */
+.notif { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 14px;
+  background: rgba(14, 17, 25, 0.85); border: 1px solid var(--edge); border-left: 4px solid var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05); 
+  opacity: 0; transform: translateY(-6px) scale(.98); transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+/* Journal d'activité (console) */
+.activity-log {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin: 10px 0 0 0;
+  padding: 12px 14px;
+  overflow: hidden;
+  border-radius: 14px;
+  min-height: 280px;
+  max-height: calc(100dvh - 300px); /* Limite la hauteur globale sur PC */
+}
+.log-header {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--dim);
+  margin-bottom: 8px;
+  font-weight: 700;
+  opacity: 0.8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+}
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0; /* Crucial pour que le scroll fonctionne dans un conteneur flex */
+  padding-right: 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.log-item {
+  color: var(--text);
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  line-height: 1.35;
+}
+.log-time {
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.log-msg {
+  word-break: break-word;
+}
+.log-msg.err { color: var(--err); }
+.log-msg.warn { color: var(--warn); }
+.log-msg.ok { color: var(--ok); }
 /* ---------- Notifications (sous les boutons, au-dessus de la signature) ---------- */
 #notifs { display: flex; flex-direction: column; gap: 6px; }
-@media (min-width: 1024px) {
-  .main-col > #notifs { display: none; }
-}
-/* Rapport déjà copié : notification discrète et validée */
-.notif.done { border-left-color: var(--ok); opacity: .62; }
-.app:has(.tpane.open.fullscreen) #npane { display: none; }
-.notif.done .nmsg::before { content: "✓ "; color: var(--ok); font-weight: 700; }
-.notif.done .nact { opacity: .7; }
 #notifs:empty { display: none; }
 /* Test plein écran : les notifications repassent en haut de l'écran */
 .app:has(.tpane.open.fullscreen) #notifs { position: fixed; z-index: 100; top: max(10px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
   width: min(94vw, 540px); }
 .notif.in { opacity: 1; transform: none; }
-.notif.ok { border-left-color: var(--ok); } .notif.warn { border-left-color: var(--warn); } .notif.err { border-left-color: var(--err); }
-.nmsg { flex: 1 1 120px; font-size: 13px; line-height: 1.25; word-break: break-word; }
-.nact { display: flex; gap: 6px; flex-wrap: wrap; }
-.nact button { height: 26px; padding: 0 9px; border-radius: 8px; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
-  color: var(--text); background: rgba(255, 255, 255, .12); border: 1px solid var(--edge); }
-.nx { width: 24px; height: 24px; border: 0; border-radius: 50%; background: transparent; color: var(--dim); font-size: 16px; line-height: 1; cursor: pointer; }
+.notif.ok { border-left-color: var(--ok); }
+ 
+.notif.warn { border-left-color: var(--warn); }
+ 
+.notif.err { border-left-color: var(--err); }
+.nmsg { flex: 1 1 160px; font-size: 13.5px; line-height: 1.35; word-break: break-word; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.nmsg::before { content: "ℹ"; font-size: 16px; flex-shrink: 0; opacity: 0.8; }
+.notif.ok .nmsg::before { content: "✓"; color: var(--ok); }
+.notif.warn .nmsg::before { content: "⚠"; color: var(--warn); }
+.notif.err .nmsg::before { content: "✕"; color: var(--err); }
+.nact { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.nact button { height: 30px; padding: 0 12px; border-radius: 8px; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+  color: var(--text); background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.15s; }
+.nact button:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.25); }
+
+/* Bouton de correction IA (distinctif et discret) */
+.nact button.btn-fix {
+  color: #ffc4c4;
+  background: rgba(255, 107, 122, 0.15);
+  border-color: rgba(255, 107, 122, 0.4);
+  box-shadow: 0 0 10px rgba(255, 107, 122, 0.15);
+  animation: pulse-fix 2s infinite;
+}
+.nact button.btn-fix:hover {
+  background: rgba(255, 107, 122, 0.25);
+  border-color: rgba(255, 107, 122, 0.6);
+  box-shadow: 0 0 15px rgba(255, 107, 122, 0.3);
+}
+@keyframes pulse-fix {
+  0% { box-shadow: 0 0 8px rgba(255, 107, 122, 0.1); }
+  50% { box-shadow: 0 0 16px rgba(255, 107, 122, 0.3); }
+  100% { box-shadow: 0 0 8px rgba(255, 107, 122, 0.1); }
+}
+.nx { width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: var(--dim); font-size: 18px; line-height: 1; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; }
+.nx:hover { background: rgba(255, 255, 255, 0.1); color: var(--text); }
 
 /* ---------- Feuilles (Avancé, bloc, test) ---------- */
-.ov { position: fixed; inset: 0; z-index: 50; display: none; align-items: flex-end; justify-content: center;
-  background: rgba(4, 5, 10, .55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.ov { position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center;
+  background: rgba(4, 5, 10, .65); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 .ov.open { display: flex; }
-.panel { width: 100%; max-width: 560px; max-height: 94vh; max-height: 94dvh; display: flex; flex-direction: column;
-  border-radius: 26px 26px 0 0; background: rgba(14, 17, 25, .82); border: 1px solid var(--edge); border-bottom: 0;
+.panel { width: 100%; max-width: 560px; max-height: 90vh; max-height: 90dvh; display: flex; flex-direction: column;
+  border-radius: 20px; background: rgba(14, 17, 25, .82); border: 1px solid var(--edge);
   -webkit-backdrop-filter: blur(26px) saturate(160%); backdrop-filter: blur(26px) saturate(160%);
-  box-shadow: 0 -10px 50px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .12);
-  padding-bottom: env(safe-area-inset-bottom); animation: rise .22s ease-out; }
-@keyframes rise { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  box-shadow: 0 10px 50px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .12);
+  animation: pop-in .25s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin: 20px; }
+@keyframes pop-in { from { transform: scale(.95) translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
 .ph { display: flex; align-items: center; gap: 8px; padding: 14px 14px 8px 18px; }
-#resp-inline { display: none; }
-@media (min-width: 1400px) {
-  #resp-inline {
-    display: flex; flex-direction: column; gap: 8px; padding: 10px;
-    position: fixed; top: 14px; right: 14px; width: 420px;
-    max-height: calc(100vh - 90px); z-index: 30;
-  }
-  #resp-inline[hidden] { display: none; }
-  #resp-inline .ri-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  #resp-inline .ri-h b { font-size: 13px; color: var(--dim); }
-  #resp-inline .ta { flex: 1 1 auto; height: auto; min-height: 180px; }
-  #resp-inline #result-inline { max-height: 40%; overflow: auto; }
-  /* 2 colonnes pour l'éditeur au-delà de 1800 px */
-  @media (min-width: 1800px) {
-    .main-col > .code { flex: 1 1 auto; }
-    .app { max-width: 1800px; }
-  }
-}
 .ph h2 { flex: 1; margin: 0; font-size: 16px; word-break: break-all; }
 .pb { overflow: auto; padding: 4px 12px 14px; -webkit-overflow-scrolling: touch; }
 
@@ -380,30 +569,91 @@ label.chk input { width: 18px; height: 18px; }
 .note { background: rgba(0, 0, 0, .22); border: 1px solid var(--edge); border-radius: 12px; padding: 9px 12px; color: var(--dim); font-size: 13px; margin: 8px 0; }
 .note.warn { border-color: var(--warn); color: var(--warn); } .note.err { border-color: var(--err); color: var(--err); } .note.okk { border-color: var(--ok); color: var(--ok); }
 .status { color: var(--dim); font-size: 13px; margin: 8px 2px; }
+/* Boîte de dialogue interne (remplace prompt / confirm) : centrée, au-dessus des autres feuilles */
+#ask { align-items: center; padding: 16px; z-index: 80; }
+#ask .panel { max-width: 420px; border-radius: 22px; border-bottom: 1px solid var(--edge); padding-bottom: 0; }
+#ask-msg { white-space: pre-wrap; margin: 4px 2px 8px; font-size: 14px; line-height: 1.4; color: var(--text); }
+#ask-input { width: 100%; height: 44px; margin-top: 4px; border-radius: 12px; border: 1px solid var(--edge); background: rgba(0, 0, 0, .25); color: var(--text); padding: 0 14px; font: inherit; }
+.sm.danger { background: rgba(255, 107, 122, .20); border-color: rgba(255, 107, 122, .55); color: #ffc4c4; }
 
 .card { background: rgba(255, 255, 255, .06); border: 1px solid var(--edge); border-radius: 14px; padding: 10px 12px; margin: 8px 0; }
+/* Carte projet : nom à gauche, boutons à droite sur la même ligne */
+.card.pcard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  margin: 8px 0;
+}
+.card.pcard .nm {
+  flex: 1;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card.pcard .acts {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 6px;
+}
 .card .nm { font: 600 13px var(--mono); word-break: break-all; }
 .card .meta2 { color: var(--dim); font-size: 12px; margin: 2px 0 8px; }
-/* Badge d'état dans les entrées d'historique */
-.hist-badge {
-  display: inline-block; font: 600 10.5px/1 var(--mono); padding: 3px 7px; border-radius: 99px;
-  margin-right: 6px; vertical-align: middle;
-  border: 1px solid var(--edge); background: rgba(255, 255, 255, .06); color: var(--dim);
-}
-.hist-badge.ok { color: var(--ok); border-color: rgba(52, 211, 153, .5); background: rgba(52, 211, 153, .12); }
-.hist-badge.err { color: var(--err); border-color: rgba(255, 107, 122, .5); background: rgba(255, 107, 122, .12); }
-.hist-badge.mark { color: var(--warn); border-color: rgba(251, 191, 36, .5); background: rgba(251, 191, 36, .12); }
-/* Bouton de rapport d'erreur dans l'historique */
-.sm.danger { color: #ffd7dc; background: rgba(255, 107, 122, .18); border-color: rgba(255, 107, 122, .5); }
-.sm.danger:hover { border-color: rgba(255, 107, 122, .8); }
 .pick { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
 .pick input { width: 18px; height: 18px; flex: 0 0 auto; margin: 0; }
+/* Arbre des blocs : flèche de repli + nom */
+.nmrow { display: flex; align-items: flex-start; gap: 4px; }
+.nmrow .pick { flex: 1; min-width: 0; }
+.fold { display: inline-block; flex: 0 0 auto; width: 32px; height: 26px; padding: 0; border: 0; border-radius: 8px; background: transparent;
+  color: var(--accent); font: inherit; text-align: center; cursor: pointer; }
 .chipc { display: inline-block; font: 11px var(--mono); padding: 1px 7px; border-radius: 99px; background: rgba(255, 255, 255, .08); border: 1px solid var(--edge); margin-right: 6px; color: var(--dim); }
 .chipc.js { color: #f7d774; } .chipc.css { color: #7fd1ff; } .chipc.html { color: #ff9b7a; }
+/* Liste des projets : cartes cliquables, projet actif mis en valeur */
+.psel-list { display: flex; flex-direction: column; gap: 10px; margin: 8px 0 4px; }
+.shortcut-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); gap: 12px; }
+.shortcut-keys { font-family: var(--mono); font-size: 12px; padding: 4px 8px; border-radius: 6px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: #bdf4fc; }
+.psel-item { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 16px;
+  background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .06); cursor: pointer;
+  transition: background .2s, border-color .2s, transform .1s;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.psel-item:hover { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .15); }
+.psel-item:active { transform: scale(.98); }
+.psel-item.on { background: rgba(34, 211, 238, .1); border-color: rgba(34, 211, 238, .4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 4px 16px rgba(34, 211, 238, .12); }
+.psel-nm { flex: 1; min-width: 0; font-weight: 600; font-size: 15px; word-break: break-all; letter-spacing: 0.3px; }
+.psel-badge { flex: 0 0 auto; font: 11px var(--mono); padding: 4px 10px; border-radius: 99px;
+  color: #bdf4fc; background: rgba(34, 211, 238, .15); border: 1px solid rgba(34, 211, 238, .4); }
 .acts { display: flex; gap: 6px; flex-wrap: wrap; }
 .sm { height: 38px; padding: 0 13px; border-radius: 11px; font-size: 13px; font-weight: 600; }
 .sm.primary { background: var(--accent); color: #021014; border-color: rgba(255, 255, 255, .25); }
 .sm.ok { background: rgba(52, 211, 153, .20); border-color: rgba(52, 211, 153, .5); }
+/* Couleurs discrètes pour différencier les actions dans la modale Projets */
+.act-open { color: #bdf4fc; background: rgba(34, 211, 238, 0.1); border-color: rgba(34, 211, 238, 0.3); }
+.act-open:hover { background: rgba(34, 211, 238, 0.2); border-color: rgba(34, 211, 238, 0.5); }
+
+.act-ren { color: #fde8b0; background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3); }
+.act-ren:hover { background: rgba(251, 191, 36, 0.2); border-color: rgba(251, 191, 36, 0.5); }
+
+.act-del { color: #ffc4c4; background: rgba(255, 107, 122, 0.1); border-color: rgba(255, 107, 122, 0.3); }
+.act-del:hover { background: rgba(255, 107, 122, 0.2); border-color: rgba(255, 107, 122, 0.5); }
+/* Raccourcis carrés (Avancé › Outils) : taille flexible, toujours sur une seule ligne */
+.quick { display: flex; flex-wrap: nowrap; gap: 8px; margin: 4px 0 10px; }
+.qb-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1 1 0; min-width: 0; }
+.qb-wrap .qb { width: 100%; margin: 0; flex: 1 1 auto; }
+.qb { flex: 1 1 0; min-width: 0; height: 62px; padding: 0 2px; border-radius: 14px; font: inherit; font-size: 11px; line-height: 1.15;
+  color: var(--text); background: var(--glass2); border: 1px solid var(--edge);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10), 0 6px 18px rgba(0, 0, 0, .40);
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  text-align: center; cursor: pointer; transition: transform .09s ease, border-color .15s, background .15s;
+  -webkit-user-select: none; user-select: none; touch-action: manipulation; overflow: hidden; }
+.qb-lbl { font-size: 11px; color: var(--dim); font-weight: 500; text-align: center; line-height: 1.2; }
+.qb:active { transform: translateY(1px) scale(.96); background: rgba(255, 255, 255, .15);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 0 0 1px rgba(34, 211, 238, .55), 0 0 18px rgba(34, 211, 238, .28); }
+.qb .ic { width: 18px; height: 18px; }
+.qb.cyan { background: rgba(34, 211, 238, .13); border-color: rgba(34, 211, 238, .45); color: #bdf4fc; }
+.qb.green { background: rgba(52, 211, 153, .13); border-color: rgba(52, 211, 153, .42); color: #c2f5e0; }
+.qb.warn { background: rgba(251, 191, 36, .13); border-color: rgba(251, 191, 36, .45); color: #fde8b0; }
 .empty { color: var(--dim); text-align: center; padding: 26px 10px; font-size: 14px; }
 
 .log details { background: rgba(255, 255, 255, .05); border: 1px solid var(--edge); border-radius: 12px; margin: 6px 0; }
@@ -420,6 +670,11 @@ label.chk input { width: 18px; height: 18px; }
 /* Test en plein écran */
 .tpane.open.fullscreen { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; border-radius: 0; background: var(--bg);
   padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+.tpane.open.fullscreen .ph { position: absolute; top: max(8px, env(safe-area-inset-top)); right: 8px; z-index: 2; padding: 0; gap: 6px; }
+.tpane.open.fullscreen .ph h2 { display: none; }
+.tpane.open.fullscreen .ph .iconbtn { opacity: .28; height: 34px; min-width: 34px; padding: 0 8px; border-radius: 50%; }
+.tpane.open.fullscreen .ph #t-fs { display: none; }
+.tpane.open.fullscreen #t-exit { display: block; }
 .tpane.open.fullscreen .pb { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .tpane.open.fullscreen #tframe { flex: 1; height: auto; min-height: 0; }
 /* Test immersif : plein écran sans aucune bordure (comme dans la PWA réelle) */
@@ -435,7 +690,6 @@ label.chk input { width: 18px; height: 18px; }
 .tpane.open.fullscreen.immersive .ph .iconbtn { opacity: .35; height: 36px; min-width: 36px; padding: 0 8px; border-radius: 50%; }
 .tpane.open.fullscreen.immersive .ph #t-fs { display: none; }
 </style>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link rel="manifest" href="./manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -465,72 +719,116 @@ label.chk input { width: 18px; height: 18px; }
     <symbol id="i-file" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
     <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
     <symbol id="i-maximize" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></symbol>
-    <symbol id="i-panel-left" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></symbol>
   </defs>
 </svg>
 
 <div class="app">
-  <header class="glass bar">
+<header class="glass bar">
+  <div class="bar-side">
     <div class="brand">Bcode</div>
-    <button class="iconbtn" id="b-undo-top" aria-label="Annuler la dernière action"><svg class="ic"><use href="#i-undo"/></svg></button>
-    <button class="iconbtn" id="b-adv"><svg class="ic"><use href="#i-sliders"/></svg>Avancé</button>
-    <button class="iconbtn sync-dot" id="b-sync-dot" aria-label="État de synchronisation IA" title="Synchronisation IA"><span class="dot"></span><span class="sync-txt"></span></button>
-<button class="iconbtn" id="b-notif-toggle" aria-pressed="false" aria-label="Notifications" title="Notifications"><span class="dot"></span><span class="nt-count"></span></button>
-    <button class="iconbtn" id="b-side-toggle" aria-pressed="false" aria-label="Masquer la liste des blocs" title="Masquer la liste des blocs"><svg class="ic"><use href="#i-panel-left"/></svg></button>
-  </header>
-<aside class="glass side" id="side">
-  <div class="side-h"><span>Blocs <b id="nb-side"></b></span><span class="side-hint">Ctrl+Entrée · Ctrl+S · /</span></div>
-  <input type="search" id="q-side" placeholder="Rechercher un bloc…" autocomplete="off" title="Filtrer les blocs (raccourci /)">
-  <div class="side-tabs" role="tablist" aria-label="Sections de la barre latérale">
-    <button class="side-tab" role="tab" data-tab="blocs" aria-selected="true">Blocs</button>
-    <button class="side-tab" role="tab" data-tab="hist" aria-selected="false">Historique</button>
   </div>
-  <label class="chk"><input type="checkbox" id="subs-side" checked> Afficher les sous-blocs</label>
-  <div class="row">
-    <button class="sm primary" id="b-send-sel-side" title="Copier prompt + index + blocs cochés">Copier prompt + cochés</button>
-    <button class="sm" id="b-unpick-side" title="Décocher tous les blocs">Tout décocher</button>
+  <div class="bar-center">
+    <button class="iconbtn b-top b-undo" id="b-undo-top" aria-label="Annuler la dernière action"><svg class="ic"><use href="#i-undo"/></svg><span>Undo</span></button>
+    <button class="iconbtn b-top b-redo" id="b-redo-top" aria-label="Rétablir" disabled><svg class="ic"><use href="#i-redo"/></svg><span>Redo</span></button>
   </div>
-  <div id="blist-side" class="blist-side"></div>
-  <div id="hlist-side" class="blist-side" hidden></div>
-</aside>
+  <div class="bar-side right" style="gap: 8px;">
+    <button class="iconbtn b-adv" id="b-fs-dn" aria-label="Réduire le texte">A−</button>
+    <button class="iconbtn b-adv" id="b-fs-up" aria-label="Agrandir le texte">A+</button>
+    <button class="iconbtn b-adv" id="b-adv"><svg class="ic"><use href="#i-sliders"/></svg>Avancé</button>
+  </div>
+</header>
+<div class="meta">
+  <button class="glass lvl" id="b-proj-open" type="button" style="text-align:left;cursor:pointer">Projet : <b id="proj-cur">—</b></button>
+  <button class="iconbtn" id="b-proj-new" aria-label="Nouveau projet"><svg class="ic"><use href="#i-plus"/></svg></button>
+  <button class="iconbtn" id="b-hl" aria-label="Coloration du code" aria-pressed="true"><svg class="ic"><use href="#i-braces"/></svg></button>
+</div>
 
-<div class="main-col">
-  <div class="meta">
-    <div class="glass chip" id="stats"></div>
-    <label class="glass lvl">Découpage :
-      <select id="level">
-        <option value="1">1</option>
-        <option value="2" selected>2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
-    </label>
-    <button class="iconbtn" id="b-clear" aria-label="Vider le code"><svg class="ic"><use href="#i-trash"/></svg></button>
+<div class="meta">
+  <div class="glass chip" id="stats"></div>
+</div>
+<div class="level-wrap">
+  <button class="glass lvl" id="b-level-open" type="button" style="text-align:left;cursor:pointer;width:100%;">Découpage : <b id="level-cur">2</b></button>
+</div>
+<div class="toggles">
+  <div class="tg-row">
+    <button class="tg" id="tg-snd" aria-pressed="false" title="Sons des boutons">♪</button>
+    <span class="tglbl">Sons des boutons</span>
   </div>
+  <div class="tg-row">
+    <button class="tg" id="tg-vib" aria-pressed="false" title="Vibrations au toucher">≈</button>
+    <span class="tglbl">Vibrations au toucher</span>
+  </div>
+  <div class="tg-row">
+    <button class="tg" id="tg-autotest" aria-pressed="false" title="Tester après Appliquer">↻</button>
+    <span class="tglbl">Test après Appliquer</span>
+  </div>
+  <div class="tg-row">
+    <button class="tg" id="tg-copyfinal" aria-pressed="false" title="Copier le code final en cliquant sur Tester">⧉</button>
+    <span class="tglbl">Copie le code final en testant</span>
+  </div>
+  <div class="tg-row">
+    <button class="tg" id="tg-autofs" aria-pressed="false" title="Test direct en plein écran">⛶</button>
+    <span class="tglbl">Test direct en plein écran</span>
+  </div>
+  <div class="tg-row">
+    <button class="tg" id="tg-sc" aria-pressed="true" title="Activer/Désactiver les raccourcis clavier">⌨</button>
+    <span class="tglbl">Raccourcis clavier</span>
+  </div>
+  <div class="tg-row">
+    <button class="tg help" id="tg-help" aria-label="Aide sur ces boutons">?</button>
+    <span class="tglbl">Aide sur ces boutons</span>
+  </div>
+</div>
+<div class="clear-wrap">
+  <button class="iconbtn b-clear" id="b-clear" aria-label="Vider le code"><svg class="ic"><use href="#i-trash"/></svg>Vider</button>
+  <button class="qb warn b-clear" id="qb-proj" aria-label="Ouvrir les projets"><svg class="ic"><use href="#i-file"/></svg>Projets</button>
+<button class="qb b-clear" id="b-shortcuts-open" aria-label="Raccourcis clavier"><svg class="ic"><use href="#i-zap"/></svg>Raccourcis</button>
+</div>
 
   <section class="glass code">
+<pre id="hl" aria-hidden="true"><div id="hl-in"></div></pre>
     <textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Collez votre code HTML ici…"></textarea>
   </section>
 
   <div class="row">
     <button class="btn hero" id="b-main"><svg class="ic"><use href="#i-zap"/></svg><span id="b-main-t">Analyser</span></button>
   </div>
+<div class="quick">
+  <div class="qb-wrap">
+    <button class="qb cyan" id="qb-marked" aria-label="Copier le code balisé"><svg class="ic"><use href="#i-braces"/></svg></button>
+    <span class="qb-lbl">Balisé</span>
+  </div>
+  <div class="qb-wrap">
+    <button class="qb" id="qb-prompt" aria-label="Copier le prompt seul"><svg class="ic"><use href="#i-copy"/></svg></button>
+    <span class="qb-lbl">Prompt</span>
+  </div>
+  <div class="qb-wrap">
+    <button class="qb cyan" id="qb-all" aria-label="Copier le prompt et le code balisé"><svg class="ic"><use href="#i-zap"/></svg></button>
+    <span class="qb-lbl">Full</span>
+  </div>
+</div>
 
   <div class="grid">
     <button class="btn small" id="b-test"><svg class="ic"><use href="#i-play"/></svg>Tester</button>
     <button class="btn small" id="b-copy-clean"><svg class="ic"><use href="#i-file"/></svg>Code final</button>
-    <button class="iconbtn" id="b-help" aria-label="Raccourcis clavier" title="Raccourcis clavier (?)">?</button>
   </div>
+<div id="notifs"></div>
+<div id="activity-log" class="glass activity-log">
+  <div class="log-header">Activité</div>
+  <div id="log-list" class="log-list"></div>
+</div>
 
-  <div id="notifs"></div>
-
+  <!-- ===== Test de l'appli (sous le bouton Tester) ===== -->
   <section class="glass tpane" id="tdlg">
     <div class="ph">
       <h2>Test de l'appli</h2>
       <button class="iconbtn" id="t-fs" aria-label="Plein écran"><svg class="ic"><use href="#i-maximize"/></svg></button>
+      <button id="t-exit" aria-label="Quitter le plein écran"></button>
       <button class="iconbtn" id="t-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button>
     </div>
     <div class="pb">
@@ -540,17 +838,10 @@ label.chk input { width: 18px; height: 18px; }
       <div class="row">
         <button class="sm" id="t-rerun">↻ Relancer</button>
         <button class="sm primary" id="t-copy">Copier l'erreur pour l'IA</button>
+        <button class="sm primary" id="t-share">📤 Partager</button>
       </div>
     </div>
   </section>
-</div>
-<aside id="npane" aria-label="Notifications">
-  <div class="npane-h">
-    <b>Notifications</b>
-    <button class="iconbtn" id="np-clear" title="Effacer les notifications traitées" aria-label="Effacer les notifications traitées"><svg class="ic"><use href="#i-trash"/></svg></button>
-  </div>
-  <div class="npane-body" id="npane-body"></div>
-</aside>
 
   <footer class="sig">Made by Laiche Brahim 2026 Paris</footer>
 </div>
@@ -567,6 +858,7 @@ label.chk input { width: 18px; height: 18px; }
           <textarea id="resp" class="ta" spellcheck="false" autocapitalize="off" wrap="off" placeholder="Réponse de l'IA (blocs #BLOC … #FIN, #APRES, #AVANT, #SUPPRIMER)…"></textarea>
           <div class="row">
             <button class="sm" id="b-rpaste">Coller</button>
+            <button class="sm" id="b-radd">+ Ajouter</button>
             <button class="sm" id="b-preview">Aperçu</button>
             <button class="sm primary" id="b-apply">Appliquer</button>
           </div>
@@ -580,6 +872,10 @@ label.chk input { width: 18px; height: 18px; }
           <input type="search" id="q" placeholder="Rechercher un bloc…" autocomplete="off">
           <div class="row"><label class="chk"><input type="checkbox" id="subs" checked> Afficher les sous-blocs</label></div>
           <div class="row">
+            <button class="sm" id="b-fold-all">▸ Tout replier</button>
+            <button class="sm" id="b-unfold-all">▾ Tout déplier</button>
+          </div>
+          <div class="row">
             <button class="sm primary" id="b-send-sel">Copier prompt + index + cochés</button>
             <button class="sm" id="b-unpick">Tout décocher</button>
           </div>
@@ -590,6 +886,17 @@ label.chk input { width: 18px; height: 18px; }
       <details class="acc" id="acc-hist" name="adv">
         <summary>Historique</summary>
         <div class="in"><div id="hlist"></div></div>
+      </details>
+      <details class="acc" id="acc-proj" name="adv">
+        <summary>Projets</summary>
+        <div class="in">
+          <div id="plist"></div>
+          <div class="row">
+            <button class="sm" id="b-export-all">⬇ Exporter tout (JSON)</button>
+            <button class="sm" id="b-import-all">⬆ Importer un export</button>
+          </div>
+          <input type="file" id="file-import" accept=".json,application/json" hidden>
+        </div>
       </details>
 
       <details class="acc" id="acc-tools" name="adv">
@@ -604,14 +911,21 @@ label.chk input { width: 18px; height: 18px; }
             <button class="sm" id="b-need">Blocs demandés</button>
           </div>
           <div class="row">
+            <button class="sm primary" id="b-share-all">📤 Code + prompt</button>
+            <button class="sm primary" id="b-share-sync">📤 Synchro</button>
+            <button class="sm primary" id="b-share-sel">📤 Blocs cochés</button>
+          </div>
+          <div class="row">
             <button class="sm" id="b-open">Ouvrir un fichier</button>
             <button class="sm" id="b-dl-clean">Télécharger propre</button>
             <button class="sm" id="b-dl-marked">Télécharger balisé</button>
             <button class="sm" id="b-strip">Retirer les marqueurs</button>
           </div>
           <div class="row"><label class="chk"><input type="checkbox" id="snd" checked> Sons discrets des boutons</label></div>
+          <div class="row"><label class="chk"><input type="checkbox" id="vib" checked> Vibrations au toucher (Android)</label></div>
           <div class="row"><label class="chk"><input type="checkbox" id="autotest"> Tester automatiquement après « Appliquer »</label></div>
           <div class="row"><label class="chk"><input type="checkbox" id="copyfinal"> Copier le code final en cliquant sur « Tester »</label></div>
+          <div class="row"><label class="chk"><input type="checkbox" id="autofs"> Lancer le test directement en plein écran</label></div>
           <input type="file" id="file" accept=".html,.htm,.js,.css,.txt,.md" hidden>
         </div>
       </details>
@@ -619,15 +933,6 @@ label.chk input { width: 18px; height: 18px; }
     </div>
   </div>
 </div>
-<aside id="resp-inline" class="glass" hidden>
-  <div class="ri-h"><b>Réponse de l'IA</b><button class="iconbtn" id="ri-close" aria-label="Masquer">×</button></div>
-  <textarea id="resp-inline-ta" class="ta" spellcheck="false" autocapitalize="off" wrap="off" placeholder="Réponse de l'IA (blocs #BLOC … #FIN)…"></textarea>
-  <div class="row">
-    <button class="sm" id="ri-paste">Coller</button>
-    <button class="sm primary" id="ri-apply">Appliquer</button>
-  </div>
-  <div id="result-inline" class="log"></div>
-</aside>
 
 <!-- ===== Voir / remplacer un bloc ===== -->
 <div class="ov" id="dlg">
@@ -642,19 +947,87 @@ label.chk input { width: 18px; height: 18px; }
     </div>
   </div>
 </div>
+<div class="ov" id="ask">
+  <div class="panel">
+    <div class="ph"><h2 id="ask-title"></h2></div>
+    <div class="pb">
+      <div id="ask-msg"></div>
+      <input type="text" id="ask-input" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="60">
+      <div class="row">
+        <button class="sm" id="ask-cancel">Annuler</button>
+        <button class="sm primary" id="ask-ok">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="ov" id="help">
   <div class="panel">
-    <div class="ph"><h2>Raccourcis & astuces</h2><button class="iconbtn" id="help-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="ph"><h2>Ces boutons</h2><button class="iconbtn" id="help-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button></div>
     <div class="pb">
-      <div class="note">
-        <b>Ctrl/⌘ + Entrée</b> — Analyser ou Coller & appliquer<br>
-        <b>Ctrl/⌘ + S</b> — Télécharger le code propre<br>
-        <b>Ctrl/⌘ + Maj + S</b> — Copier le code balisé<br>
-        <b>/</b> — Chercher un bloc (focus sidebar sur desktop)<br>
-        <b>?</b> — Cette aide<br>
-        <b>Ctrl + molette</b> sur l'éditeur — Taille de police<br>
-        <b>Double-clic</b> sur une poignée — Réinitialiser la taille
+      <div class="hrow"><span class="hkey">♪</span><div class="htxt"><b>Sons</b> — petit bip discret à chaque appui de bouton.</div></div>
+      <div class="hrow"><span class="hkey">≈</span><div class="htxt"><b>Vibrations</b> — retour haptique au toucher (Android).</div></div>
+      <div class="hrow"><span class="hkey">↻</span><div class="htxt"><b>Test auto</b> — lance le test de l'appli juste après chaque « Appliquer ».</div></div>
+      <div class="hrow"><span class="hkey">⧉</span><div class="htxt"><b>Copie finale</b> — copie le code propre en cliquant sur « Tester ».</div></div>
+      <div class="hrow"><span class="hkey">⛶</span><div class="htxt"><b>Plein écran direct</b> — chaque test démarre plein écran, sans passer par la fenêtre normale.</div></div>
+      <div class="hrow"><span class="hkey">?</span><div class="htxt"><b>Aide</b> — ce panneau. Chaque bouton est l'équivalent de la case du même nom dans Avancé › Outils.</div></div>
+    </div>
+  </div>
+</div>
+<div class="ov" id="projdlg">
+  <div class="panel">
+    <div class="ph"><h2>Projets</h2><button class="iconbtn" id="projdlg-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="pb" style="padding: 10px 20px 24px;">
+      <div id="plist2" class="psel-list"></div>
+      <div class="row" style="margin-top: 16px; gap: 12px;">
+        <button class="sm primary" id="projdlg-new" style="flex: 1 1 100%; height: 44px; font-size: 14.5px; border-radius: 12px;">+ Nouveau projet</button>
+        <button class="sm" id="projdlg-export" style="flex: 1 1 calc(50% - 6px); height: 40px; border-radius: 12px;">⬇ Exporter tout</button>
+        <button class="sm" id="projdlg-import" style="flex: 1 1 calc(50% - 6px); height: 40px; border-radius: 12px;">⬆ Importer</button>
       </div>
+      <input type="file" id="file-import2" accept=".json,application/json" hidden>
+    </div>
+  </div>
+</div>
+<div class="ov" id="shortcutdlg">
+  <div class="panel">
+    <div class="ph"><h2>Raccourcis clavier</h2><button class="iconbtn" id="shortcutdlg-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="pb">
+      <div id="shortcut-list" class="psel-list"></div>
+      <div class="row" style="margin-top: 16px; gap: 12px;">
+        <select id="shortcut-action" class="lvl" style="flex: 1; padding: 0 12px; height: 44px; border-radius: 12px;">
+          <option value="analyze">Analyser</option>
+          <option value="paste-apply">Coller & appliquer</option>
+          <option value="test">Tester l'appli</option>
+          <option value="copy-marked">Copier le code balisé</option>
+          <option value="copy-final">Copier le code final</option>
+          <option value="undo">Annuler</option>
+          <option value="redo">Rétablir</option>
+          <option value="open-projects">Ouvrir Projets</option>
+          <option value="open-advanced">Ouvrir Avancé</option>
+        </select>
+        <input type="text" id="shortcut-key" placeholder="Touche (ex: Ctrl+K)" style="flex: 1; height: 44px; border-radius: 12px; padding: 0 12px; border: 1px solid var(--edge); background: rgba(0,0,0,0.25); color: var(--text); font: inherit;" readonly>
+        <button class="sm primary" id="shortcut-add" style="height: 44px; border-radius: 12px; padding: 0 16px;">+ Ajouter</button>
+      </div>
+      <div class="note" style="margin-top: 12px;">Cliquez sur le champ, puis appuyez sur la combinaison de touches (ex: Ctrl+K).</div>
+    </div>
+  </div>
+</div>
+<div class="ov" id="projsel">
+<div class="panel">
+  <div class="ph"><h2>Choisir un projet</h2><button class="iconbtn" id="projsel-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button></div>
+  <div class="pb">
+    <div id="plist3" class="psel-list"></div>
+    <div class="row">
+      <button class="sm primary" id="projsel-new" style="flex:1 1 100%">+ Nouveau projet</button>
+    </div>
+  </div>
+</div>
+</div>
+<div class="ov" id="levelsel">
+  <div class="panel">
+    <div class="ph"><h2>Découpage</h2><button class="iconbtn" id="levelsel-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="pb">
+      <div class="note">Profondeur de découpage des blocs (1 = gros blocs, 4 = très fin).</div>
+      <div id="lvlist" class="psel-list"></div>
     </div>
   </div>
 </div>
@@ -1584,6 +1957,7 @@ function findBlock(blocks, name) {
 
 /* ---------- Lire la réponse de l'IA ---------- */
 function parseResponse(resp) {
+  resp = normalizeMarks(resp);
   const re = /(?:\/\*|<!--)#(BLOC|FIN|APRES|AVANT|SUPPRIMER):([^\s*<>]+?)(?:\*\/|-->)/g;
   const ops = [], errors = [], stack = [];
   let m, pending = null;
@@ -1609,6 +1983,11 @@ function parseResponse(resp) {
   stack.forEach(s => errors.push('BLOC non fermé dans la réponse : ' + s.name));
   if (pending) errors.push('#' + pending.mode + ':' + pending.ref + ' sans bloc à insérer');
   return { ops, errors };
+}
+/* Tolère les marqueurs lâches d'une IA (espaces autour, casse) en les remettant au format standard */
+function normalizeMarks(text) {
+  return text.replace(/(\/\*|<!--)[ \t]*#(BLOC|FIN|APRES|AVANT|SUPPRIMER)[ \t]*:[ \t]*([^\s*<>]+?)[ \t]*(\*\/|-->)/gi,
+    (m, open, kind, name, close) => open + '#' + kind.toUpperCase() + ':' + name + close);
 }
 
 /* Réécrit le premier #BLOC et le dernier #FIN d'un texte (nom + style de commentaire) */
@@ -1663,6 +2042,11 @@ function applyOps(state, ops) {
       continue;
     }
     let nt = o.text.replace(/\r?\n/g, eol);
+    const ab = abbrevLine(stripMarks(nt), o.op === 'replace' ? stripMarks(region) : '');
+    if (ab) {
+      log.push({ ok: false, name: o.name, msg: 'Bloc abrégé refusé : « ' + ab + ' » — renvoyer le bloc complet, sans abréviation' });
+      continue;
+    }
     if (o.op === 'replace') {
       nt = normalizeOuter(nt, b.name, b.html);
       nt = fixEnds(nt, region);
@@ -1777,28 +2161,27 @@ function lostSubs(oldText, newText) {
   const miss = names(oldText).filter(n => !has.has(n));
   return miss.length ? 'Sous-blocs absents de la réponse : ' + miss.slice(0, 5).join(', ') + (miss.length > 5 ? ' …' : '') : null;
 }
+/* Lignes de remplissage laissées par une IA à la place du vrai code */
+const ABBREV_FILL = /^\s*(?:\/\/|\/\*|<!--|#)?\s*(?:\.{3}|…)\s*(?:\*\/|-->)?\s*$/;
+const ABBREV_WORDS = /^\s*(?:\/\/|\/\*|<!--)\s*(?:\.{3}|…)|^\s*(?:\/\/|\/\*|<!--)[^\n]*(?:reste (?:du|de|des|de la) (?:code|bloc|fonction|fichier|classe)|rest of (?:the )?(?:code|function|block|file)|code (?:inchangé|existant)|existing code|same as (?:before|above)|\((?:inchangée?|unchanged)\))/i;
+/* Première ligne de remplissage du nouveau code qui n'existait pas déjà dans l'ancien (null si aucune) */
+function abbrevLine(code, old) {
+  const had = new Set(old.split('\n').map(l => l.trim()));
+  for (const l of code.split('\n')) {
+    if ((ABBREV_FILL.test(l) || ABBREV_WORDS.test(l)) && !had.has(l.trim())) return l.trim();
+  }
+  return null;
+}
 /* Vérification du document entier : doublons de déclarations et syntaxe de chaque script */
 function checkGlobal(text) {
   const out = [];
-  const byParent = new Map();
-  /* Un « doublon » n'en est un que si deux blocs de même nom partagent le même parent.
-     Deux sous-blocs homonymes dans des fonctions différentes sont dans des portées séparées. */
-  const all = parseMarks(text).blocks;
-  all.forEach((b, i) => {
+  const seen = new Set();
+  parseMarks(text).blocks.forEach(b => {
     const m = /^(fn|class|const|let|var):(.+)#\d+$/.exec(b.name);
-    if (!m) return;
-    /* Parent = bloc englobant le plus proche dans la liste (par intervalle) */
-    let parentStart = -1, parentEnd = Infinity;
-    for (const o of all) {
-      if (o === b) continue;
-      if (o.outerStart <= b.outerStart && b.outerEnd <= o.outerEnd && o.outerStart > parentStart) { parentStart = o.outerStart; parentEnd = o.outerEnd; }
+    if (m && !seen.has(m[1] + ':' + m[2])) {
+      seen.add(m[1] + ':' + m[2]);
+      out.push('Doublon probable : « ' + m[2] + ' » semble déclaré plusieurs fois (' + b.name + ')');
     }
-    const key = m[1] + ':' + m[2] + '@' + parentStart;
-    if (!byParent.has(key)) byParent.set(key, []);
-    byParent.get(key).push(b.name);
-  });
-  byParent.forEach(names => {
-    if (names.length > 1) out.push('Doublon probable : « ' + names[0].replace(/#\d+$/, '').replace(/^[a-z]+:/, '') + ' » semble déclaré plusieurs fois (' + names.join(', ') + ')');
   });
   const src = stripMarks(text);
   let n = 0;
@@ -1830,8 +2213,20 @@ RÈGLES DE RÉPONSE (strictes) :
 6. Ne renomme jamais un bloc existant et ne modifie pas ses marqueurs. Pour modifier un bloc, repars toujours de sa dernière version connue (ta dernière réponse ou ma dernière mise à jour), jamais de la version initiale.
 7. Ne change rien d'autre que ce que je demande : pas de refactorisation, pas de renommage, pas d'amélioration non demandée.
 8. Garde un code lisible et bien indenté (jamais minifié).
-9. Mets TOUS les blocs de ta réponse à la suite dans UN SEUL bloc de code, clôturé par 4 backticks (\`\`\`\`), même si tu mélanges HTML, CSS et JS : jamais un bloc de code par langage ni par bloc, et aucun texte entre les blocs. Une courte phrase avant ou après suffit.
+9. FORMAT DE SORTIE : toute ta réponse contient UN SEUL bloc de code, clôturé par 4 backticks (\`\`\`\`). Tous les blocs modifiés ou ajoutés y figurent à la suite, dans l'ordre, même en mélangeant HTML, CSS et JS, même avec plusieurs #APRES / #AVANT / #SUPPRIMER. Jamais un bloc de code par langage ni par bloc. Aucun texte entre les blocs ni dans le bloc de code ; une courte phrase avant ou après suffit. Je copie ce bloc de code d'un seul geste : tout ce qui est en dehors est perdu.
 10. Si le bloc à modifier n'est pas dans ce que je t'ai envoyé, demande-le-moi par son nom.
+
+Forme exacte de ta réponse (exemple de structure) :
+\`\`\`\`html
+/*\u0023BLOC:fn:exemple*/
+function exemple() { return 1; }
+/*\u0023FIN:fn:exemple*/
+<!--\u0023BLOC:html:exemple-->
+<div id="exemple"></div>
+<!--\u0023FIN:html:exemple-->
+\`\`\`\`
+
+Avant d'envoyer, vérifie : un seul bloc de code pour toute la réponse ; aucun texte entre les blocs ; chaque #APRES / #AVANT vise un nom présent dans l'index, et chaque nom ajouté n'y figure pas ; aucun « … » ni « reste inchangé ».
 
 Je vais maintenant donner le code balisé. Réponds simplement « Prêt », puis attends ma demande.`;
 
@@ -1852,6 +2247,53 @@ let dlgMode = null, dlgName = null, lastMarkErr = '';
 /* ---------- État historique (IndexedDB) et sélection de blocs ---------- */
 let idbOK = true, lastHistSig = '', idbP = null;
 const picked = new Set();
+/* Blocs repliés dans l'arbre (Avancé › Blocs) */
+const folded = new Set();
+/* ---------- Taille du texte du champ code (pas de 2 px : la hauteur de ligne, 1,5 × la taille, reste entière) ---------- */
+let codeFs = (() => {
+  try {
+    const n = parseInt(localStorage.getItem('blocs.fs'), 10);
+    return n >= 10 && n <= 20 ? n - n % 2 : 12;
+  } catch (e) { return 12; }
+})();
+function applyFs() {
+  const r = document.documentElement.style;
+  r.setProperty('--cfs', codeFs + 'px');
+  r.setProperty('--clh', (codeFs * 1.5) + 'px');
+  $('b-fs-dn').disabled = codeFs <= 10;
+  $('b-fs-up').disabled = codeFs >= 20;
+  if (hlLines.length) hlPaint(true);
+}
+function stepFs(d) {
+  const n = Math.min(20, Math.max(10, codeFs + d));
+  if (n === codeFs) return;
+  codeFs = n;
+  try { localStorage.setItem('blocs.fs', String(n)); } catch (e) { /* stockage indisponible */ }
+  applyFs();
+  notify('Taille du texte : ' + n + ' px', { kind: 'ok', ms: 1200, key: 'fs' });
+}
+/* ---------- Rétablir (redo) ---------- */
+const redoStack = [];
+/* ---------- Projets (chacun garde son code, son historique et ce que l'IA connaît) ---------- */
+const PROJ_KEY = 'blocs.projects';
+const SHORTCUT_KEY = 'blocs.shortcuts';
+function loadProjects() {
+  try {
+    const p = JSON.parse(localStorage.getItem(PROJ_KEY) || 'null');
+    if (p && Array.isArray(p.list) && p.list.length && p.list.some(x => x.id === p.cur)) return p;
+  } catch (e) { /* stockage indisponible */ }
+  return { cur: 'p1', list: [{ id: 'p1', name: 'Projet 1' }] };
+}
+let shortcuts = [];
+try { shortcuts = JSON.parse(localStorage.getItem(SHORTCUT_KEY) || '[]'); } catch(e) {}
+let projects = loadProjects();
+function saveProjects() {
+  try { localStorage.setItem(PROJ_KEY, JSON.stringify(projects)); } catch (e) { /* quota */ }
+}
+function saveShortcuts() {
+  try { localStorage.setItem(SHORTCUT_KEY, JSON.stringify(shortcuts)); } catch(e) {}
+}
+const pKey = id => 'blocs.p.' + id;
 /* ---------- Ce que l'IA connaît : empreinte du contenu propre de chaque bloc ---------- */
 const SNAP_KEY = 'blocs.snap';
 let aiSnap = {};
@@ -1889,14 +2331,12 @@ function snapMark(text, names) {
     if (!roots || roots.some(t => t.outerStart <= b.outerStart && b.outerEnd <= t.outerEnd)) aiSnap[b.name] = ownHash(text, b, A);
   });
   saveSnap();
-  if (typeof updateSyncDot === 'function') updateSyncDot();
 }
 /* Après application d'une réponse : l'IA connaît les blocs qu'elle a écrits ; ceux qui ont disparu sont oubliés */
 function snapApply(before, after, names) {
   const now = new Set(parseMarks(after).blocks.map(b => b.name));
   parseMarks(before).blocks.forEach(b => { if (!now.has(b.name)) delete aiSnap[b.name]; });
   snapMark(after, names);
-  if (typeof updateSyncDot === 'function') updateSyncDot();
 }
 /* Blocs modifiés ou ajoutés depuis ce que l'IA connaît, et blocs disparus */
 function changedBlocks(text) {
@@ -1961,30 +2401,247 @@ function topBlocks(list) {
 }
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+/* ---------- Coloration syntaxique du champ code (palette VS Code Dark+) ---------- */
+const HL_CTRL = new Set(['if', 'else', 'for', 'while', 'do', 'switch', 'case', 'default', 'break', 'continue', 'return', 'try', 'catch', 'finally', 'throw', 'await', 'yield', 'import', 'export']);
+const HL_KW = new Set(['const', 'let', 'var', 'function', 'class', 'extends', 'async', 'static', 'new', 'typeof', 'instanceof', 'in', 'of', 'delete', 'void', 'this', 'super', 'true', 'false', 'null', 'undefined']);
+function hlEsc(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function hlSpan(cls, s) {
+  return '<span class="' + cls + '">' + hlEsc(s) + '</span>';
+}
+/* Un « / » ouvre-t-il une regex (et non une division) ? */
+function hlRegexOk(code, i) {
+  let k = i - 1;
+  while (k >= 0 && /\s/.test(code[k])) k--;
+  if (k < 0) return true;
+  const c = code[k];
+  if (/[\w$]/.test(c)) {
+    let s = k;
+    while (s > 0 && /[\w$]/.test(code[s - 1])) s--;
+    return /^(return|typeof|case|in|of|delete|void|throw|new|else|do|yield|await|instanceof)$/.test(code.slice(s, k + 1));
+  }
+  return c !== ')' && c !== ']' && c !== '}';
+}
+function hlJs(code) {
+  const re = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')|(`(?:\\[\s\S]|[^`\\])*`)|(\/(?![*\/])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^\/\\\[\n])+\/[a-z]*)|(\d[\w.]*)|([A-Za-z_$][\w$]*)/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(code))) {
+    const t = m[0];
+    let cls;
+    if (m[1]) cls = /^\/\*#(?:BLOC|FIN|APRES|AVANT|SUPPRIMER):/.test(t) ? 'hl-mk' : 'hl-c';
+    else if (m[2] || m[3]) cls = 'hl-s';
+    else if (m[4]) {
+      if (!hlRegexOk(code, m.index)) { re.lastIndex = m.index + 1; continue; }
+      cls = 'hl-r';
+    } else if (m[5]) cls = 'hl-n';
+    else {
+      const dot = code[m.index - 1] === '.';
+      const after = code.slice(m.index + t.length, m.index + t.length + 24);
+      if (!dot && HL_CTRL.has(t)) cls = 'hl-kc';
+      else if (!dot && HL_KW.has(t)) cls = 'hl-k';
+      else if (/^\s*\(/.test(after)) cls = 'hl-f';
+      else if (/^[A-Z]/.test(t)) cls = 'hl-t';
+      else cls = 'hl-v';
+    }
+    out += hlEsc(code.slice(last, m.index)) + hlSpan(cls, t);
+    last = m.index + t.length;
+  }
+  return out + hlEsc(code.slice(last));
+}
+/* Le morceau de CSS qui commence en i est-il un sélecteur (« { » ensuite) ou une déclaration ? */
+function hlCssKind(code, i) {
+  for (; i < code.length; i++) {
+    const c = code[i];
+    if (c === '"' || c === "'") i = cssSkipStr(code, i, code.length) - 1;
+    else if (c === '/' && code[i + 1] === '*') { const k = code.indexOf('*/', i + 2); i = k < 0 ? code.length : k + 1; }
+    else if (c === '{') return 'sel';
+    else if (c === ';' || c === '}') return 'decl';
+  }
+  return 'decl';
+}
+function hlCssVal(t) {
+  const re = /(#[0-9a-fA-F]{3,8}\b)|(-?(?:\d+\.?\d*|\.\d+)(?:[a-zA-Z%]+)?)|(!important)|(--[\w-]+)|([\w-]+)(?=\()/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(t))) {
+    if (m.index > last) out += hlSpan('hl-val', t.slice(last, m.index));
+    out += hlSpan(m[1] || m[2] ? 'hl-n' : m[3] ? 'hl-kc' : m[4] ? 'hl-p' : 'hl-f', m[0]);
+    last = m.index + m[0].length;
+  }
+  return out + (last < t.length ? hlSpan('hl-val', t.slice(last)) : '');
+}
+function hlCss(code) {
+  const re = /(\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')|([{};])|([^{};"'\/]+|\/)|([\s\S])/g;
+  let out = '', kind = null, colon = false, m;
+  while ((m = re.exec(code))) {
+    if (m[1]) out += hlSpan(/^\/\*#(?:BLOC|FIN|APRES|AVANT|SUPPRIMER):/.test(m[1]) ? 'hl-mk' : 'hl-c', m[1]);
+    else if (m[2]) out += hlSpan('hl-s', m[2]);
+    else if (m[3]) { out += hlEsc(m[3]); kind = null; colon = false; }
+    else if (m[4]) {
+      const t = m[4];
+      if (!t.trim()) { out += hlEsc(t); continue; }
+      if (!kind) kind = hlCssKind(code, m.index);
+      if (kind === 'sel') {
+        const at = /^(\s*)(@[\w-]+)([\s\S]*)$/.exec(t);
+        out += at ? hlEsc(at[1]) + hlSpan('hl-k', at[2]) + hlSpan('hl-sel', at[3]) : hlSpan('hl-sel', t);
+      } else if (!colon) {
+        const k = t.indexOf(':');
+        if (k < 0) out += hlSpan('hl-p', t);
+        else {
+          out += hlSpan('hl-p', t.slice(0, k)) + ':' + hlCssVal(t.slice(k + 1));
+          colon = true;
+        }
+      } else out += hlCssVal(t);
+    } else out += hlEsc(m[5]);
+  }
+  return out;
+}
+function hlAttrs(a) {
+  const re = /([^\s=\/"'<>]+)(?:(\s*=\s*)("[^"]*"|'[^']*'|[^\s"'>]+))?/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(a))) {
+    out += hlEsc(a.slice(last, m.index)) + hlSpan('hl-p', m[1]);
+    if (m[2]) out += hlEsc(m[2]) + hlSpan('hl-s', m[3] || '');
+    last = m.index + m[0].length;
+  }
+  return out + hlEsc(a.slice(last));
+}
+function hlTag(t) {
+  const m = /^(<\/?)([^\s\/>]+)([\s\S]*?)(\/?>)$/.exec(t);
+  if (!m) return hlEsc(t);
+  return hlSpan('hl-tp', m[1]) + hlSpan('hl-tag', m[2]) + hlAttrs(m[3]) + hlSpan('hl-tp', m[4]);
+}
+function hlHtml(code) {
+  const re = /(<!\-\-[\s\S]*?\-\->)|(<!DOCTYPE[^>]*>)|(<(?:style|script)\b(?:"[^"]*"|'[^']*'|[^'">])*>)([\s\S]*?)(<\/(?:style|script)\s*>)|(<\/?[A-Za-z][^\s\/>]*(?:"[^"]*"|'[^']*'|[^'">])*>)/gi;
+  let out = '', last = 0, m;
+  while ((m = re.exec(code))) {
+    out += hlEsc(code.slice(last, m.index));
+    if (m[1]) out += hlSpan(/^<!\-\-#(?:BLOC|FIN|APRES|AVANT|SUPPRIMER):/.test(m[1]) ? 'hl-mk' : 'hl-c', m[1]);
+    else if (m[2]) out += hlSpan('hl-tp', m[2]);
+    else if (m[3]) {
+      const isStyle = /^<style/i.test(m[3]);
+      const isJs = !/\btype\s*=\s*["']?(?!module|(?:text|application)\/(?:javascript|ecmascript|babel|jsx))/i.test(m[3]);
+      out += hlTag(m[3]) + (isStyle ? hlCss(m[4]) : isJs ? hlJs(m[4]) : hlEsc(m[4])) + hlTag(m[5]);
+    } else out += hlTag(m[6]);
+    last = m.index + m[0].length;
+  }
+  return out + hlEsc(code.slice(last));
+}
+/* Découpe le HTML coloré en lignes ; un span qui traverse plusieurs lignes est refermé puis rouvert */
+function hlSplit(html) {
+  const lines = html.split('\n');
+  const re = /<span class="([^"]+)">|<\/span>/g;
+  let open = '';
+  for (let i = 0; i < lines.length; i++) {
+    const pre = open ? '<span class="' + open + '">' : '';
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(lines[i]))) open = m[1] || '';
+    lines[i] = pre + lines[i] + (open ? '</span>' : '');
+  }
+  return lines;
+}
+/* Dessine seulement les lignes visibles (+ marge) et cale la couche sur le défilement du champ */
+function hlPaint(force) {
+  const ta = $('src'), inner = $('hl-in'), LH = codeFs * 1.5, margin = 40;
+  const vFirst = Math.floor(ta.scrollTop / LH);
+  const vLast = Math.ceil((ta.scrollTop + ta.clientHeight) / LH);
+  const n = hlLines.length;
+  if (force || vFirst < hlWin[0] || (vLast > hlWin[1] && hlWin[1] < n)) {
+    const a = Math.max(0, vFirst - margin), b = Math.min(n, vLast + margin);
+    hlWin = [a, b];
+    inner.innerHTML = hlLines.slice(a, b).join('\n');
+  }
+  inner.style.transform = 'translate(' + (-ta.scrollLeft) + 'px,' + (hlWin[0] * LH - ta.scrollTop) + 'px)';
+}
+let hlLast = null, hlLines = [], hlWin = [0, 0];
+/* Réglage mémorisé « 1 » / « 0 » (valeur par défaut si absent ou si le stockage est indisponible) */
+function loadFlag(key, def) {
+  try {
+    const v = localStorage.getItem(key);
+    return v === null ? def : v === '1';
+  } catch (e) { return def; }
+}
+let hlOn = loadFlag('blocs.hl', true), vibOn = loadFlag('blocs.vib', true);
+let scOn = loadFlag('blocs.sc', true);
+/* Recalcule la coloration quand le texte change (repli sur le texte brut si le code est trop gros, en cas d'erreur ou si la coloration est désactivée) */
+function highlight() {
+  const ta = $('src'), v = ta.value;
+  if (!hlOn) {
+    if (hlLines.length || ta.classList.contains('hl-on')) {
+      hlLines = [];
+      hlLast = null;
+      $('hl-in').textContent = '';
+      ta.classList.remove('hl-on');
+    }
+    return;
+  }
+  if (v !== hlLast) {
+    hlLast = v;
+    try {
+      if (v.length > 400000) { ta.classList.remove('hl-on'); $('hl-in').textContent = ''; hlLines = []; return; }
+      hlLines = hlSplit(hlHtml(v));
+      ta.classList.add('hl-on');
+      hlPaint(true);
+      return;
+    } catch (e) {
+      ta.classList.remove('hl-on');
+      $('hl-in').textContent = '';
+      hlLines = [];
+      return;
+    }
+  }
+  if (hlLines.length) hlPaint(false);
+}
+function toggleHl() {
+  hlOn = !hlOn;
+  try { localStorage.setItem('blocs.hl', hlOn ? '1' : '0'); } catch (e) { /* stockage indisponible */ }
+  $('b-hl').setAttribute('aria-pressed', hlOn ? 'true' : 'false');
+  hlLast = null;
+  highlight();
+  notify(hlOn ? 'Coloration activée' : 'Coloration désactivée', { kind: 'ok', ms: 1500 });
+}
+/* Retour haptique (Android) */
+function buzz(p) {
+  try { if (vibOn && navigator.vibrate) navigator.vibrate(p); } catch (e) { /* vibration indisponible */ }
+}
 
+/* ---------- Notifications flottantes ---------- */
 function dismiss(el) {
   if (!el || !el.parentNode) return;
-  el.remove();
-  updateNotifCount();
+  clearTimeout(el._t);
+  el.classList.remove('in');
+  setTimeout(() => el.remove(), 200);
 }
 
 function dismissKey(key) {
-  const body = $('npane-body');
-  if (!body) return;
-  const el = body.querySelector('[data-key="' + key + '"]');
-  if (el) el.remove();
-  updateNotifCount();
+  const el = $('notifs').querySelector('[data-key="' + key + '"]');
+  if (el) dismiss(el);
+}
+function logActivity(msg, kind) {
+  const box = $('log-list');
+  if (!box) return;
+  const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const div = document.createElement('div');
+  div.className = 'log-item';
+  div.innerHTML = '<span class="log-time">' + time + '</span><span class="log-msg ' + (kind || '') + '">' + esc(msg) + '</span>';
+  box.prepend(div);
+  while (box.children.length > 5) box.lastChild.remove();
 }
 
+/* o : { kind: ok|warn|err, ms (0 = reste affichée), key, actions: [{label, fn}] } */
 function notify(msg, o) {
   o = o || {};
-  const body = $('npane-body');
-  if (!body) return null;
-  let el = o.key ? body.querySelector('[data-key="' + o.key + '"]') : null;
+  if (o.kind === 'err') buzz([35, 60, 35]);
+  else if (o.kind === 'warn') buzz(45);
+  else if (o.key === 'apply') buzz(28);
+  logActivity(msg, o.kind);
+  const box = $('notifs');
+  let el = o.key ? box.querySelector('[data-key="' + o.key + '"]') : null;
   if (!el) {
     el = document.createElement('div');
     if (o.key) el.dataset.key = o.key;
-    body.prepend(el);
+    box.prepend(el);
   }
   el.className = 'notif ' + (o.kind || '');
   el.innerHTML = '<div class="nmsg"></div><div class="nact"></div><button class="nx" aria-label="Fermer">×</button>';
@@ -1993,66 +2650,114 @@ function notify(msg, o) {
   (o.actions || []).forEach(a => {
     const b = document.createElement('button');
     b.textContent = a.label;
-    b.onclick = () => a.fn(el);
+    if (a.label.includes('Correction IA') || a.label.includes('Corriger')) {
+      b.className = 'btn-fix';
+    }
+    b.onclick = () => { dismiss(el); a.fn(); };
     act.appendChild(b);
   });
-  el.querySelector('.nx').onclick = () => { el.remove(); updateNotifCount(); };
-  const empty = body.querySelector('.empty');
-  if (empty) empty.remove();
-  /* Les notifications sans problème sont marquées traitées automatiquement (volet permanent) */
-  if (o.kind !== 'err' && o.kind !== 'warn') el.classList.add('done');
-  updateNotifCount();
+  el.querySelector('.nx').onclick = () => dismiss(el);
+  clearTimeout(el._t);
+  let ms = o.ms !== undefined ? o.ms : (o.kind === 'err' || o.kind === 'warn' ? 5200 : 2600);
+  /* Test en plein écran : les notifications sans problème disparaissent vite */
+  if (o.kind !== 'err' && o.kind !== 'warn' && $('tdlg').classList.contains('fullscreen')) ms = 1500;
+  if (ms) el._t = setTimeout(() => dismiss(el), ms);
+  while (box.children.length > 3) box.lastChild.remove();
+  requestAnimationFrame(() => el.classList.add('in'));
   return el;
-}
-function updateNotifCount() {
-  const body = $('npane-body');
-  const h = document.querySelector('#npane .npane-h b');
-  if (!body || !h) return;
-  const pending = body.querySelectorAll('.notif:not(.done)').length;
-  h.textContent = 'Notifications' + (pending ? ' (' + pending + ')' : '');
-  if (!body.children.length) body.innerHTML = '<div class="empty">Aucune notification.</div>';
-}
-/* Marque une notification comme « traitée » : elle reste visible mais change d'apparence */
-function notifyDone(el) {
-  if (!el) return;
-  el.classList.add('done');
-  updateNotifToggle();
-}
-/* Compteur de notifications non traitées sur le bouton du volet */
-function updateNotifToggle() {
-  const btn = $('b-notif-toggle');
-  const body = $('np-body');
-  if (!btn || !body) return;
-  const pending = body.querySelectorAll('.notif:not(.done)').length;
-  btn.dataset.state = pending ? 'has' : 'none';
-  const c = btn.querySelector('.nt-count');
-  if (c) c.textContent = pending ? String(pending) : '';
-  btn.setAttribute('aria-label', pending ? pending + ' notification(s) non traitée(s)' : 'Notifications');
-  btn.title = btn.getAttribute('aria-label');
-  if (!body.children.length) body.innerHTML = '<div class="np-empty">Aucune notification.</div>';
 }
 
 const toast = (msg, kind) => notify(msg, { kind });
-/* Copie un rapport vers l'IA et marque la notification comme traitée (couleur) */
-async function copyReport(text, el) {
-  await copyText(text, 'Rapport copié — collez-le à l\'IA ✓');
-  if (el) notifyDone(el);
-}
 
 /* ---------- Feuilles (overlays) ---------- */
 const isOpen = id => $(id).classList.contains('open');
 function openOv(id) { $(id).classList.add('open'); }
 function closeOv(id) {
+  if (id === 'ask') { askClose(null); return; }
   $(id).classList.remove('open');
   if (id === 'tdlg') stopTest();
+}
+/* ---------- Boîte de dialogue interne : askDialog({ title, msg, input, value, placeholder, ok, danger, cancel }) ---------- */
+let askResolve = null, askHasInput = false;
+function askClose(v) {
+  const r = askResolve;
+  askResolve = null;
+  $('ask').classList.remove('open');
+  if (r) r(v);
+}
+/* Renvoie une promesse : le texte saisi (si input), true (confirmation) ou null (annulé) */
+function askDialog(o) {
+  if (askResolve) askClose(null);
+  askHasInput = !!o.input;
+  $('ask-title').textContent = o.title || '';
+  $('ask-msg').textContent = o.msg || '';
+  $('ask-msg').style.display = o.msg ? '' : 'none';
+  const inp = $('ask-input');
+  inp.style.display = o.input ? '' : 'none';
+  inp.value = o.value || '';
+  inp.placeholder = o.placeholder || '';
+  const ok = $('ask-ok');
+  ok.textContent = o.ok || 'OK';
+  ok.classList.toggle('danger', !!o.danger);
+  ok.classList.toggle('primary', !o.danger);
+  $('ask-cancel').style.display = o.cancel === false ? 'none' : '';
+  openOv('ask');
+  setTimeout(() => {
+    if (o.input) { inp.focus(); inp.select(); } else ok.focus();
+  }, 60);
+  return new Promise(res => { askResolve = res; });
 }
 function openAdv(accId) {
   if (accId) document.querySelectorAll('#adv details.acc').forEach(d => { d.open = d.id === accId; });
   openOv('adv');
+  renderBlocks();
+  renderHistory();
 }
+/* Reflète l'état des cases Outils sur les boutons carrés au-dessus du code. */
+function syncToggles() {
+  $('tg-snd').classList.toggle('on', $('snd').checked);
+  $('tg-snd').setAttribute('aria-pressed', $('snd').checked ? 'true' : 'false');
+  $('tg-vib').classList.toggle('on', $('vib').checked);
+  $('tg-vib').setAttribute('aria-pressed', $('vib').checked ? 'true' : 'false');
+  $('tg-autotest').classList.toggle('on', $('autotest').checked);
+  $('tg-autotest').setAttribute('aria-pressed', $('autotest').checked ? 'true' : 'false');
+  $('tg-copyfinal').classList.toggle('on', $('copyfinal').checked);
+  $('tg-copyfinal').setAttribute('aria-pressed', $('copyfinal').checked ? 'true' : 'false');
+  $('tg-autofs').classList.toggle('on', $('autofs').checked);
+  $('tg-autofs').setAttribute('aria-pressed', $('autofs').checked ? 'true' : 'false');
+  $('tg-sc').classList.toggle('on', scOn);
+  $('tg-sc').setAttribute('aria-pressed', scOn ? 'true' : 'false');
+}
+/* Relie un bouton carré à une case à cocher : le clic bascule la case, et on répercute l'état. */
+function bindToggle(tgId, cbId) {
+  const tg = $(tgId), cb = $(cbId);
+  tg.onclick = () => { cb.click(); syncToggles(); };
+  cb.addEventListener('change', syncToggles);
+}
+$('tg-sc').onclick = () => {
+  scOn = !scOn;
+  try { localStorage.setItem('blocs.sc', scOn ? '1' : '0'); } catch (e) { /* stockage indisponible */ }
+  notify(scOn ? 'Raccourcis activés' : 'Raccourcis désactivés', { kind: 'ok', ms: 1500 });
+  syncToggles();
+};
 
+/* Mode partage : le prochain copyText ouvre la feuille de partage du téléphone au lieu du presse-papiers */
+let shareNext = false;
 /* ---------- Presse-papiers ---------- */
 async function copyText(text, okMsg) {
+  if (shareNext) {
+    shareNext = false;
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+        notify('Partagé ✓', { kind: 'ok' });
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+        okMsg = 'Partage impossible : texte copié à la place ✓';
+      }
+    } else okMsg = 'Partage indisponible ici : texte copié à la place ✓';
+  }
   try {
     await navigator.clipboard.writeText(text);
   } catch (e) {
@@ -2067,6 +2772,15 @@ async function copyText(text, okMsg) {
     if (!ok) { notify('Copie impossible (autorisez le presse-papiers)', { kind: 'err' }); return; }
   }
   notify(okMsg || 'Copié ✓', { kind: 'ok' });
+}
+/* Lance une action de copie en mode partage (doit être appelée directement depuis un toucher) */
+function shareVia(fn) {
+  if (!navigator.share) {
+    notify('Partage indisponible ici (navigateur sans feuille de partage ou page non sécurisée)', { kind: 'err' });
+    return;
+  }
+  shareNext = true;
+  try { fn(); } finally { shareNext = false; }
 }
 
 async function readClip() {
@@ -2083,7 +2797,7 @@ async function readClip() {
 /* ---------- Persistance et historique ---------- */
 function save() {
   hist = hist.slice(-MAX_HIST);
-  const data = { text: $('src').value, level: $('level').value };
+  const data = { text: $('src').value, level: String(getLevel()) };
   if (!idbOK) { saveLegacy(data); return; }
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) { /* quota */ }
   const sig = histSig();
@@ -2093,6 +2807,7 @@ function save() {
 }
 
 function pushHistory(label) {
+  redoStack.length = 0;
   const cur = $('src').value;
   if (!cur.trim()) return;
   if (hist.length && hist[hist.length - 1].text === cur) return;
@@ -2110,9 +2825,21 @@ function undoLast() {
   const h = hist[hist.length - 1];
   if (!h) { notify('Rien à annuler', { kind: 'err' }); return; }
   hist.pop();
+  redoStack.push($('src').value);
+  if (redoStack.length > MAX_HIST) redoStack.shift();
   setText(h.text);
   $('result').innerHTML = '';
-  notify('↶ Version précédente restaurée', { kind: 'ok', ms: 8000, actions: [{ label: 'Synchroniser l\'IA', fn: copyChanged }] });
+  notify('↶ Version précédente restaurée', { kind: 'ok', ms: 8000, actions: [{ label: '↷ Rétablir', fn: redoLast }, { label: 'Synchroniser l\'IA', fn: copyChanged }] });
+}
+function redoLast() {
+  if (!redoStack.length) { notify('Rien à rétablir', { kind: 'err' }); return; }
+  const t = redoStack.pop();
+  const cur = $('src').value;
+  if (cur.trim() && !(hist.length && hist[hist.length - 1].text === cur)) hist.push({ t: Date.now(), label: 'Avant rétablissement', text: cur });
+  if (hist.length > MAX_HIST) hist.shift();
+  setText(t);
+  $('result').innerHTML = '';
+  notify('↷ Version rétablie', { kind: 'ok', ms: 8000, actions: [{ label: '↶ Annuler', fn: undoLast }, { label: 'Synchroniser l\'IA', fn: copyChanged }] });
 }
 
 /* ---------- Rafraîchissement ---------- */
@@ -2120,138 +2847,91 @@ function refresh() {
   const text = $('src').value;
   const pm = parseMarks(text);
   const lines = text ? text.split('\n').length : 0;
-  const nbTxt = pm.blocks.length ? '(' + pm.blocks.length + ')' : '';
-  $('nb').textContent = nbTxt;
-  const nbSide = $('nb-side');
-  if (nbSide) nbSide.textContent = nbTxt;
+  $('nb').textContent = pm.blocks.length ? '(' + pm.blocks.length + ')' : '';
+  highlight();
   $('stats').innerHTML = !text ? 'Vide'
     : '<b>' + lines + '</b> l · ' + (pm.blocks.length ? '<b>' + pm.blocks.length + '</b> blocs' : 'non balisé');
   $('b-undo-top').disabled = !hist.length;
+  $('b-redo-top').disabled = !redoStack.length;
   syncMainBtn(pm.blocks.length);
+  syncToggles();
   const sig = pm.errors.slice(0, 3).join(' · ');
   if (sig && sig !== lastMarkErr) notify('Marqueurs incohérents : ' + sig, { kind: 'warn', key: 'marks', ms: 0 });
   if (!sig) dismissKey('marks');
   lastMarkErr = sig;
-  renderBlocks(pm);
-  renderHistory();
-  updateSyncDot();
+  /* Les listes ne sont dessinées que si le panneau Avancé est ouvert (elles sont redessinées à son ouverture) */
+  if (isOpen('adv')) {
+    renderBlocks(pm);
+    renderHistory();
+  }
 }
 /* Bouton principal : « Analyser » tant que le code n'est pas balisé, puis « Coller & appliquer » */
 function syncMainBtn(nBlocks) {
   $('b-main-t').textContent = nBlocks ? 'Coller & appliquer' : 'Analyser';
 }
-/* Pastille d'état : à jour (ok), modifs en attente (stale), jamais envoyé (none) */
-function updateSyncDot() {
-  const btn = $('b-sync-dot');
-  if (!btn) return;
-  const txt = btn.querySelector('.sync-txt');
-  const src = $('src').value;
-  const hasCode = parseMarks(src).blocks.length > 0;
-  let state = 'none', label = '';
-  if (!hasCode) {
-    state = 'none'; label = 'Aucun code balisé';
-  } else if (!Object.keys(aiSnap).length) {
-    state = 'none'; label = 'Jamais envoyé à l\'IA — cliquez pour copier';
-  } else {
-    const { changed, gone } = changedBlocks(src);
-    const n = topBlocks(changed).length + gone.length;
-    if (n === 0) { state = 'ok'; label = 'IA à jour'; }
-    else { state = 'stale'; label = n + ' bloc' + (n > 1 ? 's' : '') + ' modifié' + (n > 1 ? 's' : '') + ' — cliquez pour synchroniser'; }
-  }
-  btn.dataset.state = state;
-  btn.title = label;
-  btn.setAttribute('aria-label', label);
-  if (txt) txt.textContent = state === 'ok' ? 'À jour' : state === 'stale' ? 'Modifs' : 'IA';
-}
-$('b-sync-dot').addEventListener('click', () => {
-  const src = $('src').value;
-  if (!parseMarks(src).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'warn' }); return; }
-  if (!Object.keys(aiSnap).length) { copyAllForAI(); return; }
-  const { changed, gone } = changedBlocks(src);
-  if (!topBlocks(changed).length && !gone.length) { notify('L\'IA est à jour ✓', { kind: 'ok' }); return; }
-  copyChanged();
-});
-updateSyncDot();
 
 function renderBlocks(pm) {
   pm = pm || parseMarks($('src').value);
   const q = $('q').value.trim().toLowerCase(), subs = $('subs').checked;
-  const list = pm.blocks.filter(b => (subs || b.depth === 0) && (!q || b.name.toLowerCase().includes(q)));
+  const all = pm.blocks;
+  /* nsub : nombre de sous-blocs de chaque bloc qui en a ; tree : l'arbre n'est actif que sans recherche et avec les sous-blocs */
+  const nsub = new Map();
+  all.forEach((b, i) => {
+    let j = i + 1;
+    while (all[j] && all[j].depth > b.depth) j++;
+    if (j > i + 1) nsub.set(b.name, j - i - 1);
+  });
+  const tree = subs && !q;
+  const list = [];
+  let skip = -1;
+  for (const b of all) {
+    if (skip >= 0 && b.depth > skip) continue;
+    skip = -1;
+    if (!subs && b.depth > 0) continue;
+    if (q) { if (b.name.toLowerCase().includes(q)) list.push(b); continue; }
+    list.push(b);
+    if (nsub.has(b.name) && folded.has(b.name)) skip = b.depth;
+  }
   const box = $('blist');
-  const renderInto = (listId, searchId, subsId) => {
-    const target = $(listId);
-    if (!target) return;
-    const qEl = $(searchId), subsEl = $(subsId);
-    const sq = qEl ? qEl.value.trim().toLowerCase() : '';
-    const ssubs = subsEl ? subsEl.checked : true;
-    const sList = pm.blocks.filter(b => (ssubs || b.depth === 0) && (!sq || b.name.toLowerCase().includes(sq)));
-    if (!sList.length) {
-      target.innerHTML = '<div class="empty">' + (pm.blocks.length ? 'Aucun bloc ne correspond.' : 'Aucun bloc. Touchez « Analyser ».') + '</div>';
-      return;
-    }
-    target.innerHTML = sList.slice(0, 500).map(b =>
-      '<div class="card" style="margin-left:' + Math.min(b.depth, 4) * 12 + 'px">' +
-      '<div class="nm"><label class="pick"><input type="checkbox" data-p="' + esc(b.name) + '"' + (picked.has(b.name) ? ' checked' : '') + '><span>' + esc(b.name) + '</span></label></div>' +
-      '<div class="meta2"><span class="chipc ' + b.lang + '">' + b.lang + '</span>' + b.lines + ' ligne' + (b.lines > 1 ? 's' : '') + '</div>' +
+  if (!list.length) {
+    box.innerHTML = '<div class="empty">' + (pm.blocks.length ? 'Aucun bloc ne correspond.' : 'Aucun bloc. Touchez « Analyser ».') + '</div>';
+    return;
+  }
+  box.innerHTML = list.slice(0, 500).map(b => {
+    const n = nsub.get(b.name), fd = tree && n && folded.has(b.name);
+    const fold = tree && n
+      ? '<button class="fold" data-f="' + esc(b.name) + '" aria-label="Replier ou déplier">' + (fd ? '▸' : '▾') + '</button>'
+      : '<span class="fold"></span>';
+    return '<div class="card" style="margin-left:' + Math.min(b.depth, 4) * 12 + 'px">' +
+      '<div class="nm nmrow">' + fold + '<label class="pick"><input type="checkbox" data-p="' + esc(b.name) + '"' + (picked.has(b.name) ? ' checked' : '') + '><span>' + esc(b.name) + '</span></label></div>' +
+      '<div class="meta2"><span class="chipc ' + b.lang + '">' + b.lang + '</span>' + b.lines + ' ligne' + (b.lines > 1 ? 's' : '') +
+      (fd ? ' · ' + n + ' sous-bloc' + (n > 1 ? 's' : '') + ' replié' + (n > 1 ? 's' : '') : '') + '</div>' +
       '<div class="acts" data-n="' + esc(b.name) + '">' +
       '<button class="sm" data-a="copy">Copier</button>' +
       '<button class="sm" data-a="view">Voir</button>' +
       '<button class="sm primary" data-a="rep">Remplacer…</button>' +
-      '<button class="sm" data-a="goto">Aller</button></div></div>'
-    ).join('') + (sList.length > 500 ? '<div class="empty">… ' + (sList.length - 500) + ' autres (affinez la recherche)</div>' : '');
-  };
-  if (!list.length) {
-    box.innerHTML = '<div class="empty">' + (pm.blocks.length ? 'Aucun bloc ne correspond.' : 'Aucun bloc. Touchez « Analyser ».') + '</div>';
-    renderInto('blist-side', 'q-side', 'subs-side');
-    return;
-  }
-  box.innerHTML = list.slice(0, 500).map(b =>
-    '<div class="card" style="margin-left:' + Math.min(b.depth, 4) * 12 + 'px">' +
-    '<div class="nm"><label class="pick"><input type="checkbox" data-p="' + esc(b.name) + '"' + (picked.has(b.name) ? ' checked' : '') + '><span>' + esc(b.name) + '</span></label></div>' +
-    '<div class="meta2"><span class="chipc ' + b.lang + '">' + b.lang + '</span>' + b.lines + ' ligne' + (b.lines > 1 ? 's' : '') + '</div>' +
-    '<div class="acts" data-n="' + esc(b.name) + '">' +
-    '<button class="sm" data-a="copy">Copier</button>' +
-    '<button class="sm" data-a="view">Voir</button>' +
-    '<button class="sm primary" data-a="rep">Remplacer…</button>' +
-    '<button class="sm" data-a="goto">Aller</button></div></div>'
-  ).join('') + (list.length > 500 ? '<div class="empty">… ' + (list.length - 500) + ' autres (affinez la recherche)</div>' : '');
-  renderInto('blist-side', 'q-side', 'subs-side');
+      '<button class="sm" data-a="goto">Aller</button></div></div>';
+  }).join('') + (list.length > 500 ? '<div class="empty">… ' + (list.length - 500) + ' autres (affinez la recherche)</div>' : '');
 }
-/* Rendu de la liste latérale (desktop) */
-function renderBlocksSide(pm) {
-  const box = $('blist-side');
-  if (!box) return;
-  pm = pm || parseMarks($('src').value);
-  const qEl = $('q-side'), subsEl = $('subs-side');
-  const q = qEl ? qEl.value.trim().toLowerCase() : '';
-  const subs = subsEl ? subsEl.checked : true;
-  const list = pm.blocks.filter(b => (subs || b.depth === 0) && (!q || b.name.toLowerCase().includes(q)));
-  if (!list.length) {
-    box.innerHTML = '<div class="empty">' + (pm.blocks.length ? 'Aucun bloc ne correspond.' : 'Aucun bloc. Touchez « Analyser ».') + '</div>';
-    return;
+/* Replie (ou déplie) tous les blocs qui ont des sous-blocs */
+function foldAll(on) {
+  folded.clear();
+  if (on) {
+    const all = parseMarks($('src').value).blocks;
+    all.forEach((b, i) => { if (all[i + 1] && all[i + 1].depth > b.depth) folded.add(b.name); });
+    if (!$('subs').checked || $('q').value.trim()) notify('L\'arbre ne s\'affiche qu\'avec les sous-blocs visibles et sans recherche', { kind: 'warn' });
   }
-  box.innerHTML = list.slice(0, 500).map(b =>
-    '<div class="card" style="margin-left:' + Math.min(b.depth, 4) * 12 + 'px">' +
-    '<div class="nm"><label class="pick"><input type="checkbox" data-p="' + esc(b.name) + '"' + (picked.has(b.name) ? ' checked' : '') + '><span>' + esc(b.name) + '</span></label></div>' +
-    '<div class="meta2"><span class="chipc ' + b.lang + '">' + b.lang + '</span>' + b.lines + ' ligne' + (b.lines > 1 ? 's' : '') + '</div>' +
-    '<div class="acts" data-n="' + esc(b.name) + '">' +
-    '<button class="sm" data-a="copy">Copier</button>' +
-    '<button class="sm" data-a="view">Voir</button>' +
-    '<button class="sm primary" data-a="rep">Remplacer…</button>' +
-    '<button class="sm" data-a="goto">Aller</button></div></div>'
-  ).join('') + (list.length > 500 ? '<div class="empty">… ' + (list.length - 500) + ' autres (affinez la recherche)</div>' : '');
+  renderBlocks();
 }
 
 function renderHistory() {
   const box = $('hlist');
   if (!hist.length) { box.innerHTML = '<div class="empty">Aucune version enregistrée.</div>'; return; }
-  box.innerHTML = hist.map((h, i) => ({ h, i })).reverse().map(({ h, i }) => {
-    const st = histStatus(h);
-    return '<div class="card"><div class="nm">' + esc(h.label) + '</div><div class="meta2">' +
-      '<span class="hist-badge ' + st.kind + '"' + (st.title ? ' title="' + esc(st.title) + '"' : '') + '>' + esc(st.label) + '</span>' +
-      new Date(h.t).toLocaleString('fr-FR') + ' · ' + h.text.split('\n').length + ' lignes · ' + Math.round(h.text.length / 1024) + ' Ko</div>' +
-      histActions(h, i) + '</div>';
-  }).join('');
+  box.innerHTML = hist.map((h, i) => ({ h, i })).reverse().map(({ h, i }) =>
+    '<div class="card"><div class="nm">' + esc(h.label) + '</div><div class="meta2">' +
+    new Date(h.t).toLocaleString('fr-FR') + ' · ' + h.text.split('\n').length + ' lignes · ' + Math.round(h.text.length / 1024) + ' Ko</div>' +
+    '<div class="acts" data-i="' + i + '"><button class="sm primary" data-a="restore">Restaurer</button>' +
+    '<button class="sm" data-a="hcopy">Copier</button></div></div>').join('');
 }
 
 /* ---------- Diff ---------- */
@@ -2270,14 +2950,14 @@ function renderDiff(a, b) {
 }
 
 /* ---------- Messages prêts à renvoyer à l'IA ---------- */
-const REMIND_TEXT = 'Rappel : réponds uniquement avec les blocs modifiés (même format #BLOC/#FIN, blocs complets, noms inchangés), dans un seul bloc de code. Ne change rien d\'autre que ce que je demande.\n\nMa demande : ';
+const REMIND_TEXT = 'Rappel : réponds uniquement avec les blocs modifiés (même format #BLOC/#FIN, blocs complets, noms inchangés), TOUS dans UN SEUL bloc de code à 4 backticks, sans texte entre les blocs. Ne change rien d\'autre que ce que je demande.\n\nMa demande : ';
 
 function fixMessage(bad) {
   const lines = bad.map(l => l.glob ? '- ' + l.warn + '.' : l.ok ? '- Le bloc « ' + l.name + ' » semble invalide : ' + l.warn + '.' : '- ' + l.msg + '.');
   const miss = bad.some(l => !l.ok);
   return 'Il y a un souci avec ta dernière réponse :\n' + lines.join('\n') + '\n\n' +
     (miss ? 'Utilise exactement les noms de blocs du code balisé que je t\'ai donné. Voici l\'index actuel :\n' + buildIndex($('src').value) + '\n\n' : '') +
-    'Renvoie uniquement le(s) bloc(s) corrigé(s), complet(s), avec les mêmes marqueurs #BLOC/#FIN, dans un seul bloc de code. Ne change rien d\'autre.';
+    'Renvoie uniquement le(s) bloc(s) corrigé(s), complet(s), avec les mêmes marqueurs #BLOC/#FIN, TOUS dans UN SEUL bloc de code à 4 backticks, sans texte entre les blocs. Ne change rien d\'autre.';
 }
 
 /* ---------- Appliquer la réponse de l'IA ---------- */
@@ -2342,7 +3022,7 @@ function analyseNow(silent) {
   if (!text.trim()) { notify('Collez d\'abord du code', { kind: 'err' }); return false; }
   pushHistory('Avant analyse');
   const t0 = performance.now();
-  const r = analyze(text, { level: +$('level').value });
+  const r = analyze(text, { level: getLevel() });
   setText(r.text);
   $('src').scrollTop = 0;
   if (r.warnings.length) notify(r.warnings.join(' '), { kind: 'warn', ms: 0 });
@@ -2384,6 +3064,85 @@ async function copyRequested() {
   copyText('Voici les blocs demandés :\n\n' + f + 'html\n' + code + '\n' + f,
     list.length + ' bloc' + (list.length > 1 ? 's' : '') + ' copié' + (list.length > 1 ? 's' : '') + ' ✓');
 }
+document.addEventListener('keydown', e => {
+  if (isOpen('shortcutdlg')) {
+    if (e.target.id === 'shortcut-key') {
+      e.preventDefault();
+      let parts = [];
+      if (e.ctrlKey || e.metaKey) parts.push('Ctrl');
+      if (e.altKey) parts.push('Alt');
+      if (e.shiftKey) parts.push('Shift');
+      let k = e.key.toUpperCase();
+      if (!['CONTROL','ALT','SHIFT','META'].includes(k)) parts.push(k);
+      if (parts.length > 0 && parts[parts.length-1] !== 'CTRL' && parts[parts.length-1] !== 'ALT' && parts[parts.length-1] !== 'SHIFT') {
+        $('shortcut-key').value = parts.join('+');
+      }
+    }
+    return;
+  }
+  const txt = $('src').value;
+  if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') && document.activeElement.id !== 'shortcut-key') return;
+  let parts = [];
+  if (e.ctrlKey || e.metaKey) parts.push('Ctrl');
+  if (e.altKey) parts.push('Alt');
+  if (e.shiftKey) parts.push('Shift');
+  let k = e.key.toUpperCase();
+  if (!['CONTROL','ALT','SHIFT','META'].includes(k)) parts.push(k);
+  const combo = parts.join('+');
+  const sc = shortcuts.find(x => x.key === combo);
+  if (sc) {
+    e.preventDefault();
+    if (sc.action === 'analyze') analyseNow();
+    else if (sc.action === 'paste-apply') pasteAndApply();
+    else if (sc.action === 'test') runTest();
+    else if (sc.action === 'copy-marked') $('qb-marked').click();
+    else if (sc.action === 'copy-final') $('b-copy-clean').click();
+    else if (sc.action === 'undo') undoLast();
+    else if (sc.action === 'redo') redoLast();
+    else if (sc.action === 'open-projects') $('qb-proj').click();
+    else if (sc.action === 'open-advanced') $('b-adv').click();
+  }
+});
+document.addEventListener('keydown', e => {
+  if (!scOn) return;
+  if (isOpen('shortcutdlg')) {
+    if (e.target.id === 'shortcut-key') {
+      e.preventDefault();
+      let parts = [];
+      if (e.ctrlKey || e.metaKey) parts.push('Ctrl');
+      if (e.altKey) parts.push('Alt');
+      if (e.shiftKey) parts.push('Shift');
+      let k = e.key.toUpperCase();
+      if (!['CONTROL','ALT','SHIFT','META'].includes(k)) parts.push(k);
+      if (parts.length > 0 && parts[parts.length-1] !== 'CTRL' && parts[parts.length-1] !== 'ALT' && parts[parts.length-1] !== 'SHIFT') {
+        $('shortcut-key').value = parts.join('+');
+      }
+    }
+    return;
+  }
+  const txt = $('src').value;
+  if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') && document.activeElement.id !== 'shortcut-key') return;
+  let parts = [];
+  if (e.ctrlKey || e.metaKey) parts.push('Ctrl');
+  if (e.altKey) parts.push('Alt');
+  if (e.shiftKey) parts.push('Shift');
+  let k = e.key.toUpperCase();
+  if (!['CONTROL','ALT','SHIFT','META'].includes(k)) parts.push(k);
+  const combo = parts.join('+');
+  const sc = shortcuts.find(x => x.key === combo);
+  if (sc) {
+    e.preventDefault();
+    if (sc.action === 'analyze') analyseNow();
+    else if (sc.action === 'paste-apply') pasteAndApply();
+    else if (sc.action === 'test') runTest();
+    else if (sc.action === 'copy-marked') $('qb-marked').click();
+    else if (sc.action === 'copy-final') $('b-copy-clean').click();
+    else if (sc.action === 'undo') undoLast();
+    else if (sc.action === 'redo') redoLast();
+    else if (sc.action === 'open-projects') $('qb-proj').click();
+    else if (sc.action === 'open-advanced') $('b-adv').click();
+  }
+});
 /* Envoi partiel : prompt + index complet + seulement les blocs cochés */
 function copyPicked() {
   const src = $('src').value;
@@ -2441,6 +3200,192 @@ function clearCode() {
   setText('');
   notify('Code vidé', { ms: 7000, actions: [{ label: '↶ Annuler', fn: undoLast }] });
 }
+/* ---------- Projets : liste, changement, création, renommage, suppression ---------- */
+function renderProjects() {
+  $('proj-cur').textContent = (projects.list.find(p => p.id === projects.cur) || {}).name || '—';
+  $('plist').innerHTML = projects.list.map(p =>
+    '<div class="card"><div class="nm">' + esc(p.name) + (p.id === projects.cur ? ' <span class="chipc">actif</span>' : '') + '</div>' +
+    '<div class="acts" data-id="' + esc(p.id) + '">' +
+    (p.id === projects.cur ? '' : '<button class="sm primary" data-a="open">Ouvrir</button>') +
+    '<button class="sm" data-a="ren">Renommer</button>' +
+    '<button class="sm" data-a="del">Supprimer</button></div></div>').join('');
+  renderProjDlg();
+  renderProjSel();
+}
+async function switchProject(id) {
+  if (switchProject._busy) return;
+  if (id === projects.cur || !projects.list.some(p => p.id === id)) { renderProjects(); return; }
+  switchProject._busy = true;
+  try {
+    save();
+    let s = null, nh = null;
+    try { s = JSON.parse(localStorage.getItem(pKey(id)) || 'null'); } catch (e) { /* stockage indisponible */ }
+    if (idbOK) { try { nh = await idbGet('hist:' + id); } catch (e) { /* IndexedDB indisponible */ } }
+    if (!Array.isArray(nh)) nh = s && Array.isArray(s.hist) ? s.hist : [];
+    const old = projects.cur;
+    try {
+      localStorage.setItem(pKey(old), JSON.stringify({
+        text: $('src').value, level: String(getLevel()), snap: aiSnap,
+        hist: idbOK ? undefined : hist.slice(-MAX_HIST)
+      }));
+    } catch (e) {
+      notify('Stockage plein : changement de projet annulé', { kind: 'err' });
+      renderProjects();
+      return;
+    }
+    if (idbOK) idbSet('hist:' + old, hist).catch(() => { });
+    projects.cur = id;
+    saveProjects();
+    hist = nh;
+    aiSnap = (s && s.snap) || {};
+    saveSnap();
+    redoStack.length = 0;
+    picked.clear();
+    lastHistSig = '';
+    setLevel(parseInt((s && s.level) || '2', 10));
+    $('resp').value = '';
+    $('result').innerHTML = '';
+    setText((s && s.text) || '');
+    renderProjects();
+    notify('Projet « ' + projects.list.find(p => p.id === id).name + ' » ouvert', { kind: 'ok' });
+  } finally {
+    switchProject._busy = false;
+  }
+}
+async function newProject() {
+  const v = await askDialog({ title: 'Nouveau projet', input: true, value: 'Projet ' + (projects.list.length + 1), placeholder: 'Nom du projet', ok: 'Créer' });
+  const name = (v || '').trim();
+  if (!name) return;
+  const id = 'p' + Date.now().toString(36);
+  projects.list.push({ id, name: name.slice(0, 40) });
+  saveProjects();
+  await switchProject(id);
+}
+async function renameProject(id) {
+  const p = projects.list.find(x => x.id === id);
+  if (!p) return;
+  const v = await askDialog({ title: 'Renommer le projet', input: true, value: p.name, placeholder: 'Nom du projet', ok: 'Renommer' });
+  const name = (v || '').trim();
+  if (!name) return;
+  p.name = name.slice(0, 40);
+  saveProjects();
+  renderProjects();
+}
+async function deleteProject(id) {
+  const p = projects.list.find(x => x.id === id);
+  if (!p) return;
+  if (projects.list.length < 2) { notify('Impossible de supprimer le seul projet', { kind: 'err' }); return; }
+  const yes = await askDialog({ title: 'Supprimer le projet', msg: 'Supprimer le projet « ' + p.name + ' » et son historique ?\nCette action est définitive.', ok: 'Supprimer', danger: true });
+  if (!yes) return;
+  if (id === projects.cur) {
+    const other = projects.list.find(x => x.id !== id);
+    await switchProject(other.id);
+    if (projects.cur === id) return;
+  }
+  projects.list = projects.list.filter(x => x.id !== id);
+  saveProjects();
+  try { localStorage.removeItem(pKey(id)); } catch (e) { /* stockage indisponible */ }
+  if (idbOK) idbSet('hist:' + id, []).catch(() => { });
+  renderProjects();
+  notify('Projet supprimé', { kind: 'ok' });
+}
+/* Exporte projets, historique complet (IndexedDB), empreintes IA et réglages dans un seul JSON. */
+async function exportAllData() {
+  save();
+  const projectsOut = [];
+  const histOut = {};
+  for (const p of projects.list) {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem(pKey(p.id)) || 'null'); } catch (e) { /* stockage indisponible */ }
+    projectsOut.push({ id: p.id, name: p.name, text: (s && s.text) || '', level: (s && s.level) || '2', snap: (s && s.snap) || {} });
+    let h = null;
+    if (idbOK) { try { h = await idbGet('hist:' + p.id); } catch (e) { /* IndexedDB indisponible */ } }
+    if (!Array.isArray(h)) h = (s && Array.isArray(s.hist)) ? s.hist : [];
+    histOut[p.id] = h;
+  }
+  const settings = {};
+  ['blocs.hl', 'blocs.vib', 'blocs.sound', 'blocs.autotest', 'blocs.copyfinal', 'blocs.autofs', 'blocs.fs', 'blocs.level'].forEach(k => {
+    try { const v = localStorage.getItem(k); if (v !== null) settings[k] = v; } catch (e) { /* stockage indisponible */ }
+  });
+  const data = {
+    app: 'blocode',
+    v: 1,
+    exportedAt: new Date().toISOString(),
+    cur: projects.cur,
+    projects: projectsOut,
+    history: histOut,
+    aiSnap: aiSnap,
+    settings: settings
+  };
+  download('blocode-export-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify(data, null, 2));
+  notify('Export prêt ✓ (' + projectsOut.length + ' projet' + (projectsOut.length > 1 ? 's' : '') + ')', { kind: 'ok' });
+}
+/* Restaure un export produit par exportAllData. Demande confirmation, puis remplace les projets. */
+async function importAllData(file) {
+  let data;
+  try {
+    data = JSON.parse(await file.text());
+  } catch (e) {
+    notify('Fichier illisible (JSON invalide)', { kind: 'err' });
+    return;
+  }
+  if (!data || data.app !== 'blocode' || !Array.isArray(data.projects) || !data.projects.length) {
+    notify('Ce fichier ne ressemble pas à un export Blocode', { kind: 'err' });
+    return;
+  }
+  const nProj = data.projects.length;
+  const nHist = Object.values(data.history || {}).reduce((s, a) => s + (Array.isArray(a) ? a.length : 0), 0);
+  const yes = await askDialog({
+    title: 'Importer un export',
+    msg: 'Remplacer les ' + projects.list.length + ' projet(s) actuels par les ' + nProj + ' projet(s) de cet export ?\n' +
+      'Historique inclus : ' + nHist + ' version(s).\nCette action ne peut pas être annulée.',
+    ok: 'Importer',
+    danger: true
+  });
+  if (!yes) return;
+  /* Sauvegarde de secours : export automatique de l'état actuel avant écrasement */
+  try { await exportAllData(); } catch (e) { /* export indisponible : on continue quand même */ }
+  const oldCur = projects.cur;
+  const idMap = new Map();
+  const imported = data.projects.map(p => {
+    const same = projects.list.some(x => x.id === p.id);
+    const id = same ? ('p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)) : (p.id || ('p' + Date.now().toString(36)));
+    idMap.set(p.id, id);
+    return { id, name: (p.name || 'Projet').slice(0, 40), text: p.text || '', level: p.level || '2', snap: p.snap || {}, hist: (data.history && data.history[p.id]) || [] };
+  });
+  projects.list = imported.map(p => ({ id: p.id, name: p.name }));
+  const newCur = idMap.get(data.cur) || imported[0].id;
+  projects.cur = newCur;
+  saveProjects();
+  for (const p of imported) {
+    const payload = { text: p.text, level: p.level, snap: p.snap, hist: idbOK ? undefined : p.hist.slice(-MAX_HIST) };
+    try { localStorage.setItem(pKey(p.id), JSON.stringify(payload)); } catch (e) { /* quota */ }
+    if (idbOK) { try { await idbSet('hist:' + p.id, p.hist.slice(-MAX_HIST)); } catch (e) { idbOK = false; } }
+  }
+  if (data.settings && typeof data.settings === 'object') {
+    Object.keys(data.settings).forEach(k => {
+      if (/^blocs\.(hl|vib|sound|autotest|copyfinal|autofs|fs|level)$/.test(k)) {
+        try { localStorage.setItem(k, String(data.settings[k])); } catch (e) { /* stockage indisponible */ }
+      }
+    });
+  }
+  aiSnap = (data.aiSnap && typeof data.aiSnap === 'object') ? data.aiSnap : {};
+  saveSnap();
+  /* Bascule sur le projet importé (sans repasser par switchProject qui comparerait les hist) */
+  hist = imported.find(p => p.id === newCur).hist.slice(-MAX_HIST);
+  redoStack.length = 0;
+  picked.clear();
+  folded.clear();
+  lastHistSig = '';
+  histSig();
+  setLevel(parseInt(imported.find(p => p.id === newCur).level || '2', 10));
+  $('resp').value = '';
+  $('result').innerHTML = '';
+  setText(imported.find(p => p.id === newCur).text);
+  renderProjects();
+  renderHistory();
+  notify('Import terminé ✓ (' + nProj + ' projet' + (nProj > 1 ? 's' : '') + ' restauré' + (nProj > 1 ? 's' : '') + ')', { kind: 'ok', ms: 6000 });
+}
 
 /* ---------- Voir / remplacer un bloc ---------- */
 function openBlockDlg(mode, name) {
@@ -2483,7 +3428,7 @@ function gotoBlock(name) {
   closeOv('adv');
   const ta = $('src');
   const line = ta.value.slice(0, hit.block.outerStart).split('\n').length - 1;
-  ta.scrollTop = Math.max(0, line * 18 - 30);
+  ta.scrollTop = Math.max(0, line * codeFs * 1.5 - 30);
   ta.setSelectionRange(hit.block.outerStart, hit.block.outerStart);
 }
 
@@ -2520,12 +3465,29 @@ function showTest(done) {
   $('terrs').innerHTML = testErrors.map(o => '<div class="note err">' + esc(o.m) + (o.l ? ' — ligne ' + o.l : '') +
     (o.block ? ' · bloc <b>' + esc(o.block) + '</b>' : '') + '</div>').join('');
   $('t-copy').style.display = testErrors.length ? '' : 'none';
+  $('t-share').style.display = testErrors.length ? '' : 'none';
 }
 
 function testMessage() {
-  const list = testErrors.slice(0, 3).map(o => '- « ' + o.m + ' »' + (o.l ? ' (ligne ' + o.l + ')' : '') + (o.block ? ', dans le bloc ' + o.block : '')).join('\n');
-  return 'En lançant l\'appli après ta dernière modification, j\'obtiens :\n' + list +
-    '\n\nCorrige le problème en renvoyant uniquement les blocs modifiés, complets, avec les mêmes marqueurs #BLOC/#FIN, dans un seul bloc de code. Ne change rien d\'autre.';
+  const errs = testErrors.slice(0, 3);
+  const list = errs.map(o => '- « ' + o.m + ' »' + (o.l ? ' (ligne ' + o.l + ')' : '') + (o.block ? ', dans le bloc ' + o.block : '')).join('\n');
+  /* Code actuel des blocs fautifs, pour que l'IA reparte de la bonne version */
+  const src = $('src').value;
+  const { blocks } = parseMarks(src);
+  const bad = [];
+  errs.forEach(o => {
+    const b = o.block && blocks.find(x => x.name === o.block);
+    if (b && !bad.includes(b)) bad.push(b);
+  });
+  const top = topBlocks(bad);
+  let code = '';
+  if (top.length) {
+    const c = top.map(b => src.slice(b.outerStart, b.outerEnd)).join('').replace(/\n$/, '');
+    const f = fenceFor(c);
+    code = '\n\nVoici ' + (top.length > 1 ? 'les blocs concernés, dans leur état actuel' : 'le bloc concerné, dans son état actuel') + ' :\n\n' + f + 'html\n' + c + '\n' + f;
+  }
+  return 'En lançant l\'appli après ta dernière modification, j\'obtiens :\n' + list + code +
+    '\n\nCorrige le problème en renvoyant uniquement les blocs modifiés, complets, avec les mêmes marqueurs #BLOC/#FIN, TOUS dans UN SEUL bloc de code à 4 backticks, sans texte entre les blocs. Ne change rien d\'autre.';
 }
 
 function stopTest() {
@@ -2533,6 +3495,15 @@ function stopTest() {
   if (testListener) window.removeEventListener('message', testListener);
   testListener = null;
   $('tframe').srcdoc = '';
+}
+function enterFs() {
+  const pane = $('tdlg');
+  pane.classList.add('fullscreen');
+}
+function exitFs() {
+  const pane = $('tdlg');
+  pane.classList.remove('fullscreen');
+  pane.classList.remove('immersive');
 }
 
 function runTest(auto) {
@@ -2545,8 +3516,7 @@ function runTest(auto) {
   /* Aperçu automatique activé : test en plein écran sans bordure */
   const imm = $('autotest').checked;
   $('tdlg').classList.toggle('immersive', imm);
-  if (imm) $('tdlg').classList.add('fullscreen');
-  $('t-fs').innerHTML = '<svg class="ic"><use href="#' + ($('tdlg').classList.contains('fullscreen') ? 'i-x' : 'i-maximize') + '"/></svg>';
+  if (imm || $('autofs').checked) enterFs();
   /* Plein écran : les notifications de succès déjà affichées disparaissent vite */
   if ($('tdlg').classList.contains('fullscreen')) {
     document.querySelectorAll('#notifs .notif.ok').forEach(n => { clearTimeout(n._t); n._t = setTimeout(() => dismiss(n), 1500); });
@@ -2604,7 +3574,10 @@ function tick(strong) {
 
 document.addEventListener('pointerdown', e => {
   const b = e.target.closest && e.target.closest('button, summary');
-  if (b && !b.disabled) tick(b.classList.contains('hero'));
+  if (b && !b.disabled) {
+    tick(b.classList.contains('hero'));
+    buzz(b.classList.contains('hero') ? 14 : 8);
+  }
 }, true);
 
 /* ---------- Initialisation ---------- */
@@ -2614,14 +3587,15 @@ function init() {
     if (s) {
       $('src').value = s.text || '';
       hist = Array.isArray(s.hist) ? s.hist : [];
-      if (s.level) $('level').value = s.level;
+      if (s.level) setLevel(parseInt(s.level, 10));
     }
+    const lv = parseInt(localStorage.getItem('blocs.level'), 10);
+    if (lv >= 1 && lv <= 4) $('level-cur').textContent = lv;
   } catch (e) { /* stockage indisponible */ }
 
   /* écran principal */
   let tm;
   $('src').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(() => { refresh(); save(); }, 400); });
-  $('level').addEventListener('change', save);
   
   /* Bouton unique : Analyser (Coller -> Baliser -> Copier IA), puis Coller & appliquer */
   $('b-main').onclick = async () => {
@@ -2643,23 +3617,23 @@ function init() {
   /* feuilles */
   $('adv-close').onclick = () => closeOv('adv');
   $('dlg-x').onclick = () => closeOv('dlg');
-  $('t-x').onclick = () => { $('tdlg').classList.remove('fullscreen'); closeOv('tdlg'); };
+  $('t-x').onclick = () => { exitFs(); closeOv('tdlg'); };
   $('t-fs').onclick = () => {
     const pane = $('tdlg');
-    pane.classList.toggle('fullscreen');
-    const isFs = pane.classList.contains('fullscreen');
-    $('t-fs').innerHTML = isFs ? '<svg class="ic"><use href="#i-x"/></svg>' : '<svg class="ic"><use href="#i-maximize"/></svg>';
+    if (pane.classList.contains('fullscreen')) exitFs();
+    else enterFs();
   };
+  $('t-exit').onclick = () => exitFs();
+  $('t-exit').onclick = () => exitFs();
 
   document.querySelectorAll('.ov').forEach(ov => ov.addEventListener('click', e => { if (e.target === ov) { $('tdlg').classList.remove('fullscreen'); closeOv(ov.id); } }));
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     if (isOpen('tdlg') && $('tdlg').classList.contains('fullscreen')) {
-      $('tdlg').classList.remove('fullscreen');
-      $('t-fs').innerHTML = '<svg class="ic"><use href="#i-maximize"/></svg>';
+      exitFs();
       return;
     }
-    for (const id of ['tdlg', 'dlg', 'adv']) if (isOpen(id)) { closeOv(id); break; }
+    for (const id of ['ask', 'help', 'levelsel', 'projsel', 'tdlg', 'dlg', 'adv']) if (isOpen(id)) { closeOv(id); break; }
   });
 
   /* Avancé › Réponse de l'IA */
@@ -2688,15 +3662,14 @@ function init() {
   });
   $('b-send-sel').onclick = copyPicked;
   $('b-unpick').onclick = () => { picked.clear(); renderBlocks(); };
-$('hlist').addEventListener('click', e => {
-  const btn = e.target.closest('button[data-a]');
-  if (!btn) return;
-  const h = hist[+btn.parentElement.dataset.i];
-  if (!h) return;
-  if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
-  else if (btn.dataset.a === 'report') copyText(histReport(h), 'Rapport d\'erreurs copié — collez-le à l\'IA ✓');
-  else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); }
-});
+  $('hlist').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-a]');
+    if (!btn) return;
+    const h = hist[+btn.parentElement.dataset.i];
+    if (!h) return;
+    if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
+    else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); }
+  });
 
   /* Avancé › Outils */
   $('snd').checked = soundOn;
@@ -2739,106 +3712,156 @@ $('hlist').addEventListener('click', e => {
 
   refresh();
 }
-/* ---------- Tooltips sur les boutons-icônes (ergonomie souris) ---------- */
-function addTooltips() {
-  const tips = {
-    'b-undo-top': 'Annuler la dernière action',
-    'b-adv': 'Panneau Avancé',
-    'b-clear': 'Vider le code',
-    'b-main': 'Analyser ou appliquer la réponse (Ctrl+Entrée)',
-    'b-test': 'Tester l\'application',
-    'b-copy-clean': 'Copier le code final (sans marqueurs)',
-    't-fs': 'Plein écran',
-    't-x': 'Fermer le test',
-    'dlg-x': 'Fermer',
-    'dlg-copy': 'Copier le contenu du bloc',
-    'dlg-ok': 'Remplacer le bloc',
-    'adv-close': 'Fermer Avancé',
-    'b-rpaste': 'Coller depuis le presse-papiers',
-    'b-preview': 'Aperçu sans appliquer',
-    'b-apply': 'Appliquer la réponse',
-    'b-send-sel': 'Copier prompt + index + blocs cochés',
-    'b-unpick': 'Tout décocher',
-    'b-prompt': 'Copier le prompt seul',
-    'b-sync': 'Synchroniser l\'IA (blocs modifiés)',
-    'b-remind': 'Copier un rappel court',
-    'b-index': 'Copier l\'index des blocs',
-    'b-copy-marked': 'Copier le code balisé (Ctrl+Maj+S)',
-    'b-need': 'Blocs demandés par l\'IA',
-    'b-open': 'Ouvrir un fichier',
-    'b-dl-clean': 'Télécharger le code propre (Ctrl+S)',
-    'b-dl-marked': 'Télécharger le code balisé',
-    'b-strip': 'Retirer les marqueurs'
-  };
-  for (const id in tips) {
-    const el = $(id);
-    if (el && !el.title) el.title = tips[id];
+$('b-shortcuts-open').onclick = () => { renderShortcuts(); openOv('shortcutdlg'); };
+$('shortcutdlg-x').onclick = () => closeOv('shortcutdlg');
+$('shortcut-add').onclick = () => {
+  const act = $('shortcut-action').value;
+  const key = $('shortcut-key').value.trim();
+  if (!key) { notify('Veuillez enregistrer une touche.', { kind: 'err' }); return; }
+  shortcuts = shortcuts.filter(s => s.key !== key);
+  shortcuts.push({ action: act, key });
+  saveShortcuts();
+  renderShortcuts();
+  $('shortcut-key').value = '';
+};
+$('shortcut-list').addEventListener('click', e => {
+  if (e.target.tagName === 'BUTTON') {
+    shortcuts.splice(parseInt(e.target.dataset.i), 1);
+    saveShortcuts();
+    renderShortcuts();
   }
-}
-/* ---------- Sidebar desktop : recherche, actions, synchronisation des cases ---------- */
-function wireSidebar() {
-  addTooltips();
-  const qs = $('q-side');
-  if (!qs) return;
-  qs.addEventListener('input', () => renderBlocks());
-  $('subs-side').addEventListener('change', () => renderBlocks());
-  $('blist-side').addEventListener('click', e => {
-    const btn = e.target.closest('button[data-a]');
-    if (!btn) return;
-    const name = btn.parentElement.dataset.n, a = btn.dataset.a;
-    if (a === 'copy') {
-      const { blocks } = parseMarks($('src').value), hit = findBlock(blocks, name);
-      if (hit) copyText($('src').value.slice(hit.block.outerStart, hit.block.outerEnd), 'Bloc copié ✓');
-    } else if (a === 'view') openBlockDlg('view', name);
-    else if (a === 'rep') openBlockDlg('rep', name);
-    else if (a === 'goto') gotoBlock(name);
-  });
-  $('b-send-sel-side').onclick = copyPicked;
-  $('b-unpick-side').onclick = () => { picked.clear(); renderBlocks(); };
-  /* Sync des cases à cocher entre les deux conteneurs (#blist et #blist-side) */
-  document.addEventListener('change', e => {
-    const c = e.target && e.target.closest && e.target.closest('input[data-p]');
-    if (!c) return;
-    if (c.checked) picked.add(c.dataset.p); else picked.delete(c.dataset.p);
-    document.querySelectorAll('input[data-p]').forEach(x => {
-      if (x !== c && x.dataset.p === c.dataset.p) x.checked = c.checked;
-    });
-  });
-}
+});
 
 init();
-wireSidebar();
-/* ---------- Raccourcis clavier globaux ---------- */
-document.addEventListener('keydown', e => {
-  const mod = e.ctrlKey || e.metaKey;
-  if (mod && e.key === 'Enter') {
-    e.preventDefault();
-    $('b-main').click();
-    return;
-  }
-  if (mod && (e.key === 's' || e.key === 'S')) {
-    e.preventDefault();
-    if (e.shiftKey) $('b-copy-marked').click();
-    else $('b-dl-clean').click();
-    return;
-  }
-  const ae = document.activeElement;
-  const tag = (ae && ae.tagName) || '';
-  const inField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (ae && ae.isContentEditable);
-  /* Focus rapide sur la recherche de blocs */
-  if (!mod && !inField && e.key === '/') {
-    e.preventDefault();
-    if (window.innerWidth >= 1024) {
-      const qs = $('q-side');
-      if (qs) qs.focus();
-    } else {
-      openAdv('acc-blocs');
-      setTimeout(() => { const q = $('q'); if (q) q.focus(); }, 100);
-    }
-  }
+applyFs();
+$('b-fs-dn').onclick = () => stepFs(-2);
+$('b-fs-up').onclick = () => stepFs(2);
+$('b-share-all').onclick = () => shareVia(copyAllForAI);
+$('b-share-sync').onclick = () => shareVia(copyChanged);
+$('b-share-sel').onclick = () => shareVia(copyPicked);
+$('t-share').onclick = () => shareVia(() => copyText(testMessage(), 'Message copié ✓'));
+$('b-fold-all').onclick = () => foldAll(true);
+$('b-unfold-all').onclick = () => foldAll(false);
+$('blist').addEventListener('click', e => {
+  const f = e.target.closest('button[data-f]');
+  if (!f) return;
+  const n = f.dataset.f;
+  if (folded.has(n)) folded.delete(n); else folded.add(n);
+  renderBlocks();
 });
 /* Synchronisation de l'IA : bouton (Avancé › Outils) et mémorisation de l'envoi « Copier balisé » */
 $('b-sync').onclick = copyChanged;
+/* Raccourcis carrés (Avancé › Outils) */
+$('qb-marked').onclick = () => {
+  const v = $('src').value;
+  if (!parseMarks(v).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'err' }); return; }
+  snapMark(v);
+  copyText(v, 'Code balisé copié ✓');
+};
+$('qb-prompt').onclick = () => copyText(PROMPT_TEXT, 'Prompt copié ✓');
+$('qb-all').onclick = () => copyAllForAI();
+/* Ouvre une modale dédiée à la gestion des projets */
+$('qb-proj').onclick = () => { closeOv('adv'); renderProjects(); openOv('projdlg'); };
+/* Dessine la liste des projets dans la modale de sélection (cartes cliquables) */
+function renderProjSel() {
+  $('plist3').innerHTML = projects.list.map(p =>
+    '<div class="psel-item' + (p.id === projects.cur ? ' on' : '') + '" data-id="' + esc(p.id) + '" role="button" tabindex="0">' +
+    '<span class="psel-nm">' + esc(p.name) + '</span>' +
+    (p.id === projects.cur ? '<span class="psel-badge">actif</span>' : '') +
+    '</div>').join('');
+}
+/* Niveau de découpage courant (état interne, remplace l'ancien <select>) */
+function getLevel() {
+  return Math.min(4, Math.max(1, parseInt($('level-cur').textContent, 10) || 2));
+}
+function setLevel(n) {
+  n = Math.min(4, Math.max(1, n | 0));
+  $('level-cur').textContent = n;
+  try { localStorage.setItem('blocs.level', String(n)); } catch (e) { /* stockage indisponible */ }
+  renderLevelSel();
+  save();
+}
+/* Dessine les 4 niveaux dans la modale (carte active mise en valeur) */
+function renderLevelSel() {
+  const cur = getLevel();
+  const labels = { 1: 'Gros blocs', 2: 'Standard', 3: 'Fin', 4: 'Très fin' };
+  $('lvlist').innerHTML = [1, 2, 3, 4].map(n =>
+    '<div class="psel-item' + (n === cur ? ' on' : '') + '" data-n="' + n + '" role="button" tabindex="0">' +
+    '<span class="psel-nm">Niveau ' + n + ' — ' + labels[n] + '</span>' +
+    (n === cur ? '<span class="psel-badge">actif</span>' : '') +
+    '</div>').join('');
+}
+$('b-level-open').onclick = () => { renderLevelSel(); openOv('levelsel'); };
+$('levelsel-x').onclick = () => closeOv('levelsel');
+$('lvlist').addEventListener('click', e => {
+  const item = e.target.closest('.psel-item');
+  if (!item) return;
+  setLevel(+item.dataset.n);
+  closeOv('levelsel');
+  notify('Découpage : niveau ' + getLevel(), { kind: 'ok', ms: 1500 });
+});
+$('levelsel').addEventListener('click', e => { if (e.target === $('levelsel')) closeOv('levelsel'); });
+/* Ouvre la modale interne de choix du projet */
+$('b-proj-open').onclick = () => { renderProjSel(); openOv('projsel'); };
+$('projsel-x').onclick = () => closeOv('projsel');
+$('projsel-new').onclick = async () => { await newProject(); renderProjSel(); };
+$('plist3').addEventListener('click', e => {
+  const item = e.target.closest('.psel-item');
+  if (!item) return;
+  switchProject(item.dataset.id).then(() => { closeOv('projsel'); notify('Projet ouvert', { kind: 'ok' }); });
+});
+/* Clic sur le fond : ferme la modale */
+$('projsel').addEventListener('click', e => { if (e.target === $('projsel')) closeOv('projsel'); });
+/* Dessine la liste des projets dans la modale dédiée */
+function renderProjDlg() {
+  $('plist2').innerHTML = projects.list.map(p =>
+    '<div class="card pcard"><div class="nm">' + esc(p.name) + (p.id === projects.cur ? ' <span class="chipc">actif</span>' : '') + '</div>' +
+    '<div class="acts" data-id="' + esc(p.id) + '">' +
+    (p.id === projects.cur ? '' : '<button class="sm act-open" data-a="open">Ouvrir</button>') +
+    '<button class="sm act-ren" data-a="ren">Renommer</button>' +
+    '<button class="sm act-del" data-a="del">Supprimer</button></div></div>').join('');
+}
+function renderShortcuts() {
+  const box = $('shortcut-list');
+  if (!shortcuts.length) { box.innerHTML = '<div class="empty">Aucun raccourci.</div>'; return; }
+  const names = { analyze: 'Analyser', 'paste-apply': 'Coller & appliquer', test: 'Tester l\'appli', 'copy-marked': 'Copier balisé', 'copy-final': 'Copier code final', undo: 'Annuler', redo: 'Rétablir', 'open-projects': 'Ouvrir Projets', 'open-advanced': 'Ouvrir Avancé' };
+  box.innerHTML = shortcuts.map((s, i) =>
+    '<div class="shortcut-item">' +
+    '<span>' + esc(names[s.action] || s.action) + '</span>' +
+    '<div style="display:flex;align-items:center;gap:8px;">' +
+    '<span class="shortcut-keys">' + esc(s.key) + '</span>' +
+    '<button class="sm danger" data-i="' + i + '" style="height: 28px; padding: 0 8px; border-radius: 6px;">✕</button>' +
+    '</div></div>'
+  ).join('');
+}
+$('projdlg-x').onclick = () => closeOv('projdlg');
+$('projdlg-new').onclick = () => newProject();
+$('projdlg-export').onclick = () => exportAllData();
+$('projdlg-import').onclick = () => $('file-import2').click();
+$('file-import2').onchange = e => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (f) importAllData(f);
+};
+$('plist2').addEventListener('click', e => {
+  const btn = e.target.closest('button[data-a]');
+  if (!btn) return;
+  const id = btn.parentElement.dataset.id, a = btn.dataset.a;
+  if (a === 'open') switchProject(id).then(() => { renderProjDlg(); notify('Projet ouvert', { kind: 'ok' }); });
+  else if (a === 'ren') renameProject(id).then(renderProjDlg);
+  else if (a === 'del') deleteProject(id).then(renderProjDlg);
+});
+/* Clic sur le fond : ferme la modale des projets */
+$('projdlg').addEventListener('click', e => { if (e.target === $('projdlg')) closeOv('projdlg'); });
+/* Réponse en plusieurs morceaux : « + Ajouter » colle à la suite au lieu de remplacer */
+$('b-radd').onclick = async () => {
+  const t = await readClip();
+  if (t === null) return;
+  const r = $('resp');
+  r.value = r.value.trim() ? r.value.replace(/\s+$/, '') + '\n\n' + t : t;
+  const n = (r.value.match(/#BLOC:/g) || []).length;
+  notify('Ajouté ✓ — ' + n + ' marqueur(s) #BLOC au total', { kind: 'ok' });
+};
 $('b-copy-marked').addEventListener('click', () => { const v = $('src').value; if (parseMarks(v).blocks.length) snapMark(v); });
 /* Option « Copier le code final en cliquant sur Tester » */
 $('b-test').addEventListener('click', () => {
@@ -2847,188 +3870,54 @@ $('b-test').addEventListener('click', () => {
 });
 try { $('copyfinal').checked = localStorage.getItem('blocs.copyfinal') === '1'; } catch (_) { }
 $('copyfinal').addEventListener('change', e => { try { localStorage.setItem('blocs.copyfinal', e.target.checked ? '1' : '0'); } catch (_) { } });
-/* ---------- Onglets de la sidebar : Blocs / Historique ---------- */
-function initSideTabs() {
-  const bar = document.querySelector('.side-tabs');
-  if (!bar) return;
-  const blist = $('blist-side'), hlist = $('hlist-side');
-  const tabs = bar.querySelectorAll('.side-tab');
-  const show = which => {
-    tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.tab === which ? 'true' : 'false'));
-    if (blist) blist.hidden = which !== 'blocs';
-    if (hlist) hlist.hidden = which !== 'hist';
-    if (which === 'hist') renderHistSide();
-  };
-  tabs.forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
-  show('blocs');
-}
-/* Rendu de l'historique dans la sidebar desktop */
-function renderHistSide() {
-  const box = $('hlist-side');
-  if (!box) return;
-  if (!hist.length) { box.innerHTML = '<div class="empty">Aucune version enregistrée.</div>'; return; }
-  box.innerHTML = hist.map((h, i) => ({ h, i })).reverse().map(({ h, i }) => {
-    const st = histStatus(h);
-    return '<div class="card"><div class="nm">' + esc(h.label) + '</div>' +
-      '<div class="meta2"><span class="hist-badge ' + st.kind + '"' + (st.title ? ' title="' + esc(st.title) + '"' : '') + '>' + esc(st.label) + '</span>' +
-      new Date(h.t).toLocaleString('fr-FR') + ' · ' + h.text.split('\n').length + ' lignes</div>' +
-      histActions(h, i) + '</div>';
-  }).join('');
-}
-/* État d'une version d'historique : null si OK, sinon message ; plus les marqueurs incohérents */
-function histStatus(h) {
-  const text = h.text || '';
-  const pm = parseMarks(text);
-  const markBad = pm.errors.length > 0;
-  const codes = checkGlobal(text);
-  if (!markBad && !codes.length) return { kind: 'ok', label: 'OK' };
-  const parts = [];
-  if (markBad) parts.push('marqueurs');
-  if (codes.length) parts.push(codes.length + ' erreur' + (codes.length > 1 ? 's' : ''));
-  return { kind: markBad ? 'mark' : 'err', label: parts.join(' · '), title: (markBad ? 'Marqueurs incohérents · ' : '') + codes.slice(0, 3).join(' — ') };
-}
-/* Construit un rapport d'erreurs prêt à coller dans l'IA pour une version de l'historique */
-function histReport(h) {
-  const text = h.text || '';
-  const pm = parseMarks(text);
-  const codes = checkGlobal(text);
-  const lines = [];
-  lines.push('Version d\'historique « ' + h.label + ' » (' + new Date(h.t).toLocaleString('fr-FR') + ') en erreur.');
-  if (pm.errors.length) {
-    lines.push('');
-    lines.push('Marqueurs incohérents :');
-    pm.errors.forEach(e => lines.push('- ' + e));
-  }
-  if (codes.length) {
-    lines.push('');
-    lines.push('Erreurs JS détectées :');
-    codes.slice(0, 6).forEach(c => lines.push('- ' + c));
-    if (codes.length > 6) lines.push('- … (' + (codes.length - 6) + ' autres)');
-  }
-  lines.push('');
-  lines.push('Corrige uniquement ce qui provoque ces erreurs, sans refactoriser, et renvoie seulement les blocs modifiés, complets, avec les mêmes marqueurs #BLOC/#FIN, dans un seul bloc de code.');
-  lines.push('');
-  lines.push(buildIndex(text));
-  return lines.join('\n');
-}
-/* Renvoie le HTML des boutons d'action d'une entrée d'historique (avec bouton de rapport si erreurs) */
-function histActions(h, i) {
-  const st = histStatus(h);
-  let html = '<div class="acts" data-i="' + i + '">' +
-    '<button class="sm primary" data-a="restore">Restaurer</button>' +
-    '<button class="sm" data-a="hcopy">Copier</button>';
-  if (st.kind !== 'ok') html += '<button class="sm danger" data-a="report">📨 Rapport IA</button>';
-  html += '</div>';
-  return html;
-}
-$('hlist-side').addEventListener('click', e => {
+try { $('autofs').checked = localStorage.getItem('blocs.autofs') === '1'; } catch (_) { }
+$('autofs').addEventListener('change', e => { try { localStorage.setItem('blocs.autofs', e.target.checked ? '1' : '0'); } catch (_) { } });
+$('b-export-all').onclick = exportAllData;
+$('b-import-all').onclick = () => $('file-import').click();
+$('file-import').onchange = e => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (f) importAllData(f);
+};
+/* Boîte de dialogue interne : boutons et touche Entrée */
+$('ask-ok').onclick = () => askClose(askHasInput ? $('ask-input').value : true);
+$('ask-cancel').onclick = () => askClose(null);
+$('ask-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); askClose($('ask-input').value); }
+});
+/* Coloration : mise à jour à la frappe et synchronisation du défilement */
+$('src').addEventListener('input', () => { cancelAnimationFrame(highlight._r); highlight._r = requestAnimationFrame(highlight); });
+$('src').addEventListener('scroll', () => { if (hlLines.length) hlPaint(false); }, { passive: true });
+/* Rétablir, projets, coloration, vibrations */
+$('b-redo-top').onclick = redoLast;
+$('b-proj-new').onclick = newProject;
+$('plist').addEventListener('click', e => {
   const btn = e.target.closest('button[data-a]');
   if (!btn) return;
-  const h = hist[+btn.parentElement.dataset.i];
-  if (!h) return;
-  if (btn.dataset.a === 'hcopy') copyText(h.text, 'Version copiée ✓');
-  else if (btn.dataset.a === 'report') copyText(histReport(h), 'Rapport d\'erreurs copié — collez-le à l\'IA ✓');
-  else { pushHistory('Avant restauration'); setText(h.text); notify('Version restaurée ✓', { kind: 'ok' }); renderHistSide(); }
+  const id = btn.parentElement.dataset.id, a = btn.dataset.a;
+  if (a === 'open') switchProject(id).then(() => closeOv('adv'));
+  else if (a === 'ren') renameProject(id);
+  else if (a === 'del') deleteProject(id);
 });
-/* ---------- Aide raccourcis ---------- */
-function initHelp() {
-  const btn = $('b-help');
-  if (btn) btn.addEventListener('click', () => openOv('help'));
-  const x = $('help-x');
-  if (x) x.addEventListener('click', () => closeOv('help'));
-  const ov = $('help');
-  if (ov) ov.addEventListener('click', e => { if (e.target === ov) closeOv('help'); });
-  document.addEventListener('keydown', e => {
-    if (e.key !== '?' || e.ctrlKey || e.metaKey) return;
-    const ae = document.activeElement, tag = (ae && ae.tagName) || '';
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (ae && ae.isContentEditable)) return;
-    e.preventDefault();
-    openOv('help');
-  });
-}
-/* ---------- Réponse IA en colonne latérale (grand écran) ---------- */
-function initRespInline() {
-  const pane = $('resp-inline');
-  if (!pane) return;
-  const KEY = 'blocs.splitresp', ta = $('resp-inline-ta');
-  let on = false;
-  try { on = localStorage.getItem(KEY) === '1'; } catch (e) { /* stockage indisponible */ }
-  const apply = v => {
-    pane.hidden = !v;
-    const cb = $('split-resp');
-    if (cb) cb.checked = v;
-  };
-  apply(on);
-  const cb = $('split-resp');
-  if (cb) cb.addEventListener('change', e => {
-    on = e.target.checked;
-    apply(on);
-    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (err) { }
-  });
-  const x = $('ri-close');
-  if (x) x.addEventListener('click', () => { apply(false); try { localStorage.setItem(KEY, '0'); } catch (e) { } });
-  const paste = $('ri-paste');
-  if (paste) paste.addEventListener('click', async () => {
-    const t = await readClip(); if (t !== null) { ta.value = t; notify('Collé ✓', { kind: 'ok' }); }
-  });
-  const apply2 = $('ri-apply');
-  if (apply2) apply2.addEventListener('click', () => {
-    $('resp').value = ta.value;
-    runResponse(true);
-  });
-}
-/* ---------- Zoom de police de l'éditeur (Ctrl + molette) ---------- */
-function initEditorZoom() {
-  const ta = $('src');
-  if (!ta) return;
-  const KEY = 'blocs.srcfs';
-  let fs = 12;
-  try { const v = parseFloat(localStorage.getItem(KEY)); if (v >= 10 && v <= 22) fs = v; } catch (e) { /* stockage indisponible */ }
-  const apply = v => { fs = Math.max(10, Math.min(22, v)); ta.style.setProperty('--src-fs', fs + 'px'); };
-  apply(fs);
-  ta.addEventListener('wheel', e => {
-    if (!(e.ctrlKey || e.metaKey)) return;
-    e.preventDefault();
-    apply(fs + (e.deltaY < 0 ? 1 : -1));
-    try { localStorage.setItem(KEY, String(fs)); } catch (err) { }
-  }, { passive: false });
-}
-initSideTabs();
-initHelp();
-initRespInline();
-initEditorZoom();
-/* ---------- Barre latérale masquable (desktop) ---------- */
-function initSideToggle() {
-  const app = document.querySelector('.app');
-  const btn = $('b-side-toggle');
-  if (!app || !btn) return;
-  const KEY = 'blocs.sideoff';
-  let off = false;
-  try { off = localStorage.getItem(KEY) === '1'; } catch (e) { /* stockage indisponible */ }
-  const apply = v => {
-    app.classList.toggle('side-off', v);
-    const label = v ? 'Afficher la liste des blocs' : 'Masquer la liste des blocs';
-    btn.setAttribute('aria-pressed', v ? 'true' : 'false');
-    btn.setAttribute('aria-label', label);
-    btn.title = label;
-  };
-  apply(off);
-  btn.addEventListener('click', () => {
-    off = !off;
-    apply(off);
-    try { localStorage.setItem(KEY, off ? '1' : '0'); } catch (e) { /* stockage indisponible */ }
-  });
-}
-function initNotifPanel() {
-  const clr = $('np-clear');
-  if (clr) clr.addEventListener('click', () => {
-    const body = $('npane-body');
-    if (!body) return;
-    body.querySelectorAll('.notif.done').forEach(n => n.remove());
-    updateNotifCount();
-  });
-  updateNotifCount();
-}
+$('b-hl').onclick = toggleHl;
+$('b-hl').setAttribute('aria-pressed', hlOn ? 'true' : 'false');
+$('vib').checked = vibOn;
+$('vib').onchange = e => {
+  vibOn = e.target.checked;
+  try { localStorage.setItem('blocs.vib', vibOn ? '1' : '0'); } catch (_) { }
+  if (vibOn) buzz(20);
+};
+renderProjects();
+renderLevelSel();
+/* Aide des toggles */
+$('tg-help').onclick = () => openOv('help');
+$('help-x').onclick = () => closeOv('help');
+bindToggle('tg-snd', 'snd');
+bindToggle('tg-vib', 'vib');
+bindToggle('tg-autotest', 'autotest');
+bindToggle('tg-copyfinal', 'copyfinal');
+bindToggle('tg-autofs', 'autofs');
+syncToggles();
 
 </script>
 <script>
