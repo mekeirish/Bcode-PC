@@ -213,6 +213,192 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
     width: 48%;
   }
 }
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.left-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.editor-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+@media (min-width: 1100px) {
+  .app {
+    width: 100%;
+    max-width: 1720px;
+    min-height: 100dvh;
+    padding: 16px 22px;
+    gap: 12px;
+  }
+
+.workspace {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(230px, 260px) minmax(320px, 1fr) minmax(340px, var(--test-pane-width, 420px));
+  align-items: stretch;
+  gap: 16px;
+}
+
+.left-rail {
+  min-width: 0;
+  min-height: 0;
+  max-height: calc(100dvh - 90px);
+  align-self: stretch;
+  gap: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+.left-rail .meta {
+  flex-wrap: wrap;
+}
+.left-rail .meta .chip,
+.left-rail .meta .lvl {
+  min-width: 0;
+}
+.left-rail .toggles {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.left-rail .tg {
+  width: 40px;
+  height: 40px;
+}
+.left-rail .proj-bar {
+  justify-content: flex-start;
+  padding: 8px 4px;
+}
+.left-rail .row {
+  margin-top: 0;
+}
+.left-rail .btn.hero {
+  width: 100%;
+}
+.left-rail .quick {
+  flex-wrap: wrap;
+  margin: 0;
+}
+.left-rail .qb {
+  flex: 1 1 28%;
+  height: auto;
+  min-height: 58px;
+}
+.left-rail .grid {
+  grid-template-columns: 1fr;
+}
+
+.editor-column {
+  height: 100%;
+  min-height: 0;
+}
+.editor-column .code {
+  flex: 1;
+  height: 100%;
+  min-height: 500px;
+  max-height: none;
+}
+
+.workspace > #tdlg {
+  display: flex !important;
+  position: relative;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.workspace > #tdlg::before {
+  content: "";
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  bottom: 0;
+  left: -8px;
+  width: 16px;
+  cursor: col-resize;
+  touch-action: none;
+  background: transparent;
+}
+
+.workspace > #tdlg:hover::before {
+  background: linear-gradient(
+    to right,
+    transparent 6px,
+    rgba(232, 184, 76, .45) 7px,
+    rgba(232, 184, 76, .45) 9px,
+    transparent 10px
+  );
+}
+
+.workspace.is-resizing,
+.workspace.is-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+.workspace > #tdlg #tframe {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  border: 1px solid #343b49;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 12px 30px rgba(0, 0, 0, .35);
+}
+
+.workspace > #tdlg.open.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex !important;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  box-sizing: border-box;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: #000;
+}
+
+.workspace > #tdlg.open.fullscreen #tframe {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+}
 .bar { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 16px; }
 .brand { flex: 1; font-weight: 700; font-size: 18px; letter-spacing: .6px; }
 .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -285,9 +471,35 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
 .btn:hover, .iconbtn:hover, .sm:hover { border-color: rgba(34, 211, 238, .55); }
 .btn:active, .iconbtn:active, .sm:active { transform: translateY(1px) scale(.97); background: rgba(255, 255, 255, .15);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 0 0 1px rgba(34, 211, 238, .55), 0 0 18px rgba(34, 211, 238, .28); }
-.btn { display: flex; align-items: center; justify-content: center; gap: 9px; height: 58px; padding: 0 14px; border-radius: 16px;
-  font-weight: 600; font-size: 14.5px; line-height: 1.15; }
-.btn.tbtn { flex-direction: column; gap: 5px; height: 62px; padding: 0 6px; font-size: 12.5px; }
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: auto;
+  min-height: 48px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 8px 14px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 14.5px;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.btn.tbtn {
+  flex-direction: column;
+  gap: 5px;
+  height: auto;
+  min-height: 62px;
+  padding: 8px 6px;
+  font-size: 12.5px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .btn.cyan { background: rgba(34, 211, 238, .13); border-color: rgba(34, 211, 238, .45); color: #bdf4fc; }
 .btn.green { background: rgba(52, 211, 153, .13); border-color: rgba(52, 211, 153, .42); color: #c2f5e0; }
 .btn.hero { width: 78%; height: 60px; font-size: 15.5px; background: var(--accent); border-color: rgba(255, 255, 255, .28); color: #021014;
@@ -405,17 +617,56 @@ label.chk input { width: 18px; height: 18px; }
 .psel-badge { flex: 0 0 auto; font: 11px var(--mono); padding: 2px 8px; border-radius: 99px;
   color: #bdf4fc; background: rgba(34, 211, 238, .18); border: 1px solid rgba(34, 211, 238, .45); }
 .acts { display: flex; gap: 6px; flex-wrap: wrap; }
-.sm { height: 38px; padding: 0 13px; border-radius: 11px; font-size: 13px; font-weight: 600; }
+.sm {
+  height: auto;
+  min-height: 40px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 8px 13px;
+  border-radius: 11px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
 .sm.primary { background: var(--accent); color: #021014; border-color: rgba(255, 255, 255, .25); }
 .sm.ok { background: rgba(52, 211, 153, .20); border-color: rgba(52, 211, 153, .5); }
 /* Raccourcis carrés (Avancé › Outils) : taille flexible, toujours sur une seule ligne */
 .quick { display: flex; flex-wrap: nowrap; gap: 8px; margin: 4px 0 10px; }
-.qb { flex: 1 1 0; min-width: 0; height: 62px; padding: 0 2px; border-radius: 14px; font: inherit; font-size: 11px; line-height: 1.15;
-  color: var(--text); background: var(--glass2); border: 1px solid var(--edge);
+.qb {
+  flex: 1 1 0;
+  min-width: 0;
+  height: auto;
+  min-height: 62px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 7px 4px;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  background: var(--glass2);
+  border: 1px solid var(--edge);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10), 0 6px 18px rgba(0, 0, 0, .40);
-  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  text-align: center; cursor: pointer; transition: transform .09s ease, border-color .15s, background .15s;
-  -webkit-user-select: none; user-select: none; touch-action: manipulation; overflow: hidden; }
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform .09s ease, border-color .15s, background .15s;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  overflow: hidden;
+}
 .qb:active { transform: translateY(1px) scale(.96); background: rgba(255, 255, 255, .15);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 0 0 1px rgba(34, 211, 238, .55), 0 0 18px rgba(34, 211, 238, .28); }
 .qb .ic { width: 18px; height: 18px; }
@@ -438,6 +689,46 @@ label.chk input { width: 18px; height: 18px; }
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
   transition: transform .09s ease, border-color .15s, background .15s;
   -webkit-user-select: none; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.btn,
+.sm,
+.tl,
+.qb {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.btn.hero {
+  height: auto;
+  min-height: 56px;
+  padding: 10px 14px;
+}
+
+.btn.tbtn {
+  min-height: 62px;
+}
+
+.sm {
+  height: auto;
+  min-height: 40px;
+}
+
+.tl {
+  height: auto;
+  min-height: 48px;
+  padding: 8px 10px;
+}
+
+.qb {
+  height: auto;
+  min-height: 62px;
+  padding: 7px 4px;
+}
 .tl .ic { width: 18px; height: 18px; flex: none; }
 .tl:active { transform: translateY(1px) scale(.97); background: rgba(255, 255, 255, .15); box-shadow: 0 0 0 1px rgba(34, 211, 238, .55), 0 0 16px rgba(34, 211, 238, .25); }
 .tl.cyan { background: rgba(34, 211, 238, .13); border-color: rgba(34, 211, 238, .45); color: #bdf4fc; }
@@ -557,16 +848,52 @@ label.chk input { width: 18px; height: 18px; }
 #tframe { width: 100%; height: 46vh; border: 1px solid var(--edge); border-radius: 12px; background: #fff; margin-top: 8px; }
 .tpane { display: none; }
 .tpane.open { display: block; }
-/* Test en plein écran */
-.tpane.open.fullscreen { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; border-radius: 0; background: var(--bg);
-  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+.tpane.open.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  box-sizing: border-box;
+  border-radius: 0;
+  background: var(--bg);
+  overflow: hidden;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
 .tpane.open.fullscreen .ph { position: absolute; top: max(8px, env(safe-area-inset-top)); right: 8px; z-index: 2; padding: 0; gap: 6px; }
 .tpane.open.fullscreen .ph h2 { display: none; }
 .tpane.open.fullscreen .ph .iconbtn { opacity: .28; height: 34px; min-width: 34px; padding: 0 8px; border-radius: 50%; }
 .tpane.open.fullscreen .ph #t-fs { display: none; }
 .tpane.open.fullscreen #t-exit { display: block; }
-.tpane.open.fullscreen .pb { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.tpane.open.fullscreen #tframe { flex: 1; height: auto; min-height: 0; }
+.tpane.open.fullscreen .pb {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 4px 12px 12px;
+}
+.tpane.open.fullscreen #tframe {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: none;
+  height: 0;
+  min-height: 0;
+  aspect-ratio: auto;
+  margin: 8px 0 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
 /* Test immersif : plein écran sans aucune bordure (comme dans la PWA réelle) */
 .tpane.open.fullscreen.immersive { border: 0; border-radius: 0; box-shadow: none; padding: 0; background: #000;
   -webkit-backdrop-filter: none; backdrop-filter: none; }
@@ -645,78 +972,95 @@ label.chk input { width: 18px; height: 18px; }
 </svg>
 
 <div class="app">
-<header class="glass bar">
-  <div class="brand">Bcode</div>
-  <button class="iconbtn" id="b-undo-top" aria-label="Annuler la dernière action"><svg class="ic"><use href="#i-undo"/></svg></button>
-  <button class="iconbtn" id="b-redo-top" aria-label="Rétablir" disabled><svg class="ic"><use href="#i-redo"/></svg></button>
-  <button class="iconbtn" id="b-adv"><svg class="ic"><use href="#i-sliders"/></svg>Avancé</button>
-  <button class="iconbtn" id="b-cloud" title="Cloud GitHub (non connecté)" aria-label="Cloud GitHub"><svg class="ic"><use href="#i-cloud"/></svg></button>
-</header>
+  <header class="glass bar">
+    <div class="brand">Bcode</div>
+    <button class="iconbtn" id="b-undo-top" aria-label="Annuler la dernière action"><svg class="ic"><use href="#i-undo"/></svg></button>
+    <button class="iconbtn" id="b-redo-top" aria-label="Rétablir" disabled><svg class="ic"><use href="#i-redo"/></svg></button>
+    <button class="iconbtn" id="b-adv"><svg class="ic"><use href="#i-sliders"/></svg>Avancé</button>
+    <button class="iconbtn" id="b-cloud" title="Cloud GitHub (non connecté)" aria-label="Cloud GitHub"><svg class="ic"><use href="#i-cloud"/></svg></button>
+  </header>
 
-<div class="meta">
-  <div class="glass chip" id="stats"></div>
-  <button class="glass lvl" id="b-level-open" type="button" style="text-align:left;cursor:pointer">Découpage : <b id="level-cur">2</b></button>
-  <button class="iconbtn" id="b-clear" aria-label="Vider le code"><svg class="ic"><use href="#i-trash"/></svg></button>
-</div>
-<div class="toggles">
-  <button class="tg" id="tg-snd" aria-pressed="false" title="Sons des boutons">♪</button>
-  <button class="tg" id="tg-vib" aria-pressed="false" title="Vibrations au toucher">≈</button>
-  <button class="tg" id="tg-autotest" aria-pressed="false" title="Tester après Appliquer">↻</button>
-  <button class="tg" id="tg-copyfinal" aria-pressed="false" title="Copier le code final en cliquant sur Tester">⧉</button>
-  <button class="tg" id="tg-autofs" aria-pressed="false" title="Test direct en plein écran">⛶</button>
-  <button class="tg" id="b-hl" aria-label="Coloration du code" aria-pressed="true" title="Coloration syntaxique"><svg class="ic" style="width:18px;height:18px;"><use href="#i-braces"/></svg></button>
-  <button class="tg help" id="tg-help" aria-label="Aide sur ces boutons">?</button>
-</div>
-
-<div class="proj-bar" id="proj-bar" title="Changer de projet">
-  <svg class="ic" style="width: 14px; height: 14px; opacity: 0.7;"><use href="#i-file"/></svg>
-  <span>Projet : <b id="proj-cur">—</b></span>
-</div>
-  <section class="glass code">
-<pre id="hl" aria-hidden="true"><div id="hl-in"></div></pre>
-    <textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Collez votre code HTML ici…"></textarea>
-    <div class="fsz">
-      <button class="iconbtn" id="b-fs-dn" aria-label="Réduire le texte">A−</button>
-      <button class="iconbtn" id="b-fs-up" aria-label="Agrandir le texte">A+</button>
-    </div>
-  </section>
-
-  <div class="row">
-    <button class="btn hero" id="b-main"><svg class="ic"><use href="#i-zap"/></svg><span id="b-main-t">Analyser</span></button>
-  </div>
-<div class="quick">
-<button class="qb red" id="qb-need" aria-label="Blocs demandés"><svg class="ic"><use href="#i-swap"/></svg>Dem.</button>
-  <button class="qb cyan" id="qb-marked" aria-label="Copier le code balisé"><svg class="ic"><use href="#i-braces"/></svg>Bal</button>
-  <button class="qb" id="qb-prompt" aria-label="Copier le prompt seul"><svg class="ic"><use href="#i-copy"/></svg>Prompt</button>
-  <button class="qb cyan" id="qb-all" aria-label="Copier le prompt et le code balisé"><svg class="ic"><use href="#i-zap"/></svg>P+C</button>
-  <button class="qb warn" id="qb-proj" aria-label="Ouvrir les projets"><svg class="ic"><use href="#i-file"/></svg>Proj.</button>
-</div>
-
-  <div class="grid">
-    <button class="btn small" id="b-test"><svg class="ic"><use href="#i-play"/></svg>Tester</button>
-    <button class="btn small" id="b-copy-clean"><svg class="ic"><use href="#i-file"/></svg>Code final</button>
-  </div>
-<div id="notifs"></div>
-
-  <!-- ===== Test de l'appli (sous le bouton Tester) ===== -->
-  <section class="glass tpane" id="tdlg">
-    <div class="ph">
-      <h2>Test de l'appli</h2>
-      <button class="iconbtn" id="t-fs" aria-label="Plein écran"><svg class="ic"><use href="#i-maximize"/></svg></button>
-      <button id="t-exit" aria-label="Quitter le plein écran"></button>
-      <button class="iconbtn" id="t-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button>
-    </div>
-    <div class="pb">
-      <div id="tstatus" class="status"></div>
-      <div id="terrs"></div>
-      <iframe id="tframe" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"></iframe>
-      <div class="row">
-        <button class="sm" id="t-rerun">↻ Relancer</button>
-        <button class="sm primary" id="t-copy">Copier l'erreur pour l'IA</button>
-        <button class="sm primary" id="t-share">📤 Partager</button>
+  <main class="workspace">
+    <aside class="left-rail">
+      <div class="meta">
+        <div class="glass chip" id="stats"></div>
+        <button class="glass lvl" id="b-level-open" type="button" style="text-align:left;cursor:pointer">Découpage : <b id="level-cur">2</b></button>
+        <button class="iconbtn" id="b-clear" aria-label="Vider le code"><svg class="ic"><use href="#i-trash"/></svg></button>
       </div>
+
+      <div class="toggles">
+        <button class="tg" id="tg-snd" aria-pressed="false" title="Sons des boutons">♪</button>
+        <button class="tg" id="tg-vib" aria-pressed="false" title="Vibrations au toucher">≈</button>
+        <button class="tg" id="tg-autotest" aria-pressed="false" title="Tester après Appliquer">↻</button>
+        <button class="tg" id="tg-copyfinal" aria-pressed="false" title="Copier le code final en cliquant sur Tester">⧉</button>
+        <button class="tg" id="b-hl" aria-label="Coloration du code" aria-pressed="true" title="Coloration syntaxique"><svg class="ic" style="width:18px;height:18px;"><use href="#i-braces"/></svg></button>
+        <button class="tg help" id="tg-help" aria-label="Aide sur ces boutons">?</button>
+      </div>
+
+      <div class="proj-bar" id="proj-bar" title="Changer de projet">
+        <svg class="ic" style="width:14px;height:14px;opacity:.7;"><use href="#i-file"/></svg>
+        <span>Projet : <b id="proj-cur">—</b></span>
+      </div>
+
+      <div class="row">
+        <button class="btn hero" id="b-main"><svg class="ic"><use href="#i-zap"/></svg><span id="b-main-t">Analyser</span></button>
+      </div>
+
+      <div class="quick">
+        <button class="qb red" id="qb-need" aria-label="Blocs demandés"><svg class="ic"><use href="#i-swap"/></svg>Dem.</button>
+        <button class="qb cyan" id="qb-marked" aria-label="Copier le code balisé"><svg class="ic"><use href="#i-braces"/></svg>Bal</button>
+        <button class="qb" id="qb-prompt" aria-label="Copier le prompt seul"><svg class="ic"><use href="#i-copy"/></svg>Prompt</button>
+        <button class="qb cyan" id="qb-all" aria-label="Copier le prompt et le code balisé"><svg class="ic"><use href="#i-zap"/></svg>P+C</button>
+        <button class="qb warn" id="qb-proj" aria-label="Ouvrir les projets"><svg class="ic"><use href="#i-file"/></svg>Proj.</button>
+      </div>
+
+      <div class="grid">
+        <button class="btn small" id="b-test"><svg class="ic"><use href="#i-play"/></svg>Tester</button>
+        <button class="btn small" id="b-copy-clean"><svg class="ic"><use href="#i-file"/></svg>Code final</button>
+      </div>
+<section class="glass test-controls">
+  <div class="ph">
+    <h2>Test de l'appli</h2>
+    <button class="iconbtn" id="t-fs" aria-label="Plein écran">
+      <svg class="ic"><use href="#i-maximize"/></svg>
+    </button>
+    <button class="iconbtn" id="t-exit" aria-label="Quitter le plein écran">↙</button>
+    <button class="iconbtn" id="t-x" aria-label="Fermer">
+      <svg class="ic"><use href="#i-x"/></svg>
+    </button>
+  </div>
+
+  <div class="pb">
+    <div id="tstatus" class="status"></div>
+    <div id="terrs"></div>
+    <div class="row">
+      <button class="sm" id="t-rerun">↻ Relancer</button>
+      <button class="sm primary" id="t-copy">Copier l'erreur pour l'IA</button>
+      <button class="sm primary" id="t-share">📤 Partager</button>
     </div>
-  </section>
+  </div>
+</section>
+
+      <div id="notifs"></div>
+    </aside>
+
+    <section class="editor-column">
+      <section class="glass code">
+        <pre id="hl" aria-hidden="true"><div id="hl-in"></div></pre>
+        <textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Collez votre code HTML ici…"></textarea>
+        <div class="fsz">
+          <button class="iconbtn" id="b-fs-dn" aria-label="Réduire le texte">A−</button>
+          <button class="iconbtn" id="b-fs-up" aria-label="Agrandir le texte">A+</button>
+        </div>
+      </section>
+    </section>
+
+<section class="glass tpane" id="tdlg">
+\
+&#x20; \<iframe id="tframe" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups">\</iframe>\
+&#x20; \
+</section>
+  </main>
 
   <footer class="sig">Made by Laiche Brahim 2026 Paris</footer>
 </div>
@@ -2825,21 +3169,47 @@ function openAdv(accId) {
 function syncToggles() {
   $('tg-snd').classList.toggle('on', $('snd').checked);
   $('tg-snd').setAttribute('aria-pressed', $('snd').checked ? 'true' : 'false');
+
   $('tg-vib').classList.toggle('on', $('vib').checked);
   $('tg-vib').setAttribute('aria-pressed', $('vib').checked ? 'true' : 'false');
+
   $('tg-autotest').classList.toggle('on', $('autotest').checked);
   $('tg-autotest').setAttribute('aria-pressed', $('autotest').checked ? 'true' : 'false');
+
   $('tg-copyfinal').classList.toggle('on', $('copyfinal').checked);
   $('tg-copyfinal').setAttribute('aria-pressed', $('copyfinal').checked ? 'true' : 'false');
-  $('tg-autofs').classList.toggle('on', $('autofs').checked);
-  $('tg-autofs').setAttribute('aria-pressed', $('autofs').checked ? 'true' : 'false');
 }
-/* Relie un bouton carré à une case à cocher : le clic bascule la case, et on répercute l'état. */
+/* Relie un bouton carré à une case à cocher, si les deux éléments existent. */
 function bindToggle(tgId, cbId) {
-  const tg = $(tgId), cb = $(cbId);
-  tg.onclick = () => { cb.click(); syncToggles(); };
+  const tg = $(tgId);
+  const cb = $(cbId);
+  if (!tg || !cb) return;
+  tg.onclick = () => {
+    cb.click();
+    syncToggles();
+  };
   cb.addEventListener('change', syncToggles);
 }
+const CLOUD_REPO = {
+  owner: 'mekeirish',
+  name: 'Bcode-Projects',
+  branch: 'main',
+  api: 'https://api.github.com',
+  tokenKey: 'blocs.gh.token',
+  syncKey: 'blocs.gh.lastSync'
+};
+const cloudToken = {
+  get() {
+    try { return localStorage.getItem(CLOUD_REPO.tokenKey) || ''; }
+    catch (e) { return ''; }
+  },
+  set(t) {
+    try {
+      if (t) localStorage.setItem(CLOUD_REPO.tokenKey, t);
+      else localStorage.removeItem(CLOUD_REPO.tokenKey);
+    } catch (e) { /* stockage indisponible */ }
+  }
+};
 
 /* Mode partage : le prochain copyText ouvre la feuille de partage du téléphone au lieu du presse-papiers */
 let shareNext = false;
@@ -3740,31 +4110,89 @@ function stopTest() {
 }
 function enterFs() {
   const pane = $('tdlg');
+
   pane.classList.add('fullscreen');
+
+  /* Synchronise la classe CSS avec la sortie native du plein écran */
+  if (!pane._fullscreenSync) {
+    const syncFullscreen = () => {
+      const active = document.fullscreenElement || document.webkitFullscreenElement;
+
+      if (!active) {
+        pane.classList.remove('fullscreen', 'immersive');
+      }
+    };
+
+    document.addEventListener('fullscreenchange', syncFullscreen);
+    document.addEventListener('webkitfullscreenchange', syncFullscreen);
+    pane._fullscreenSync = true;
+  }
+
+  /* Vrai plein écran navigateur, avec le CSS comme solution de secours */
+  const requestFullscreen = pane.requestFullscreen || pane.webkitRequestFullscreen;
+  const currentFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+
+  if (requestFullscreen && !currentFullscreen) {
+    try {
+      const result = requestFullscreen.call(pane);
+
+      if (result && typeof result.catch === 'function') {
+        result.catch(() => {
+          pane.classList.add('fullscreen');
+        });
+      }
+    } catch (error) {
+      pane.classList.add('fullscreen');
+    }
+  }
 }
 function exitFs() {
   const pane = $('tdlg');
+  const currentFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
+  const exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen;
+
   pane.classList.remove('fullscreen');
   pane.classList.remove('immersive');
+
+  if (currentFullscreen === pane && exitFullscreen) {
+    try {
+      const result = exitFullscreen.call(document);
+
+      if (result && typeof result.catch === 'function') {
+        result.catch(() => {});
+      }
+    } catch (error) {
+      /* La classe CSS est déjà retirée : le mode normal est restauré. */
+    }
+  }
 }
 
 function runTest(auto) {
   const text = $('src').value;
-  if (!text.trim()) { notify('Aucun code à tester', { kind: 'err' }); return; }
+  if (!text.trim()) {
+    notify('Aucun code à tester', { kind: 'err' });
+    return;
+  }
+  exitFs();
   stopTest();
   testErrors = [];
   showTest(false);
   openOv('tdlg');
-  /* Aperçu automatique activé : test en plein écran sans bordure */
-  const imm = $('autotest').checked;
-  $('tdlg').classList.toggle('immersive', imm);
-  if (imm || $('autofs').checked) enterFs();
-  /* Plein écran : les notifications de succès déjà affichées disparaissent vite */
+
+  /* Le rendu reste intégré au cadre de prévisualisation. */
+  const imm = false;
+
+  $('tdlg').classList.remove('immersive', 'fullscreen');
+
   if ($('tdlg').classList.contains('fullscreen')) {
-    document.querySelectorAll('#notifs .notif.ok').forEach(n => { clearTimeout(n._t); n._t = setTimeout(() => dismiss(n), 1500); });
+    exitFs();
   }
-  $('tdlg').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  if (window.matchMedia('(max-width: 1099px)').matches) {
+    $('tdlg').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
   const frame = $('tframe');
+
   testListener = ev => {
     if (ev.source !== frame.contentWindow || !ev.data || !ev.data.blocsProbe) return;
     const o = ev.data.blocsProbe;
@@ -3774,14 +4202,22 @@ function runTest(auto) {
     testErrors.push(o);
     showTest(false);
   };
+
   window.addEventListener('message', testListener);
+
   const m = /<head[^>]*>/i.exec(text);
-  frame.srcdoc = m ? text.slice(0, m.index + m[0].length) + PROBE + text.slice(m.index + m[0].length) : PROBE + text;
+  frame.srcdoc = m
+    ? text.slice(0, m.index + m[0].length) + PROBE + text.slice(m.index + m[0].length)
+    : PROBE + text;
+
   runTest._t = setTimeout(() => {
     showTest(true);
+
     if ((auto === true || imm) && testErrors.length) {
       notify(testErrors.length + ' erreur(s) au test après application', {
-        kind: 'err', ms: 0, key: 'autotest',
+        kind: 'err',
+        ms: 0,
+        key: 'autotest',
         actions: [
           { label: '↶ Annuler', fn: undoLast },
           { label: '📨 Correction IA', fn: () => copyText(testMessage(), 'Message copié ✓ — collez-le à l\'IA') }
@@ -3972,6 +4408,67 @@ $('blist').addEventListener('change', e => {
 
   refresh();
 }
+function enableWorkspaceResize() {
+  const workspace = document.querySelector('.workspace');
+  const testPane = document.getElementById('tdlg');
+
+  if (!workspace || !testPane) return;
+
+  let startX = 0;
+  let startWidth = 0;
+  let activePointer = null;
+
+  workspace.addEventListener('pointerdown', event => {
+    if (window.innerWidth < 1100 || event.button !== 0) return;
+
+    const rect = testPane.getBoundingClientRect();
+    const distanceFromLeft = event.clientX - rect.left;
+
+    if (
+      !testPane.contains(event.target) ||
+      distanceFromLeft < -2 ||
+      distanceFromLeft > 14
+    ) return;
+
+    event.preventDefault();
+
+    activePointer = event.pointerId;
+    startX = event.clientX;
+    startWidth = rect.width;
+
+    workspace.classList.add('is-resizing');
+    workspace.setPointerCapture(event.pointerId);
+  });
+
+  workspace.addEventListener('pointermove', event => {
+    if (activePointer !== event.pointerId) return;
+
+    const availableWidth = workspace.clientWidth - 260 - 320 - 32;
+    const maxWidth = Math.max(310, Math.min(700, availableWidth));
+    const newWidth = Math.max(
+      310,
+      Math.min(maxWidth, startWidth + startX - event.clientX)
+    );
+
+    workspace.style.setProperty('--test-pane-width', `${newWidth}px`);
+  });
+
+  const stopResize = event => {
+    if (activePointer !== event.pointerId) return;
+
+    activePointer = null;
+    workspace.classList.remove('is-resizing');
+
+    if (workspace.hasPointerCapture(event.pointerId)) {
+      workspace.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  workspace.addEventListener('pointerup', stopResize);
+  workspace.addEventListener('pointercancel', stopResize);
+}
+
+enableWorkspaceResize();
 
 init();
 applyFs();
@@ -4173,26 +4670,6 @@ bindToggle('tg-autotest', 'autotest');
 bindToggle('tg-copyfinal', 'copyfinal');
 bindToggle('tg-autofs', 'autofs');
 syncToggles();
-const CLOUD_REPO = {
-  owner: 'mekeirish',
-  name: 'Bcode-Projects',
-  branch: 'main',
-  api: 'https://api.github.com',
-  tokenKey: 'blocs.gh.token',
-  syncKey: 'blocs.gh.lastSync'
-};
-const cloudToken = {
-  get() {
-    try { return localStorage.getItem(CLOUD_REPO.tokenKey) || ''; }
-    catch (e) { return ''; }
-  },
-  set(t) {
-    try {
-      if (t) localStorage.setItem(CLOUD_REPO.tokenKey, t);
-      else localStorage.removeItem(CLOUD_REPO.tokenKey);
-    } catch (e) { /* stockage indisponible */ }
-  }
-};
 const cloudSync = {
   get() {
     try { return parseInt(localStorage.getItem(CLOUD_REPO.syncKey) || '0', 10) || 0; }
