@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#05070b">
 <meta name="color-scheme" content="dark">
-<title>Bcode pro PC</title>
+<title>Qwen Bcode PC</title>
 <style>
 /* Cyber glass : fond uni, verre translucide, filets cyan */
 :root {
@@ -1449,6 +1449,15 @@ label.chk input { width: 18px; height: 18px; }
 #split-result .tl.hit:active {
   background: rgba(52, 211, 153, .28);
 }
+/* Onglets de la modale de découpe (Parties / Blocs) et recherche par blocs */
+#splitdlg [hidden] { display: none !important; }
+#split-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0 0 12px; }
+#split-tabs .tl { min-height: 38px; padding: 6px 10px; font-size: 13px; border-radius: 11px; }
+#blk-q { height: 36px; font-size: 13px; border-radius: 11px; padding: 0 12px; }
+#splitdlg .btools { flex-wrap: wrap; }
+#splitdlg .btools .sw.mini { flex: 0 0 auto; }
+.blk-snip { margin: 2px 0 0 2px; font: 11.5px/1.4 var(--mono); color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.blk-snip .code-hl { color: var(--text); }
 .sec { margin: 16px 2px 8px; font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--dim); }
 /* Interrupteurs : la case à cocher d'origine (mêmes id) est habillée en switch */
 .sw { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 6px 2px; border-top: 1px solid rgba(255, 255, 255, .06);
@@ -1517,6 +1526,7 @@ label.chk input { width: 18px; height: 18px; }
 /* ---------- Modale Projets : liste compacte mobile ---------- */
 .pj-head { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
 .pj-sum { flex: 1; min-width: 0; color: var(--dim); font-size: 12.5px; }
+#pj-q { height: 40px; margin: 0 0 10px; }
 .pj { margin: 6px 0; border: 1px solid var(--edge); border-radius: 14px; background: rgba(255, 255, 255, .05); overflow: hidden; }
 .pj.on { border-color: rgba(34, 211, 238, .5); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 0 14px rgba(34, 211, 238, .14); }
 .pj-row { display: flex; align-items: stretch; }
@@ -1984,6 +1994,7 @@ label.chk input { width: 18px; height: 18px; }
   <div class="row"><label class="chk"><input type="checkbox" id="cloud-auto" checked> Sauvegarde auto (30 s sans frappe)</label></div>
   <div id="cloud-last-sync" class="status"></div>
 </div>
+<input type="search" id="pj-q" placeholder="Rechercher un projet…" autocomplete="off" spellcheck="false">
 <div id="cloud-projects"></div>
     </div>
   </div>
@@ -2017,12 +2028,35 @@ label.chk input { width: 18px; height: 18px; }
   <div class="panel">
     <div class="ph"><h2>Découper le code balisé</h2><button class="iconbtn" id="splitdlg-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button></div>
     <div class="pb">
-      <div class="note">Choisissez le nombre de parties. Le découpage respecte toujours les blocs complets : aucun bloc n'est coupé.</div>
-      <div id="split-counts"></div>
-      <div class="btools">
-        <input type="search" id="split-q" placeholder="Rechercher un mot dans les parties…" autocomplete="off">
+      <div id="split-tabs">
+        <button class="tl primary" data-tab="parts">Parties</button>
+        <button class="tl" data-tab="blocks">Blocs</button>
       </div>
-      <div id="split-result"></div>
+      <div id="split-pane-parts">
+        <div class="note">Choisissez le nombre de parties. Elles ont à peu près le même nombre de lignes et aucun bloc n'est jamais coupé.</div>
+        <div id="split-counts"></div>
+        <div class="btools">
+          <input type="search" id="split-q" placeholder="Rechercher un mot dans les parties…" autocomplete="off">
+        </div>
+        <div id="split-result"></div>
+      </div>
+      <div id="split-pane-blocks" hidden>
+        <div class="note">Tapez un mot : tous les blocs qui le contiennent sont cochés. Copiez-les un par un, ou tous ensemble.</div>
+        <div class="btools">
+          <input type="search" id="blk-q" placeholder="Mot à chercher dans les blocs…" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="btools">
+          <label class="sw mini"><input type="checkbox" id="blk-opt-name" checked><span>Noms</span></label>
+          <label class="sw mini"><input type="checkbox" id="blk-opt-code" checked><span>Code</span></label>
+          <button class="sm" id="blk-all">Tout cocher</button>
+          <button class="sm" id="blk-none">Aucun</button>
+        </div>
+        <div id="blk-result"></div>
+        <div class="selbar" id="blk-bar" hidden>
+          <button class="sm primary" id="blk-copy" style="flex:1">Copier les blocs (<span id="blk-n">0</span>)</button>
+          <button class="sm" id="blk-copy-ai" title="Copier prompt + index + blocs cochés">Prompt + index</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -4564,6 +4598,7 @@ const v = await askDialog({ title: 'Renommer le projet', input: true, value: p.n
 const name = (v || '').trim();
 if (!name) return;
 p.name = name.slice(0, 40);
+p.nameDirty = true;
 saveProjects();
 renderProjects();
 cloudRenameProject(p.id, p.name);
@@ -5246,40 +5281,54 @@ $('qb-marked').onclick = () => {
 };
 let qbLongT = null, qbLongFired = false;
 let splitText = '', splitChoice = 0, splitParts = null, splitQuery = '';
+let blkQuery = '', blkSel = new Set(), blkHits = [], blkInName = true, blkInCode = true, splitTab = 'parts', blkCache = { text: null, pm: null, own: [], low: [] };
 let codeSearchMatches = [], codeSearchIdx = -1;
 let codeSearchHL = '';        // mot recherché actuellement surligné ('' = aucun)
 /* Découpe un code balisé en n parties contiguës, sans jamais couper un bloc.
-   Le découpage se fait uniquement entre les blocs de premier niveau. */
+   La coupe se fait uniquement entre blocs de premier niveau, et les parties sont équilibrées
+   en nombre de lignes (partition qui minimise l'écart entre les tailles des parties). */
 function splitTagged(text, n) {
   const pm = parseMarks(text);
   if (!pm.blocks.length) return null;
   const tops = topBlocks(pm.blocks);
   if (!tops.length) return null;
-  const count = Math.min(n, tops.length);
+  const N = tops.length;
+  const count = Math.min(n, N);
   if (count <= 1) return [text];
-  const w = tops.map(b => b.outerEnd - b.outerStart);
-  const total = w.reduce((a, b) => a + b, 0);
-  const prefix = [];
-  let acc = 0;
-  for (const x of w) { acc += x; prefix.push(acc); }
-  const cuts = [0];
-  for (let k = 1; k < count; k++) {
-    const t = total * k / count;
-    let idx = prefix.findIndex(v => v >= t);
-    if (idx < 0) idx = tops.length - 1;
-    const last = cuts[cuts.length - 1];
-    const minC = last + 1;
-    const maxC = tops.length - (count - k);
-    const c = Math.max(minC, Math.min(maxC, idx + 1));
-    cuts.push(c);
+  /* Unité = un bloc de premier niveau avec le texte qui le précède : les lignes des unités s'additionnent exactement */
+  const starts = tops.map((b, i) => i === 0 ? 0 : b.outerStart);
+  starts.push(text.length);
+  const S = [0];
+  for (let i = 0; i < N; i++) {
+    const seg = text.slice(starts[i], starts[i + 1]);
+    S.push(S[i] + (seg.match(/\n/g) || []).length);
   }
-  cuts.push(tops.length);
+  /* Programmation dynamique : minimise la somme des carrés des tailles (parties les plus égales possible) */
+  let prev = new Array(N + 1).fill(Infinity);
+  prev[0] = 0;
+  const arcs = [];
+  for (let k = 1; k <= count; k++) {
+    const cur = new Array(N + 1).fill(Infinity);
+    const arc = new Array(N + 1).fill(0);
+    for (let i = k; i <= N - (count - k); i++) {
+      for (let j = k - 1; j < i; j++) {
+        if (prev[j] === Infinity) continue;
+        const d = S[i] - S[j];
+        const v = prev[j] + d * d;
+        if (v < cur[i]) { cur[i] = v; arc[i] = j; }
+      }
+    }
+    arcs.push(arc);
+    prev = cur;
+  }
+  const idx = [N];
+  for (let k = count, i = N; k >= 1; k--) {
+    i = arcs[k - 1][i];
+    idx.push(i);
+  }
+  idx.reverse();
   const parts = [];
-  for (let k = 0; k < cuts.length - 1; k++) {
-    const a = k === 0 ? 0 : tops[cuts[k]].outerStart;
-    const b = k === cuts.length - 2 ? text.length : tops[cuts[k + 1]].outerStart;
-    parts.push(text.slice(a, b));
-  }
+  for (let k = 0; k < count; k++) parts.push(text.slice(starts[idx[k]], starts[idx[k + 1]]));
   return parts;
 }
 function renderSplitCounts() {
@@ -5305,13 +5354,133 @@ function renderSplitParts() {
       return '<button class="tl' + (hit ? ' hit' : '') + '" data-i="' + i + '"><span>Partie ' + (i + 1) + '</span><small style="opacity:.65;font-weight:400">' + l + ' l.</small></button>';
     }).join('') + '</div>';
 }
+/* Blocs du code de la découpe + texte propre de chaque bloc (sans ses sous-blocs), calculés une seule fois par code */
+function blkParse() {
+  if (blkCache.text === splitText && blkCache.pm) return blkCache;
+  const pm = parseMarks(splitText);
+  const all = pm.blocks;
+  const own = all.map((b, i) => {
+    let out = '', pos = b.innerStart;
+    for (let j = i + 1; j < all.length && all[j].depth > b.depth; j++) {
+      const c = all[j];
+      if (c.depth !== b.depth + 1) continue;
+      out += splitText.slice(pos, c.outerStart);
+      pos = c.outerEnd;
+    }
+    return out + splitText.slice(pos, b.innerEnd);
+  });
+  blkCache = { text: splitText, pm: pm, own: own, low: own.map(s => s.toLowerCase()) };
+  return blkCache;
+}
+/* Extrait (HTML) de la ligne où le mot apparaît, avec le mot surligné */
+function blkSnippet(own, idx, len) {
+  const ls = own.lastIndexOf('\n', idx - 1) + 1;
+  let le = own.indexOf('\n', idx);
+  if (le < 0) le = own.length;
+  const line = own.slice(ls, le);
+  const li = idx - ls;
+  let start = Math.max(Math.max(0, li - 30), /^\s*/.exec(line)[0].length);
+  start = Math.min(start, li);
+  const end = Math.min(line.length, li + len + 50);
+  return (start > 0 ? '… ' : '') + esc(line.slice(start, li)) + '<mark class="code-hl">' + esc(line.slice(li, li + len)) + '</mark>' +
+    esc(line.slice(li + len, end)) + (end < line.length ? ' …' : '');
+}
+/* Blocs qui contiennent le mot (dans leur nom et/ou dans leur propre code) */
+function blkSearch() {
+  const q = blkQuery.trim().toLowerCase();
+  blkHits = [];
+  if (!q) return;
+  const c = blkParse();
+  c.pm.blocks.forEach((b, i) => {
+    const nameHit = blkInName && b.name.toLowerCase().includes(q);
+    let n = 0, first = -1;
+    if (blkInCode) {
+      const low = c.low[i];
+      let k = low.indexOf(q);
+      first = k;
+      while (k >= 0) { n++; k = low.indexOf(q, k + q.length); }
+    }
+    if (!nameHit && !n) return;
+    blkHits.push({ b: b, n: n, nameHit: nameHit, snip: n ? blkSnippet(c.own[i], first, q.length) : '' });
+  });
+}
+function renderBlkResult() {
+  const box = $('blk-result');
+  if (!box) return;
+  const q = blkQuery.trim();
+  if (!q) {
+    box.innerHTML = '<div class="empty">Tapez un mot pour trouver les blocs qui le contiennent.</div>';
+  } else if (!blkHits.length) {
+    box.innerHTML = '<div class="empty">Aucun bloc ne contient « ' + esc(q) + ' ».</div>';
+  } else {
+    const total = blkHits.reduce((s, h) => s + h.n, 0);
+    const nb = blkHits.length;
+    box.innerHTML = '<div class="status">' + nb + ' bloc' + (nb > 1 ? 's' : '') + ' trouvé' + (nb > 1 ? 's' : '') +
+      (total ? ' · ' + total + ' occurrence' + (total > 1 ? 's' : '') : '') + '</div>' +
+      blkHits.slice(0, 200).map(h => {
+        const b = h.b;
+        return '<div class="bk' + (b.depth ? ' nest' : '') + '" style="margin-left:' + Math.min(b.depth, 3) * 10 + 'px">' +
+          '<div class="bk-top"><label class="pick"><input type="checkbox" data-bs="' + esc(b.name) + '"' + (blkSel.has(b.name) ? ' checked' : '') + '><span class="bk-nm">' + esc(b.name) + '</span></label></div>' +
+          (h.snip ? '<div class="blk-snip">' + h.snip + '</div>' : '') +
+          '<div class="bk-bot"><div class="bk-info"><span class="chipc ' + b.lang + '">' + b.lang + '</span>' + b.lines + ' l.' +
+          (h.n ? ' · ' + h.n + '×' : '') + (h.nameHit ? ' · nom' : '') + '</div>' +
+          '<div class="acts" data-bn="' + esc(b.name) + '">' +
+          '<button class="ib" data-ba="copy" aria-label="Copier ce bloc" title="Copier"><svg class="ic"><use href="#i-copy"/></svg></button>' +
+          '<button class="ib" data-ba="goto" aria-label="Aller au bloc" title="Aller au bloc"><svg class="ic"><use href="#i-goto"/></svg></button></div></div></div>';
+      }).join('') +
+      (nb > 200 ? '<div class="empty">… ' + (nb - 200) + ' autres (précisez le mot)</div>' : '');
+  }
+  updBlkBar();
+}
+/* Barre de copie : visible quand des blocs sont trouvés, avec le nombre de blocs cochés */
+function updBlkBar() {
+  const bar = $('blk-bar');
+  if (!bar) return;
+  const n = blkSel.size;
+  bar.hidden = !blkHits.length;
+  $('blk-n').textContent = String(n);
+  $('blk-copy').disabled = !n;
+  $('blk-copy-ai').disabled = !n;
+}
+/* Nouvelle recherche : tous les blocs trouvés sont cochés */
+function blkRun() {
+  blkSearch();
+  blkSel = new Set(blkHits.map(h => h.b.name));
+  renderBlkResult();
+}
+/* Copie tous les blocs cochés en une fois (withAi : avec le prompt et l'index complet) */
+function blkCopy(withAi) {
+  const list = topBlocks(blkHits.filter(h => blkSel.has(h.b.name)).map(h => h.b));
+  if (!list.length) { notify('Cochez d\'abord des blocs', { kind: 'err' }); return; }
+  const code = list.map(b => splitText.slice(b.outerStart, b.outerEnd)).join('').replace(/\n$/, '');
+  const f = fenceFor(code), word = blkQuery.trim();
+  const label = list.length + ' bloc' + (list.length > 1 ? 's' : '') + ' copié' + (list.length > 1 ? 's' : '') + ' ✓';
+  if (withAi) {
+    const head = PROMPT_TEXT.replace(/\n\nJe vais maintenant[\s\S]*$/, '');
+    copyText(head + '\n\nVoici l\'index complet des blocs, puis seulement les blocs utiles à ma demande (ceux qui contiennent « ' + word + ' »). Si un autre bloc t\'est nécessaire, demande-le-moi par son nom. Réponds simplement « Prêt », puis attends ma demande.\n\n' +
+      buildIndex(splitText) + '\n\n' + f + 'html\n' + code + '\n' + f, 'Index + ' + label);
+  } else {
+    copyText('Voici les blocs contenant « ' + word + ' » :\n\n' + f + 'html\n' + code + '\n' + f, label);
+  }
+}
+function setSplitTab(tab) {
+  splitTab = tab === 'blocks' ? 'blocks' : 'parts';
+  $('split-pane-parts').hidden = splitTab !== 'parts';
+  $('split-pane-blocks').hidden = splitTab !== 'blocks';
+  document.querySelectorAll('#split-tabs button').forEach(b => b.classList.toggle('primary', b.dataset.tab === splitTab));
+  if (splitTab === 'blocks') {
+    renderBlkResult();
+    const q = $('blk-q');
+    if (q && !q.value) setTimeout(() => q.focus(), 60);
+  }
+}
 function openSplitDlg() {
   const v = $('src').value;
   if (!parseMarks(v).blocks.length) {
     notify('Code non balisé : touchez « Analyser »', { kind: 'err' });
     return;
   }
-  /* Le choix, les parties et la recherche restent mémorisés tant que le code balisé n'a pas changé */
+  /* Le choix, les parties et les recherches restent mémorisés tant que le code balisé n'a pas changé */
   if (splitText !== v) {
     splitText = v;
     splitChoice = 0;
@@ -5319,9 +5488,15 @@ function openSplitDlg() {
     splitQuery = '';
     const q = $('split-q');
     if (q) q.value = '';
+    blkQuery = '';
+    blkSel = new Set();
+    blkHits = [];
+    const bq = $('blk-q');
+    if (bq) bq.value = '';
   }
   renderSplitCounts();
   renderSplitParts();
+  setSplitTab(splitTab);
   openOv('splitdlg');
 }
 function codeSearchUpdate(jump) {
@@ -5506,6 +5681,38 @@ $('splitdlg').addEventListener('click', e => {
     }
   }
 });
+/* Onglets et actions de la recherche par blocs */
+$('splitdlg').addEventListener('click', e => {
+  const tb = e.target.closest('button[data-tab]');
+  if (tb) { setSplitTab(tb.dataset.tab); return; }
+  const ba = e.target.closest('button[data-ba]');
+  if (ba) {
+    const name = ba.parentElement.dataset.bn;
+    const b = blkParse().pm.blocks.find(x => x.name === name);
+    if (!b) return;
+    if (ba.dataset.ba === 'copy') copyText(splitText.slice(b.outerStart, b.outerEnd), 'Bloc copié ✓');
+    else if (ba.dataset.ba === 'goto') { closeOv('splitdlg'); gotoBlock(name); }
+    return;
+  }
+  const btn = e.target.closest('#blk-all, #blk-none, #blk-copy, #blk-copy-ai');
+  if (!btn) return;
+  if (btn.id === 'blk-all') { blkSel = new Set(blkHits.map(h => h.b.name)); renderBlkResult(); }
+  else if (btn.id === 'blk-none') { blkSel = new Set(); renderBlkResult(); }
+  else if (btn.id === 'blk-copy') blkCopy(false);
+  else if (btn.id === 'blk-copy-ai') blkCopy(true);
+});
+$('splitdlg').addEventListener('change', e => {
+  const t = e.target;
+  if (t.matches && t.matches('input[data-bs]')) {
+    if (t.checked) blkSel.add(t.dataset.bs); else blkSel.delete(t.dataset.bs);
+    updBlkBar();
+  } else if (t.id === 'blk-opt-name') { blkInName = t.checked; blkRun(); }
+  else if (t.id === 'blk-opt-code') { blkInCode = t.checked; blkRun(); }
+});
+$('blk-q').addEventListener('input', () => {
+  blkQuery = $('blk-q').value;
+  blkRun();
+});
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && isOpen('splitdlg')) closeOv('splitdlg');
 });
@@ -5583,6 +5790,8 @@ $('projsel').addEventListener('click', e => { if (e.target === $('projsel')) clo
 $('cloud-projects').addEventListener('click', e => {
   if (e.target.closest('#pj-help')) openOv('legend');
 });
+/* Recherche de projets : filtre la liste de la modale Projets par nom */
+$('pj-q').addEventListener('input', () => renderProjectList(cloudIdx.list));
 $('legend-x').onclick = () => closeOv('legend');
 /* Dessine la liste des projets dans la modale dédiée */
 function renderProjDlg() {
@@ -5961,7 +6170,9 @@ async function cloudPullProject(id) {
   if (!infoFile) throw new Error('Projet introuvable sur le cloud : ' + id);
   const info = JSON.parse(infoFile.text);
   if (!info.currentVersion) throw new Error('Aucune version disponible pour ' + id);
-  return await cloudPullVersion(id, info.currentVersion, info.updatedAt);
+  const res = await cloudPullVersion(id, info.currentVersion, info.updatedAt);
+  if (projAdoptName(id, info.name)) renderProjects();
+  return res;
 }
 async function cloudPullAll() {
   const idxFile = await ghGetFile('index.json');
@@ -6100,6 +6311,7 @@ async function cloudRemoteList() {
   }
   if (!list) list = await ghRebuildIndex();
   cloudIdx = { list: list, at: Date.now() };
+  cloudAdoptNames(list);
   return list;
 }
 /* Reconstruit la liste des projets depuis projects/<id>/info.json */
@@ -6129,17 +6341,54 @@ async function cloudFetchProject(id) {
 /* Répercute un renommage sur le Cloud (sans créer de version) */
 async function cloudRenameProject(id, name) {
   if (!cloudToken.get()) return;
+  if (!cloudRenameProject._run) cloudRenameProject._run = new Set();
+  if (cloudRenameProject._run.has(id)) return;
+  cloudRenameProject._run.add(id);
   try {
     const f = await ghGetFile('projects/' + id + '/info.json');
     if (!f) return;
     const info = JSON.parse(f.text);
-    if (info.name === name) return;
+    if (info.name === name) { projNameClean(id); return; }
     info.name = name;
     await ghPutFile('projects/' + id + '/info.json', JSON.stringify(info, null, 2), 'Rename ' + id, f.sha);
     await ghWriteIndexEntry(info);
+    cloudIdxSet(info);
+    projNameClean(id);
   } catch (e) {
     notify('Renommage Cloud impossible : ' + e.message, { kind: 'warn' });
+  } finally {
+    cloudRenameProject._run.delete(id);
   }
+}
+/* Un renommage local reste « en attente » (nameDirty) tant que le Cloud ne l'a pas reçu : le nom du Cloud ne l'écrase jamais */
+function projNameClean(id) {
+  const p = projects.list.find(x => x.id === id);
+  if (p && p.nameDirty) {
+    delete p.nameDirty;
+    saveProjects();
+  }
+}
+/* Applique le nom du Cloud (celui du dernier appareil qui a mis à jour le projet) : un projet n'a qu'un seul nom */
+function projAdoptName(id, name) {
+  const p = projects.list.find(x => x.id === id);
+  if (!p || !name || p.nameDirty) return false;
+  const nm = String(name).slice(0, 40);
+  if (p.name === nm) return false;
+  p.name = nm;
+  saveProjects();
+  return true;
+}
+/* Aligne les noms de l'appareil sur ceux du Cloud ; un renommage local pas encore envoyé est renvoyé au Cloud */
+function cloudAdoptNames(list) {
+  if (!Array.isArray(list)) return;
+  let changed = false;
+  list.forEach(rp => {
+    if (rp.deleted) return;
+    const p = projects.list.find(x => x.id === rp.id);
+    if (p && p.nameDirty) { cloudRenameProject(p.id, p.name); return; }
+    if (projAdoptName(rp.id, rp.name)) changed = true;
+  });
+  if (changed) renderProjects();
 }
 /* Recharge dans l'éditeur le projet en cours depuis son enregistrement local */
 async function reloadCurrentFromStore() {
@@ -6168,17 +6417,26 @@ function renderProjectList(remote, err) {
     };
   });
 rows.sort((a, b) => (b.isCur - a.isCur) || (((b.rp && b.rp.updatedAt) || 0) - ((a.rp && a.rp.updatedAt) || 0)));
-const trash = known ? remote.filter(r => r.deleted && !projects.list.some(p => p.id === r.id)) : [];
+/* Recherche par nom : le champ « Rechercher un projet » filtre la liste (la corbeille aussi) */
+const pq = ($('pj-q') ? $('pj-q').value : '').trim().toLowerCase();
+const totalRows = rows.length;
+if (pq) {
+  for (let i = rows.length - 1; i >= 0; i--) {
+    if (!rows[i].p.name.toLowerCase().includes(pq)) rows.splice(i, 1);
+  }
+}
+const trash = known ? remote.filter(r => r.deleted && !projects.list.some(p => p.id === r.id) && (!pq || (r.name || r.id).toLowerCase().includes(pq))) : [];
 
 let html = '';
 if (err) html += '<div class="note warn">Cloud injoignable (' + esc(err) + ') · liste de l\'appareil affichée.</div>';
 const quota = storageInfo.quota && storageInfo.usage > storageInfo.quota * 0.6
   ? ' · navigateur ' + Math.round(storageInfo.usage / storageInfo.quota * 100) + ' %'
   : '';
-html += '<div class="pj-head"><div class="pj-sum">' + rows.length + ' projet' + (rows.length > 1 ? 's' : '') + ' · ' +
+html += '<div class="pj-head"><div class="pj-sum">' + (pq ? rows.length + ' / ' : '') + totalRows + ' projet' + (totalRows > 1 ? 's' : '') + ' · ' +
   fmtSize(estimateLocalStorageSize()) + ' local' + quota + '</div>' +
   '<button class="pj-help" id="pj-help" aria-label="Légende des icônes">?</button>' +
   '<button class="sm primary" id="cloud-new-proj">+ Nouveau</button></div>';
+if (pq && !rows.length && !trash.length) html += '<div class="empty">Aucun projet ne correspond à « ' + esc(pq) + ' ».</div>';
   html += rows.map(r => {
   const kb = r.isCur ? Math.round($('src').value.length / 1024) : (r.s && typeof r.s.text === 'string' ? Math.round(r.s.text.length / 1024) : 0);
   const conf = cloudConflicts.has(r.p.id) || (r.unsaved && r.newer);
@@ -6583,6 +6841,8 @@ async function cloudSaveInner(id, force) {
     if (!force) {
       const s = projLocal(id);
       const ri = await cloudRemoteInfo(id);
+      /* Le nom du Cloud s'applique ici avant d'écrire : un projet n'a jamais deux noms */
+      if (ri && projAdoptName(id, ri.name)) renderProjects();
       if (ri && ri.updatedAt > ((s && s._cloudUpdatedAt) || 0)) {
         /* Le Cloud a une version plus récente : identique à la mienne (rien à faire) ou conflit */
         const rem = await cloudFetchProject(id);
