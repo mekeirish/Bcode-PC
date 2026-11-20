@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#05070b">
 <meta name="color-scheme" content="dark">
-<title>B5</title>
+<title>Bcode pro PC</title>
 <style>
 /* Cyber glass : fond uni, verre translucide, filets cyan */
 :root {
@@ -18,6 +18,493 @@
 html { background: var(--bg); }
 html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
   font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+:root {
+  /* Palette de base */
+  --bg: #080c14;
+  --text: #edf4ff;
+  --dim: #9aa9bd;
+  --accent: #67e8f9;
+  --ok: #5ee6b0;
+  --warn: #ffd166;
+  --err: #ff758f;
+
+  /* Couleurs sources pour les variations alpha */
+  --rgb-cyan: 103, 232, 249;
+  --rgb-green: 94, 230, 176;
+  --rgb-amber: 255, 209, 102;
+  --rgb-rose: 255, 117, 143;
+  --rgb-bluegray: 164, 191, 222;
+  --rgb-lavender: 103, 101, 190;
+  --rgb-white: 255, 255, 255;
+  --rgb-black: 0, 0, 0;
+  --rgb-navy: 5, 11, 20;
+
+  /* Surfaces */
+  --surface-glass: rgba(19, 29, 45, 0.72);
+  --surface-glass-raised: rgba(29, 43, 63, 0.82);
+  --surface-card: rgba(21, 31, 47, 0.66);
+  --surface-panel: rgba(12, 19, 31, 0.94);
+  --surface-header: rgba(15, 24, 39, 0.86);
+  --surface-input: rgba(var(--rgb-navy), 0.64);
+  --surface-overlay: rgba(3, 7, 14, 0.68);
+  --surface-notification: rgba(13, 22, 36, 0.96);
+
+  /* Bordures réutilisables */
+  --border-subtle: 1px solid rgba(var(--rgb-bluegray), 0.10);
+  --border-soft: 1px solid rgba(var(--rgb-bluegray), 0.16);
+  --border-default: 1px solid rgba(var(--rgb-bluegray), 0.20);
+  --border-accent: 1px solid rgba(var(--rgb-cyan), 0.42);
+  --border-accent-strong: 1px solid rgba(var(--rgb-cyan), 0.58);
+  --border-success: 1px solid rgba(var(--rgb-green), 0.38);
+  --border-warning: 1px solid rgba(var(--rgb-amber), 0.42);
+  --border-danger: 1px solid rgba(var(--rgb-rose), 0.42);
+  --border-highlight: 1px solid rgba(var(--rgb-white), 0.72);
+
+  /* Couleurs de bordure pour les propriétés ciblées */
+  --edge-subtle: rgba(var(--rgb-bluegray), 0.10);
+  --edge-soft: rgba(var(--rgb-bluegray), 0.16);
+  --edge-default: rgba(var(--rgb-bluegray), 0.20);
+  --edge-accent: rgba(var(--rgb-cyan), 0.42);
+  --edge-accent-strong: rgba(var(--rgb-cyan), 0.58);
+  --edge-success: rgba(var(--rgb-green), 0.38);
+  --edge-warning: rgba(var(--rgb-amber), 0.42);
+  --edge-danger: rgba(var(--rgb-rose), 0.42);
+  --edge-highlight: rgba(var(--rgb-white), 0.72);
+
+  /* Teintes et reflets */
+  --tint-cyan: rgba(var(--rgb-cyan), 0.08);
+  --tint-cyan-hover: rgba(var(--rgb-cyan), 0.13);
+  --tint-cyan-active: rgba(var(--rgb-cyan), 0.19);
+  --tint-green: rgba(var(--rgb-green), 0.12);
+  --tint-amber: rgba(var(--rgb-amber), 0.12);
+  --tint-rose: rgba(var(--rgb-rose), 0.13);
+  --tint-white: rgba(var(--rgb-white), 0.045);
+  --shine-soft: rgba(var(--rgb-white), 0.075);
+
+  /* Dégradés centralisés */
+  --gradient-page:
+    radial-gradient(
+      ellipse at 12% 8%,
+      rgba(var(--rgb-cyan), 0.10),
+      transparent 34rem
+    ),
+    radial-gradient(
+      ellipse at 88% 82%,
+      rgba(var(--rgb-lavender), 0.10),
+      transparent 38rem
+    ),
+    var(--bg);
+  --gradient-page-overlay:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(var(--rgb-cyan), 0.045),
+      transparent 42rem
+    ),
+    linear-gradient(135deg, var(--tint-white), transparent 48%);
+  --gradient-glass:
+    linear-gradient(145deg, var(--tint-white), transparent 55%);
+  --gradient-header:
+    linear-gradient(
+      110deg,
+      rgba(var(--rgb-cyan), 0.075),
+      transparent 48%
+    );
+  --gradient-panel:
+    linear-gradient(
+      150deg,
+      rgba(var(--rgb-bluegray), 0.08),
+      transparent 45%
+    );
+  --gradient-accent:
+    linear-gradient(135deg, #8af1fb 0%, #55dced 48%, #43c9df 100%);
+  --gradient-accent-hover:
+    linear-gradient(135deg, #a1f5fc 0%, #6ce5f2 48%, #55d7e8 100%);
+
+  /* Ombres et anneaux de focus */
+  --shadow-soft: 0 8px 22px rgba(var(--rgb-black), 0.20);
+  --shadow-glass: 0 14px 36px rgba(var(--rgb-black), 0.28);
+  --shadow-panel: 0 24px 70px rgba(var(--rgb-black), 0.58);
+  --glow-cyan: 0 0 22px rgba(var(--rgb-cyan), 0.10);
+  --focus-ring: 0 0 0 3px rgba(var(--rgb-cyan), 0.10);
+
+  /* Mouvement */
+  --ease-ui: cubic-bezier(0.2, 0.75, 0.25, 1);
+  --transition-ui:
+    color 0.18s var(--ease-ui),
+    background-color 0.18s var(--ease-ui),
+    border-color 0.18s var(--ease-ui),
+    box-shadow 0.18s var(--ease-ui),
+    transform 0.18s var(--ease-ui);
+}
+
+body {
+  background: var(--gradient-page);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+body::before {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  background: var(--gradient-page-overlay);
+  content: "";
+  pointer-events: none;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+}
+
+.glass {
+  border-color: var(--edge-soft);
+  border-top-color: var(--edge-accent);
+  background: var(--gradient-glass), var(--surface-glass);
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 1px 0 var(--shine-soft);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  backdrop-filter: blur(16px) saturate(125%);
+}
+
+.bar {
+  border-color: var(--edge-default);
+  background: var(--gradient-header), var(--surface-header);
+}
+
+.brand {
+  color: var(--text);
+  text-shadow: 0 0 22px rgba(var(--rgb-cyan), 0.24);
+}
+
+.code {
+  border-color: var(--edge-default);
+  background: var(--gradient-glass), rgba(13, 20, 32, 0.9);
+  transition: var(--transition-ui);
+}
+
+.code:focus-within {
+  border-color: var(--edge-accent);
+  box-shadow:
+    var(--focus-ring),
+    var(--shadow-glass),
+    inset 0 1px 0 var(--shine-soft);
+}
+
+#src::selection,
+#src.hl-on::selection {
+  background: rgba(var(--rgb-cyan), 0.28);
+}
+
+.chip,
+.lvl {
+  border-color: var(--edge-soft);
+  background: rgba(20, 30, 46, 0.76);
+}
+
+.chip b:first-child {
+  color: var(--warn);
+}
+
+.chip b:nth-of-type(2) {
+  color: var(--ok);
+}
+
+.proj-bar {
+  color: var(--warn);
+  transition: var(--transition-ui);
+}
+
+.proj-bar:hover {
+  color: #ffe1a0;
+  text-shadow: 0 0 16px rgba(var(--rgb-amber), 0.22);
+}
+
+.btn,
+.iconbtn,
+.sm,
+.tg,
+.qb,
+.tl,
+.ib,
+.fold,
+.pj-help {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn,
+.iconbtn,
+.sm,
+.tl,
+.qb,
+.ib,
+.tg {
+  border-color: var(--edge-soft);
+  background-image: var(--gradient-glass);
+  transition: var(--transition-ui);
+}
+
+.btn:hover,
+.iconbtn:hover,
+.sm:hover,
+.tl:hover,
+.qb:hover,
+.ib:hover,
+.tg:hover {
+  border-color: var(--edge-accent);
+  box-shadow:
+    0 0 0 1px rgba(var(--rgb-cyan), 0.06),
+    var(--shadow-soft);
+}
+
+.btn:active,
+.iconbtn:active,
+.sm:active,
+.tl:active,
+.qb:active,
+.ib:active,
+.tg:active {
+  transform: translateY(1px);
+}
+
+.btn.hero,
+.tl.primary,
+.sm.primary {
+  border-color: var(--edge-accent);
+  background-color: var(--accent);
+  background-image: var(--gradient-accent);
+  color: var(--bg);
+  box-shadow:
+    0 8px 24px rgba(var(--rgb-cyan), 0.19),
+    inset 0 1px 0 rgba(var(--rgb-white), 0.48);
+}
+
+.btn.hero:hover,
+.tl.primary:hover,
+.sm.primary:hover {
+  border-color: var(--edge-highlight);
+  background-image: var(--gradient-accent-hover);
+  box-shadow:
+    0 10px 30px rgba(var(--rgb-cyan), 0.28),
+    inset 0 1px 0 rgba(var(--rgb-white), 0.56);
+}
+
+.btn.green,
+.tl.green,
+.sm.ok {
+  border-color: var(--edge-success);
+  background-color: var(--tint-green);
+  color: #baf7df;
+}
+
+.btn.cyan,
+.tl.cyan,
+.qb.cyan {
+  border-color: rgba(var(--rgb-cyan), 0.34);
+  background-color: rgba(var(--rgb-cyan), 0.12);
+  color: #c5f8ff;
+}
+
+.btn:disabled,
+.iconbtn:disabled {
+  filter: saturate(0.55);
+}
+
+.tg.on {
+  border-color: var(--edge-accent-strong);
+  background: var(--tint-cyan-active);
+  color: #c9faff;
+  box-shadow:
+    inset 0 1px 0 rgba(var(--rgb-white), 0.10),
+    0 0 18px rgba(var(--rgb-cyan), 0.14);
+}
+
+.qb.red,
+.sm.danger {
+  border-color: var(--edge-danger);
+  background-color: var(--tint-rose);
+  color: #ffd0da;
+}
+
+.qb.warn,
+.tl.warn {
+  border-color: var(--edge-warning);
+  background-color: var(--tint-amber);
+  color: #ffe6aa;
+}
+
+.ov {
+  background: var(--surface-overlay);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  backdrop-filter: blur(12px) saturate(120%);
+}
+
+.panel {
+  border-color: var(--edge-default);
+  background: var(--gradient-panel), var(--surface-panel);
+  box-shadow:
+    var(--shadow-panel),
+    inset 0 1px 0 rgba(var(--rgb-white), 0.09);
+}
+
+.ph {
+  border-bottom: var(--border-subtle);
+}
+
+.ph h2 {
+  color: var(--text);
+  letter-spacing: 0.015em;
+}
+
+.acc,
+.card,
+.bk,
+.hs,
+.pj,
+.psel-item,
+.log details {
+  border-color: var(--edge-soft);
+  background: var(--gradient-glass), var(--surface-card);
+  transition: var(--transition-ui);
+}
+
+.acc[open],
+.pj.on,
+.psel-item.on {
+  border-color: var(--edge-accent);
+  box-shadow:
+    inset 0 1px 0 rgba(var(--rgb-white), 0.06),
+    var(--glow-cyan);
+}
+
+.acc > summary {
+  color: var(--text);
+}
+
+.acc > summary .ic,
+.acc[open] > summary .ic {
+  color: var(--accent);
+}
+
+.acc > summary::after {
+  color: var(--dim);
+}
+
+.note {
+  border-color: var(--edge-soft);
+  background: rgba(var(--rgb-navy), 0.46);
+}
+
+.note.warn {
+  border-color: var(--edge-warning);
+  background: var(--tint-amber);
+  color: #ffdf91;
+}
+
+.note.err {
+  border-color: var(--edge-danger);
+  background: var(--tint-rose);
+  color: #ffb8c6;
+}
+
+.note.okk {
+  border-color: var(--edge-success);
+  background: var(--tint-green);
+  color: #aaf0d1;
+}
+
+input[type="search"],
+#ask-input,
+.ta {
+  border-color: var(--edge-default);
+  background: var(--surface-input);
+  transition: var(--transition-ui);
+}
+
+input[type="search"]:focus,
+#ask-input:focus,
+.ta:focus {
+  border-color: var(--edge-accent);
+  box-shadow: var(--focus-ring);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--dim);
+}
+
+.bk.nest {
+  border-left-color: rgba(var(--rgb-cyan), 0.54);
+}
+
+.chipc {
+  border-color: var(--edge-soft);
+  background: rgba(var(--rgb-white), 0.055);
+}
+
+.pj-main:active,
+.psel-item:active {
+  background-color: var(--tint-cyan);
+}
+
+.pj-more {
+  color: var(--dim);
+  transition: var(--transition-ui);
+}
+
+.pj-more[aria-expanded="true"] {
+  color: var(--accent);
+}
+
+.bdg.bd-act {
+  background: var(--gradient-accent);
+}
+
+.notif {
+  border-color: var(--edge-default);
+  background: var(--surface-notification);
+  box-shadow: var(--shadow-glass);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.sig {
+  color: var(--dim);
+  letter-spacing: 0.08em;
+}
+
+::selection {
+  background: rgba(var(--rgb-cyan), 0.24);
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 99px;
+  background: rgba(var(--rgb-bluegray), 0.30);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--rgb-cyan), 0.42);
+  background-clip: padding-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 .glass { background: var(--glass); border: 1px solid var(--edge); border-top-color: rgba(34, 211, 238, .30); border-radius: 16px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .08); }
@@ -231,6 +718,43 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
   min-width: 0;
   min-height: 0;
 }
+/* Inversion : le rendu passe au centre, le code à droite */
+@media (min-width: 1100px) {
+  .workspace.flipped {
+    grid-template-columns: minmax(230px, 260px) minmax(340px, var(--test-pane-width, 420px)) minmax(320px, 1fr);
+  }
+  .workspace.flipped > .editor-column { order: 3; }
+  .workspace.flipped > #tdlg { order: 2; }
+  .workspace.flipped > #tdlg::before {
+    left: auto;
+    right: -8px;
+  }
+  .workspace.flipped > #tdlg:hover::before {
+    background: linear-gradient(
+      to left,
+      transparent 6px,
+      rgba(232, 184, 76, .45) 7px,
+      rgba(232, 184, 76, .45) 9px,
+      transparent 10px
+    );
+  }
+}
+/* Bouton d'inversion code ⇄ rendu : visible uniquement sur la mise en page PC (>= 1100px) */
+#b-flip { display: none; }
+@media (min-width: 1100px) {
+  #b-flip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+  }
+  #b-flip[aria-pressed="true"] {
+    color: #c9faff;
+    border-color: rgba(34, 211, 238, .55);
+    background: rgba(34, 211, 238, .14);
+  }
+}
 @media (min-width: 1100px) {
   .app {
     width: 100%;
@@ -413,6 +937,62 @@ html, body { height: 100%; margin: 0; color: var(--text); color-scheme: dark;
 #hl { position: absolute; inset: 6px; margin: 0; padding: 8px; overflow: hidden; pointer-events: none;
   font-family: var(--mono); font-size: var(--cfs, 12px); line-height: var(--clh, 18px); white-space: pre; tab-size: 2; letter-spacing: normal; color: var(--text); -webkit-text-size-adjust: 100%; }
 #hl-in { will-change: transform; }
+/* Barre de recherche du code : s'ajoute au-dessus de l'éditeur */
+.code-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  padding: 5px 8px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: var(--glass);
+  border: 1px solid var(--edge);
+}
+#code-q {
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  height: 30px;
+  padding: 0 6px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  outline: 0;
+}
+#code-q::placeholder { color: var(--dim); }
+#code-q:focus { border: 0; box-shadow: none; outline: 0; }
+.code-search .iconbtn {
+  flex: none;
+  height: 30px;
+  min-width: 30px;
+  padding: 0 6px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+.code-q-count {
+  flex: none;
+  min-width: 40px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+.code-q-count:empty { display: none; }
+#code-q-x { display: none; }
+.code-search.has-q #code-q-x { display: inline-flex; }
+/* Surlignage des mots trouvés par la recherche dans le code */
+.code-hl {
+  background: rgba(251, 191, 36, .22);
+  color: inherit;
+  border-radius: 2px;
+}
+.code-hl.cur {
+  background: rgba(34, 211, 238, .42);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, .6);
+}
 #src.hl-on { position: relative; z-index: 1; color: transparent; caret-color: var(--text); -webkit-text-size-adjust: 100%; }
 #src.hl-on::selection { background: rgba(34, 211, 238, .30); }
 .hl-c { color: #6a9955; }
@@ -693,14 +1273,68 @@ label.chk input { width: 18px; height: 18px; }
 .sm,
 .tl,
 .qb {
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
-  text-align: center;
-  line-height: 1.2;
+  position: relative;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 160ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    background-color 160ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    border-color 160ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    box-shadow 160ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    transform 160ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.btn:not(:disabled):not([aria-disabled="true"]):hover,
+.sm:not(:disabled):not([aria-disabled="true"]):hover,
+.tl:not(:disabled):not([aria-disabled="true"]):hover,
+.qb:not(:disabled):not([aria-disabled="true"]):hover {
+  border-color: var(--edge-accent);
+  box-shadow:
+    0 8px 22px rgba(var(--rgb-black), 0.24),
+    0 0 0 1px rgba(var(--rgb-cyan), 0.08);
+  transform: translateY(-1px);
+}
+
+.btn:focus-visible,
+.sm:focus-visible,
+.tl:focus-visible,
+.qb:focus-visible {
+  z-index: 1;
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px rgba(var(--rgb-cyan), 0.13);
+}
+
+.btn:not(:disabled):not([aria-disabled="true"]):active,
+.sm:not(:disabled):not([aria-disabled="true"]):active,
+.tl:not(:disabled):not([aria-disabled="true"]):active,
+.qb:not(:disabled):not([aria-disabled="true"]):active {
+  box-shadow: inset 0 2px 5px rgba(var(--rgb-black), 0.24);
+  transform: translateY(1px) scale(0.985);
+}
+
+.btn:disabled,
+.sm:disabled,
+.tl:disabled,
+.qb:disabled,
+.btn[aria-disabled="true"],
+.sm[aria-disabled="true"],
+.tl[aria-disabled="true"],
+.qb[aria-disabled="true"] {
+  cursor: not-allowed;
+  filter: saturate(0.45);
+  opacity: 0.58;
+  box-shadow: none;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .sm,
+  .tl,
+  .qb {
+    transition: none;
+  }
 }
 
 .btn.hero {
@@ -737,6 +1371,84 @@ label.chk input { width: 18px; height: 18px; }
 .tl.primary { background: var(--accent); border-color: rgba(255, 255, 255, .28); color: #021014;
   box-shadow: 0 0 18px rgba(34, 211, 238, .30), inset 0 1px 0 rgba(255, 255, 255, .40); }
 .tl-grid.c3 .tl { flex-direction: column; gap: 4px; min-height: 60px; padding: 6px 4px; font-size: 12px; }
+/* Modale de découpe : centrée à l'écran, boutons de nombre tout petits, recherche */
+#splitdlg { align-items: center; padding: 16px; z-index: 90; }
+#splitdlg .panel {
+  max-width: 480px;
+  border-radius: 22px;
+  border-bottom: 1px solid var(--edge);
+  padding-bottom: 0;
+}
+#splitdlg .pb {
+  padding: 4px 18px 18px;
+}
+#splitdlg .note {
+  margin: 4px 0 12px;
+  line-height: 1.45;
+}
+#split-counts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 2px 0 12px;
+  padding: 8px 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .035);
+  border: 1px solid rgba(255, 255, 255, .06);
+}
+#split-counts .tl {
+  flex: 0 0 auto;
+  min-width: 36px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 9px;
+  letter-spacing: .02em;
+}
+#split-counts .tl.primary {
+  box-shadow: 0 0 16px rgba(34, 211, 238, .28), inset 0 1px 0 rgba(255, 255, 255, .4);
+}
+#splitdlg .btools {
+  margin: 0 0 10px;
+}
+#split-q {
+  height: 36px;
+  font-size: 13px;
+  border-radius: 11px;
+  padding: 0 12px;
+}
+#split-result .status {
+  margin: 4px 2px 8px;
+  font-size: 12.5px;
+  color: var(--dim);
+}
+#split-result .tl-grid {
+  gap: 6px;
+}
+#split-result .tl {
+  min-height: 44px;
+  padding: 6px 8px;
+  font-size: 12.5px;
+  border-radius: 11px;
+  flex-direction: column;
+  gap: 2px;
+}
+#split-result .tl small {
+  font-size: 10.5px;
+  letter-spacing: .02em;
+}
+#split-result .tl.hit {
+  border-color: rgba(52, 211, 153, .55);
+  background: rgba(52, 211, 153, .18);
+  color: #c2f5e0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 0 14px rgba(52, 211, 153, .18);
+}
+#split-result .tl.hit:active {
+  background: rgba(52, 211, 153, .28);
+}
 .sec { margin: 16px 2px 8px; font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--dim); }
 /* Interrupteurs : la case à cocher d'origine (mêmes id) est habillée en switch */
 .sw { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 6px 2px; border-top: 1px solid rgba(255, 255, 255, .06);
@@ -982,11 +1694,11 @@ label.chk input { width: 18px; height: 18px; }
 
   <main class="workspace">
     <aside class="left-rail">
-      <div class="meta">
-        <div class="glass chip" id="stats"></div>
-        <button class="glass lvl" id="b-level-open" type="button" style="text-align:left;cursor:pointer">Découpage : <b id="level-cur">2</b></button>
-        <button class="iconbtn" id="b-clear" aria-label="Vider le code"><svg class="ic"><use href="#i-trash"/></svg></button>
-      </div>
+<div class="meta">
+  <div class="glass chip" id="stats"></div>
+  <button class="glass lvl" id="b-level-open" type="button" style="text-align:left;cursor:pointer"><span id="level-label">Découpage : </span><b id="level-cur">2</b></button>
+  <button class="iconbtn" id="b-clear" aria-label="Vider le code"><svg class="ic"><use href="#i-trash"/></svg></button>
+</div>
 
       <div class="toggles">
         <button class="tg" id="tg-snd" aria-pressed="false" title="Sons des boutons">♪</button>
@@ -1045,14 +1757,23 @@ label.chk input { width: 18px; height: 18px; }
     </aside>
 
     <section class="editor-column">
-      <section class="glass code">
-        <pre id="hl" aria-hidden="true"><div id="hl-in"></div></pre>
-        <textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Collez votre code HTML ici…"></textarea>
-        <div class="fsz">
-          <button class="iconbtn" id="b-fs-dn" aria-label="Réduire le texte">A−</button>
-          <button class="iconbtn" id="b-fs-up" aria-label="Agrandir le texte">A+</button>
-        </div>
-      </section>
+<div class="code-search" id="code-search">
+  <svg class="ic" style="width:15px;height:15px;opacity:.6;flex:none" aria-hidden="true"><use href="#i-goto"/></svg>
+  <input type="search" id="code-q" placeholder="Rechercher dans le code…" autocomplete="off" spellcheck="false">
+  <span id="code-q-count" class="code-q-count" aria-live="polite"></span>
+  <button class="iconbtn" id="code-q-prev" aria-label="Occurrence précédente" title="Précédent (Maj+Entrée)">↑</button>
+  <button class="iconbtn" id="code-q-next" aria-label="Occurrence suivante" title="Suivant (Entrée)">↓</button>
+  <button class="iconbtn" id="code-q-x" aria-label="Effacer la recherche" title="Effacer">×</button>
+</div>
+<section class="glass code">
+  <pre id="hl" aria-hidden="true"><div id="hl-in"></div></pre>
+  <textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Collez votre code HTML ici…"></textarea>
+  <div class="fsz">
+    <button class="iconbtn" id="b-fs-dn" aria-label="Réduire le texte">A−</button>
+    <button class="iconbtn" id="b-fs-up" aria-label="Agrandir le texte">A+</button>
+    <button class="iconbtn" id="b-flip" aria-label="Inverser code et rendu" title="Inverser code et rendu" aria-pressed="false">⇄</button>
+  </div>
+</section>
     </section>
 
 <section class="glass tpane" id="tdlg">
@@ -1291,6 +2012,19 @@ label.chk input { width: 18px; height: 18px; }
     </div>
   </div>
 </div>
+</div>
+<div class="ov" id="splitdlg">
+  <div class="panel">
+    <div class="ph"><h2>Découper le code balisé</h2><button class="iconbtn" id="splitdlg-x" aria-label="Fermer"><svg class="ic"><use href="#i-x"/></svg></button></div>
+    <div class="pb">
+      <div class="note">Choisissez le nombre de parties. Le découpage respecte toujours les blocs complets : aucun bloc n'est coupé.</div>
+      <div id="split-counts"></div>
+      <div class="btools">
+        <input type="search" id="split-q" placeholder="Rechercher un mot dans les parties…" autocomplete="off">
+      </div>
+      <div id="split-result"></div>
+    </div>
+  </div>
 </div>
 <div class="ov" id="levelsel">
   <div class="panel">
@@ -3118,7 +3852,6 @@ function notify(msg, o) {
   return el;
 }
 
-const toast = (msg, kind) => notify(msg, { kind });
 
 /* ---------- Feuilles (overlays) ---------- */
 const isOpen = id => $(id).classList.contains('open');
@@ -3348,6 +4081,7 @@ function pushHistory(label) {
 
 function setText(v) {
   $('src').value = v;
+  if ($('code-q') && $('code-q').value) codeSearchUpdate(false);
   refresh();
   save();
 }
@@ -3382,14 +4116,15 @@ $('nb').textContent = pm.blocks.length ? String(pm.blocks.length) : '';
 highlight();
   $('stats').innerHTML = !text ? 'Vide'
     : '<b>' + lines + '</b> l · ' + (pm.blocks.length ? '<b>' + pm.blocks.length + '</b> blocs' : 'non balisé');
-  $('b-undo-top').disabled = !hist.length;
-  $('b-redo-top').disabled = !redoStack.length;
-  syncMainBtn(pm.blocks.length);
-  syncToggles();
-  const sig = pm.errors.slice(0, 3).join(' · ');
-  if (sig && sig !== lastMarkErr) notify('Marqueurs incohérents : ' + sig, { kind: 'warn', key: 'marks', ms: 0 });
-  if (!sig) dismissKey('marks');
-  lastMarkErr = sig;
+$('b-undo-top').disabled = !hist.length;
+$('b-redo-top').disabled = !redoStack.length;
+$('level-label').style.display = pm.blocks.length ? 'none' : '';
+syncMainBtn(pm.blocks.length);
+syncToggles();
+const sig = pm.errors.slice(0, 3).join(' · ');
+if (sig && sig !== lastMarkErr) notify('Marqueurs incohérents : ' + sig, { kind: 'warn', key: 'marks', ms: 0 });
+if (!sig) dismissKey('marks');
+lastMarkErr = sig;
   /* Les listes ne sont dessinées que si le panneau Avancé est ouvert (elles sont redessinées à son ouverture) */
   if (isOpen('adv')) {
     renderBlocks(pm);
@@ -3640,13 +4375,6 @@ function copyChanged() {
   copyText(msg, 'Mise à jour copiée ✓ — collez-la à l\'IA');
 }
 
-async function pasteCode() {
-  const t = await readClip();
-  if (t === null) return;
-  pushHistory('Avant collage');
-  setText(t);
-  notify('Collé ✓ · ' + t.split('\n').length + ' lignes', { kind: 'ok' });
-}
 
 async function pasteAndApply() {
   if (!parseMarks($('src').value).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'err' }); return; }
@@ -4005,7 +4733,7 @@ function openBlockDlg(mode, name) {
   const hit = findBlock(blocks, name);
   if (!hit) { notify('Bloc introuvable', { kind: 'err' }); return; }
   const b = hit.block;
-  dlgMode = mode; dlgName = b.name;
+  dlgName = b.name;
   $('dlg-title').textContent = (mode === 'view' ? 'Bloc : ' : 'Remplacer : ') + b.name;
   const ta = $('dlg-text');
   ta.readOnly = mode === 'view';
@@ -4054,7 +4782,7 @@ function download(name, text) {
 }
 
 /* ---------- Test d'exécution ---------- */
-let testErrors = [], testListener = null, testWarned = false;
+let testErrors = [], testListener = null;
 
 const PROBE = '<script>(function(){var P=function(o){try{parent.postMessage({blocsProbe:o},"*")}catch(e){}};' +
   'window.addEventListener("error",function(e){P({m:String(e.message),l:e.lineno})});' +
@@ -4422,12 +5150,13 @@ function enableWorkspaceResize() {
     if (window.innerWidth < 1100 || event.button !== 0) return;
 
     const rect = testPane.getBoundingClientRect();
-    const distanceFromLeft = event.clientX - rect.left;
+    const flipped = workspace.classList.contains('flipped');
+    const distanceFromEdge = flipped ? (rect.right - event.clientX) : (event.clientX - rect.left);
 
     if (
       !testPane.contains(event.target) ||
-      distanceFromLeft < -2 ||
-      distanceFromLeft > 14
+      distanceFromEdge < -2 ||
+      distanceFromEdge > 14
     ) return;
 
     event.preventDefault();
@@ -4445,9 +5174,11 @@ function enableWorkspaceResize() {
 
     const availableWidth = workspace.clientWidth - 260 - 320 - 32;
     const maxWidth = Math.max(310, Math.min(700, availableWidth));
+    const flipped = workspace.classList.contains('flipped');
+    const delta = flipped ? (event.clientX - startX) : (startX - event.clientX);
     const newWidth = Math.max(
       310,
-      Math.min(maxWidth, startWidth + startX - event.clientX)
+      Math.min(maxWidth, startWidth + delta)
     );
 
     workspace.style.setProperty('--test-pane-width', `${newWidth}px`);
@@ -4480,6 +5211,22 @@ $('b-share-sel').onclick = () => shareVia(copyPicked);
 $('t-share').onclick = () => shareVia(() => copyText(testMessage(), 'Message copié ✓'));
 $('b-fold-all').onclick = () => foldAll(true);
 $('b-unfold-all').onclick = () => foldAll(false);
+/* Inversion code ⇄ rendu : état mémorisé, bouton dans .fsz */
+(function () {
+  const ws = document.querySelector('.workspace');
+  const btn = document.getElementById('b-flip');
+  if (!ws || !btn) return;
+  let on = false;
+  try { on = localStorage.getItem('blocs.flip') === '1'; } catch (e) { /* stockage indisponible */ }
+  ws.classList.toggle('flipped', on);
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  btn.onclick = () => {
+    ws.classList.toggle('flipped');
+    const now = ws.classList.contains('flipped');
+    btn.setAttribute('aria-pressed', now ? 'true' : 'false');
+    try { localStorage.setItem('blocs.flip', now ? '1' : '0'); } catch (e) { /* stockage indisponible */ }
+  };
+})();
 $('blist').addEventListener('click', e => {
   const f = e.target.closest('button[data-f]');
   if (!f) return;
@@ -4489,13 +5236,297 @@ $('blist').addEventListener('click', e => {
 });
 /* Synchronisation de l'IA : bouton (Avancé › Outils) et mémorisation de l'envoi « Copier balisé » */
 $('b-sync').onclick = copyChanged;
-/* Raccourcis carrés (Avancé › Outils) */
+/* Raccourcis carrés (Avancé › Outils) — appui long : découper le code balisé */
 $('qb-marked').onclick = () => {
+  if (qbLongFired) { qbLongFired = false; return; }
   const v = $('src').value;
   if (!parseMarks(v).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'err' }); return; }
   snapMark(v);
   copyText(v, 'Code balisé copié ✓');
 };
+let qbLongT = null, qbLongFired = false;
+let splitText = '', splitChoice = 0, splitParts = null, splitQuery = '';
+let codeSearchMatches = [], codeSearchIdx = -1;
+let codeSearchHL = '';        // mot recherché actuellement surligné ('' = aucun)
+/* Découpe un code balisé en n parties contiguës, sans jamais couper un bloc.
+   Le découpage se fait uniquement entre les blocs de premier niveau. */
+function splitTagged(text, n) {
+  const pm = parseMarks(text);
+  if (!pm.blocks.length) return null;
+  const tops = topBlocks(pm.blocks);
+  if (!tops.length) return null;
+  const count = Math.min(n, tops.length);
+  if (count <= 1) return [text];
+  const w = tops.map(b => b.outerEnd - b.outerStart);
+  const total = w.reduce((a, b) => a + b, 0);
+  const prefix = [];
+  let acc = 0;
+  for (const x of w) { acc += x; prefix.push(acc); }
+  const cuts = [0];
+  for (let k = 1; k < count; k++) {
+    const t = total * k / count;
+    let idx = prefix.findIndex(v => v >= t);
+    if (idx < 0) idx = tops.length - 1;
+    const last = cuts[cuts.length - 1];
+    const minC = last + 1;
+    const maxC = tops.length - (count - k);
+    const c = Math.max(minC, Math.min(maxC, idx + 1));
+    cuts.push(c);
+  }
+  cuts.push(tops.length);
+  const parts = [];
+  for (let k = 0; k < cuts.length - 1; k++) {
+    const a = k === 0 ? 0 : tops[cuts[k]].outerStart;
+    const b = k === cuts.length - 2 ? text.length : tops[cuts[k + 1]].outerStart;
+    parts.push(text.slice(a, b));
+  }
+  return parts;
+}
+function renderSplitCounts() {
+  const nums = [2, 3, 6, 10, 15, 20];
+  $('split-counts').innerHTML = nums.map(n =>
+    '<button class="tl' + (n === splitChoice ? ' primary' : '') + '" data-n="' + n + '">' + n + '</button>'
+  ).join('');
+}
+function renderSplitParts() {
+  const box = $('split-result');
+  if (!box) return;
+  if (!splitParts) { box.innerHTML = ''; return; }
+  const note = splitParts.length < splitChoice
+    ? '<div class="note warn">Seulement ' + splitParts.length + ' partie(s) possible(s) : il n\'y a pas assez de blocs de premier niveau pour en faire ' + splitChoice + ' sans couper un bloc.</div>'
+    : '';
+  const q = splitQuery.trim().toLowerCase();
+  box.innerHTML = note +
+    '<div class="status">' + splitParts.length + ' partie(s) — touchez une partie pour la copier</div>' +
+    '<div class="tl-grid c3">' +
+    splitParts.map((p, i) => {
+      const l = p.split('\n').length;
+      const hit = q && p.toLowerCase().includes(q);
+      return '<button class="tl' + (hit ? ' hit' : '') + '" data-i="' + i + '"><span>Partie ' + (i + 1) + '</span><small style="opacity:.65;font-weight:400">' + l + ' l.</small></button>';
+    }).join('') + '</div>';
+}
+function openSplitDlg() {
+  const v = $('src').value;
+  if (!parseMarks(v).blocks.length) {
+    notify('Code non balisé : touchez « Analyser »', { kind: 'err' });
+    return;
+  }
+  /* Le choix, les parties et la recherche restent mémorisés tant que le code balisé n'a pas changé */
+  if (splitText !== v) {
+    splitText = v;
+    splitChoice = 0;
+    splitParts = null;
+    splitQuery = '';
+    const q = $('split-q');
+    if (q) q.value = '';
+  }
+  renderSplitCounts();
+  renderSplitParts();
+  openOv('splitdlg');
+}
+function codeSearchUpdate(jump) {
+  if (jump === undefined) jump = true;
+  const input = $('code-q');
+  if (!input) return;
+  const ta = $('src');
+  const q = input.value;
+  const wrap = input.closest('.code-search');
+  if (wrap) wrap.classList.toggle('has-q', !!q);
+  const cnt = $('code-q-count');
+  if (!q) {
+    codeSearchMatches = [];
+    codeSearchIdx = -1;
+    cnt.textContent = '';
+    codeSearchHL = '';
+    codeSearchHighlight();
+    return;
+  }
+  const lower = ta.value.toLowerCase();
+  const ql = q.toLowerCase();
+  const m = [];
+  let i = 0;
+  while ((i = lower.indexOf(ql, i)) !== -1) {
+    m.push(i);
+    i += ql.length;
+  }
+  codeSearchMatches = m;
+  if (!m.length) {
+    codeSearchIdx = -1;
+    cnt.textContent = '0';
+    codeSearchHL = '';
+    codeSearchHighlight();
+    return;
+  }
+  if (codeSearchIdx < 0 || codeSearchIdx >= m.length) codeSearchIdx = 0;
+  codeSearchHL = q;
+  codeSearchHighlight();
+  if (jump) codeSearchGo(codeSearchIdx);
+  else cnt.textContent = (codeSearchIdx + 1) + '/' + m.length;
+}
+function codeSearchGo(idx) {
+  const m = codeSearchMatches;
+  if (!m.length) { $('code-q-count').textContent = '0'; return; }
+  if (idx < 0) idx = m.length - 1;
+  if (idx >= m.length) idx = 0;
+  codeSearchIdx = idx;
+  const ta = $('src');
+  const q = $('code-q').value;
+  ta.setSelectionRange(m[idx], m[idx] + q.length);
+  const line = ta.value.slice(0, m[idx]).split('\n').length - 1;
+  const lh = codeFs * 1.5;
+  ta.scrollTop = Math.max(0, line * lh - ta.clientHeight / 2 + lh / 2);
+  $('code-q-count').textContent = (idx + 1) + '/' + m.length;
+}
+/* Surligne dans la couche #hl toutes les occurrences du mot recherché (et l'occurrence courante en plus fort) */
+function codeSearchHighlight() {
+  const q = codeSearchHL;
+  const ta = $('src');
+  const inner = $('hl-in');
+  if (!hlOn || !inner) return;
+  if (!q) {
+    if (hlLines.length) { hlPaint(true); }
+    return;
+  }
+  /* On repart de la version colorée du texte puis on encadre les occurrences */
+  if (ta.value !== hlLast) {
+    hlLast = null;
+    highlight();
+    if (!hlLines.length) return;
+  }
+  const v = ta.value;
+  const lower = v.toLowerCase();
+  const ql = q.toLowerCase();
+  const LH = codeFs * 1.5;
+  const vFirst = Math.floor(ta.scrollTop / LH);
+  const vLast = Math.ceil((ta.scrollTop + ta.clientHeight) / LH);
+  const margin = 40;
+  const n = hlLines.length;
+  const a = Math.max(0, vFirst - margin), b = Math.min(n, vLast + margin);
+  hlWin = [a, b];
+  /* Occurences dont le début tombe dans la fenêtre visible (en lignes) */
+  const pos = [];
+  let i = 0;
+  while ((i = lower.indexOf(ql, i)) !== -1) { pos.push(i); i += ql.length; }
+  /* Découpe [start,end] en lignes */
+  const lineStarts = [0];
+  for (let k = 0; k < v.length; k++) if (v[k] === '\n') lineStarts.push(k + 1);
+  const curPos = codeSearchMatches[codeSearchIdx];
+  /* Pour chaque occurrence, on encadre via un repérage sur le texte reconstitué */
+  const segs = [];
+  let lastPos = 0;
+  for (const p of pos) {
+    if (p < lineStarts[a]) continue;
+    if (p >= (lineStarts[b] || v.length)) break;
+    segs.push([p, p + ql.length, p === curPos]);
+  }
+  if (!segs.length) {
+    inner.innerHTML = hlLines.slice(a, b).join('\n');
+  } else {
+    /* On reconstruit la zone visible à partir du texte, coloration JS/HTML remplacée par un simple fond */
+    let html = '';
+    let last = lineStarts[a];
+    const end = lineStarts[b] || v.length;
+    for (const [s, e, cur] of segs) {
+      if (s < last) continue;
+      html += hlEsc(v.slice(last, s));
+      html += '<mark class="code-hl' + (cur ? ' cur' : '') + '">' + hlEsc(v.slice(s, Math.min(e, end))) + '</mark>';
+      last = Math.min(e, end);
+    }
+    html += hlEsc(v.slice(last, end));
+    inner.innerHTML = hlSplit(html).join('\n');
+  }
+  inner.style.transform = 'translate(' + (-ta.scrollLeft) + 'px,' + (hlWin[0] * LH - ta.scrollTop) + 'px)';
+}
+function codeSearchNext() {
+  if (!codeSearchMatches.length) return;
+  codeSearchGo((codeSearchIdx + 1) % codeSearchMatches.length);
+}
+function codeSearchPrev() {
+  if (!codeSearchMatches.length) return;
+  codeSearchGo((codeSearchIdx - 1 + codeSearchMatches.length) % codeSearchMatches.length);
+}
+function codeSearchClear() {
+  const input = $('code-q');
+  if (!input) return;
+  input.value = '';
+  codeSearchUpdate(false);
+  input.focus();
+}
+$('split-q').addEventListener('input', () => {
+  splitQuery = $('split-q').value;
+  renderSplitParts();
+});
+/* Appui long sur « Bal » : ouvre la découpe du code balisé (le clic simple continue de copier) */
+$('qb-marked').addEventListener('contextmenu', e => e.preventDefault());
+$('qb-marked').addEventListener('pointerdown', e => {
+  if (e.button !== undefined && e.button !== 0) return;
+  clearTimeout(qbLongT);
+  qbLongFired = false;
+  const x0 = e.clientX, y0 = e.clientY;
+  const el = $('qb-marked');
+  const cleanup = () => {
+    el.removeEventListener('pointermove', onMove);
+    el.removeEventListener('pointerup', cleanup);
+    el.removeEventListener('pointercancel', cleanup);
+  };
+  const onMove = ev => {
+    if (Math.abs(ev.clientX - x0) > 10 || Math.abs(ev.clientY - y0) > 10) {
+      clearTimeout(qbLongT);
+      cleanup();
+    }
+  };
+  el.addEventListener('pointermove', onMove);
+  el.addEventListener('pointerup', cleanup);
+  el.addEventListener('pointercancel', cleanup);
+  qbLongT = setTimeout(() => {
+    qbLongFired = true;
+    cleanup();
+    buzz(20);
+    openSplitDlg();
+    setTimeout(() => { qbLongFired = false; }, 800);
+  }, 500);
+});
+$('splitdlg-x').onclick = () => closeOv('splitdlg');
+$('splitdlg').addEventListener('click', e => {
+  const nb = e.target.closest('button[data-n]');
+  if (nb) {
+    splitChoice = +nb.dataset.n;
+    splitParts = splitTagged(splitText, splitChoice);
+    renderSplitCounts();
+    renderSplitParts();
+    buzz(8);
+    return;
+  }
+  const pb = e.target.closest('button[data-i]');
+  if (pb) {
+    const i = +pb.dataset.i;
+    if (splitParts && splitParts[i] != null) {
+      copyText(splitParts[i], 'Partie ' + (i + 1) + ' copiée ✓');
+      buzz(10);
+    }
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && isOpen('splitdlg')) closeOv('splitdlg');
+});
+$('code-q').addEventListener('input', () => codeSearchUpdate(true));
+$('code-q').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (e.shiftKey) codeSearchPrev(); else codeSearchNext();
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    codeSearchClear();
+  }
+});
+$('code-q-next').onclick = codeSearchNext;
+$('code-q-prev').onclick = codeSearchPrev;
+$('code-q-x').onclick = codeSearchClear;
+/* Recherche : rester synchro quand le code change à la frappe */
+$('src').addEventListener('input', () => {
+  const q = $('code-q');
+  if (q && q.value) codeSearchUpdate(false);
+});
 $('qb-prompt').onclick = () => copyText(PROMPT_TEXT, 'Prompt copié ✓');
 $('qb-all').onclick = () => copyAllForAI();
 $('qb-proj').onclick = () => { closeOv('adv'); renderCloudDialog(); openOv('clouddlg'); };
