@@ -1254,6 +1254,10 @@ label.chk input { width: 18px; height: 18px; }
 .qb.red { background: rgba(255, 107, 122, .13); border-color: rgba(255, 107, 122, .45); color: #ffc4c4; }
 .qb.green { background: rgba(52, 211, 153, .13); border-color: rgba(52, 211, 153, .42); color: #c2f5e0; }
 .qb.warn { background: rgba(251, 191, 36, .13); border-color: rgba(251, 191, 36, .45); color: #fde8b0; }
+/* Raccourci Prompt : deux choix qui se déploient au-dessus du bouton */
+.qb-pop { position: fixed; z-index: 60; display: flex; flex-direction: column; gap: 6px; }
+.qb-pop .qb { flex: none; width: 100%; min-height: 50px; }
+#qb-prompt[aria-expanded="true"] { border-color: var(--edge-accent); box-shadow: 0 0 0 1px rgba(var(--rgb-cyan), 0.2), var(--shadow-soft); }
 .empty { color: var(--dim); text-align: center; padding: 26px 10px; font-size: 14px; }
 /* ---------- Avancé : sections, tuiles, interrupteurs, lignes compactes ---------- */
 .acc > summary .ic { width: 20px; height: 20px; flex: none; color: var(--accent); }
@@ -1449,15 +1453,17 @@ label.chk input { width: 18px; height: 18px; }
 #split-result .tl.hit:active {
   background: rgba(52, 211, 153, .28);
 }
-/* Onglets de la modale de découpe (Parties / Blocs) et recherche par blocs */
+/* Onglets de la modale de découpe (Parties / Blocs / Entre) */
 #splitdlg [hidden] { display: none !important; }
-#split-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0 0 12px; }
+#split-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 12px; }
 #split-tabs .tl { min-height: 38px; padding: 6px 10px; font-size: 13px; border-radius: 11px; }
 #blk-q { height: 36px; font-size: 13px; border-radius: 11px; padding: 0 12px; }
 #splitdlg .btools { flex-wrap: wrap; }
 #splitdlg .btools .sw.mini { flex: 0 0 auto; }
 .blk-snip { margin: 2px 0 0 2px; font: 11.5px/1.4 var(--mono); color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .blk-snip .code-hl { color: var(--text); }
+.btw-inputs { display: grid; gap: 6px; margin: 0 0 8px; }
+#btw-a, #btw-b { height: 36px; font-size: 13px; border-radius: 11px; padding: 0 12px; font-family: var(--mono); }
 .sec { margin: 16px 2px 8px; font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--dim); }
 /* Interrupteurs : la case à cocher d'origine (mêmes id) est habillée en switch */
 .sw { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 6px 2px; border-top: 1px solid rgba(255, 255, 255, .06);
@@ -1558,6 +1564,30 @@ label.chk input { width: 18px; height: 18px; }
 .vr-t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .vr-t span { color: var(--dim); }
 .vr .sm { height: 30px; padding: 0 10px; font-size: 12px; }
+/* Modale Projets : éléments plus compacts, deux colonnes sur grand écran */
+#clouddlg .pb { padding: 2px 10px 12px; }
+#clouddlg .note { margin: 4px 0; padding: 6px 10px; font-size: 12px; }
+#clouddlg .row { margin: 6px 0 0; gap: 6px; }
+#clouddlg #pj-q { height: 34px; margin: 0 0 6px; font-size: 13px; }
+#clouddlg .pj-head { margin: 0 0 6px; gap: 6px; }
+#clouddlg .pj-sum { font-size: 12px; }
+#clouddlg .pj { margin: 4px 0; border-radius: 12px; }
+#clouddlg .pj-main { min-height: 44px; padding: 5px 4px 5px 11px; gap: 8px; }
+#clouddlg .pj-body { gap: 1px; }
+#clouddlg .pj-nm { font-size: 13.5px; }
+#clouddlg .pj-sub { font-size: 11px; }
+#clouddlg .pj-more { flex-basis: 42px; font-size: 20px; }
+#clouddlg .bdg { width: 19px; height: 19px; }
+#clouddlg .bdg .ic { width: 11px; height: 11px; }
+#clouddlg .pj-conf { padding: 0 8px 6px; }
+#clouddlg .pj-acts { gap: 5px; padding: 6px 8px 8px; }
+#clouddlg .pj-acts .sm { flex: 1 1 28%; height: 32px; min-height: 32px; padding: 0 8px; font-size: 12px; }
+#clouddlg .pj-head .sm { height: 32px; min-height: 32px; padding: 0 12px; font-size: 12.5px; }
+#clouddlg .status { margin: 6px 2px; }
+@media (min-width: 768px) {
+  #cloud-projects { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; align-items: start; }
+  #cloud-projects > .pj-head, #cloud-projects > .note, #cloud-projects > .status, #cloud-projects > .empty { grid-column: 1 / -1; }
+}
 
 .log details { background: rgba(255, 255, 255, .05); border: 1px solid var(--edge); border-radius: 12px; margin: 6px 0; }
 .log summary { padding: 9px 12px; cursor: pointer; font-size: 14px; word-break: break-word; }
@@ -2070,6 +2100,7 @@ body.multi .app.pane-narrow .workspace > #tdlg.open.fullscreen, html.is-pane .ap
       <div id="split-tabs">
         <button class="tl primary" data-tab="parts">Parties</button>
         <button class="tl" data-tab="blocks">Blocs</button>
+        <button class="tl" data-tab="between">Entre</button>
       </div>
       <div id="split-pane-parts">
         <div class="note">Choisissez le nombre de parties. Elles ont à peu près le même nombre de lignes et aucun bloc n'est jamais coupé.</div>
@@ -2094,6 +2125,27 @@ body.multi .app.pane-narrow .workspace > #tdlg.open.fullscreen, html.is-pane .ap
         <div class="selbar" id="blk-bar" hidden>
           <button class="sm primary" id="blk-copy" style="flex:1">Copier les blocs (<span id="blk-n">0</span>)</button>
           <button class="sm" id="blk-copy-ai" title="Copier prompt + index + blocs cochés">Prompt + index</button>
+        </div>
+      </div>
+      <div id="split-pane-between" hidden>
+        <div class="note">Cherchez tout ce qui se trouve entre une suite de caractères de début et une suite de fin, puis copiez-le. Fin vide : jusqu'à la fin de la ligne.</div>
+        <div class="btw-inputs">
+          <input type="search" id="btw-a" placeholder="Début (ex. function render)" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <input type="search" id="btw-b" placeholder="Fin (ex. })" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="btools">
+          <label class="sw mini"><input type="checkbox" id="btw-incl" checked><span>Avec début/fin</span></label>
+          <label class="sw mini"><input type="checkbox" id="btw-case"><span>Casse</span></label>
+          <label class="sw mini"><input type="checkbox" id="btw-nest"><span>Imbriqué</span></label>
+          <label class="sw mini"><input type="checkbox" id="btw-strip"><span>Sans marqueurs</span></label>
+        </div>
+        <div class="btools">
+          <button class="sm" id="btw-all">Tout cocher</button>
+          <button class="sm" id="btw-none">Aucun</button>
+        </div>
+        <div id="btw-result"></div>
+        <div class="selbar" id="btw-bar" hidden>
+          <button class="sm primary" id="btw-copy" style="flex:1">Copier les passages (<span id="btw-n">0</span>)</button>
         </div>
       </div>
     </div>
@@ -4686,6 +4738,52 @@ saveProjects();
 renderProjects();
 cloudRenameProject(p.id, p.name);
 }
+/* Duplique un projet : demande le nom de la copie, puis crée un projet indépendant (sans historique) */
+async function duplicateProject(id) {
+  const p = projects.list.find(x => x.id === id);
+  if (!p) return;
+  const v = await askDialog({
+    title: 'Dupliquer le projet',
+    msg: 'Nom de la copie de « ' + p.name + ' » :',
+    input: true,
+    value: (p.name.length > 32 ? p.name.slice(0, 32) : p.name) + ' (copie)',
+    placeholder: 'Nom du projet',
+    ok: 'Dupliquer'
+  });
+  const name = (v || '').trim().slice(0, 40);
+  if (!name) return;
+  if (id === projects.cur) save();
+  const s = projLocal(id);
+  let text = id === projects.cur ? $('src').value : (s && typeof s.text === 'string' ? s.text : null);
+  let level = s && s.level ? s.level : '2';
+  if (text === null) {
+    if (!cloudToken.get()) {
+      notify('Ce projet n\'est pas sur cet appareil : connectez le Cloud pour le dupliquer.', { kind: 'err' });
+      return;
+    }
+    try {
+      notify('Lecture du projet sur le Cloud…', { kind: 'ok', key: 'dup', ms: 0 });
+      const rem = await cloudFetchProject(id);
+      dismissKey('dup');
+      text = rem.text || '';
+      level = rem.level || level;
+    } catch (e) {
+      dismissKey('dup');
+      notify('Duplication impossible : ' + e.message, { kind: 'err', ms: 0 });
+      return;
+    }
+  }
+  const nid = 'p' + Date.now().toString(36);
+  if (!projPut(nid, { text: text, level: level, snap: {}, _cloudUpdatedAt: 0, _cloudHash: '' })) {
+    notify('Stockage local plein : duplication impossible.', { kind: 'err', ms: 0 });
+    return;
+  }
+  projects.list.push({ id: nid, name: name });
+  saveProjects();
+  renderProjects();
+  notify('Projet « ' + name + ' » créé ✓', { kind: 'ok' });
+  if (cloudToken.get()) setTimeout(() => cloudAutoBackup(true), 800);
+}
 async function deleteProject(id) {
   const p = projects.list.find(x => x.id === id);
   if (!p) return;
@@ -5371,6 +5469,7 @@ $('qb-marked').onclick = () => {
 let qbLongT = null, qbLongFired = false;
 let splitText = '', splitChoice = 0, splitParts = null, splitQuery = '';
 let blkQuery = '', blkSel = new Set(), blkHits = [], blkInName = true, blkInCode = true, splitTab = 'parts', blkCache = { text: null, pm: null, own: [], low: [] };
+let btwHits = [], btwSel = new Set(), btwWhy = '';
 let codeSearchMatches = [], codeSearchIdx = -1;
 let codeSearchHL = '';        // mot recherché actuellement surligné ('' = aucun)
 /* Découpe un code balisé en n parties contiguës, sans jamais couper un bloc.
@@ -5553,15 +5652,130 @@ function blkCopy(withAi) {
   }
 }
 function setSplitTab(tab) {
-  splitTab = tab === 'blocks' ? 'blocks' : 'parts';
+  splitTab = (tab === 'blocks' || tab === 'between') ? tab : 'parts';
   $('split-pane-parts').hidden = splitTab !== 'parts';
   $('split-pane-blocks').hidden = splitTab !== 'blocks';
+  $('split-pane-between').hidden = splitTab !== 'between';
   document.querySelectorAll('#split-tabs button').forEach(b => b.classList.toggle('primary', b.dataset.tab === splitTab));
   if (splitTab === 'blocks') {
     renderBlkResult();
     const q = $('blk-q');
     if (q && !q.value) setTimeout(() => q.focus(), 60);
+  } else if (splitTab === 'between') {
+    btwRun();
+    const a = $('btw-a');
+    if (a && !a.value) setTimeout(() => a.focus(), 60);
   }
+}
+/* Passages entre « début » et « fin » (le premier début, puis la première fin qui le suit ; en mode imbriqué, la fin qui équilibre les débuts) */
+function btwFind() {
+  const a = $('btw-a').value, b = $('btw-b').value;
+  const cs = $('btw-case').checked, incl = $('btw-incl').checked, nest = $('btw-nest').checked;
+  btwHits = [];
+  btwWhy = '';
+  if (!a) return;
+  let T = splitText, A = a, B = b;
+  if (!cs) {
+    const low = splitText.toLowerCase();
+    if (low.length === splitText.length) { T = low; A = a.toLowerCase(); B = b.toLowerCase(); }
+  }
+  let i = 0;
+  while (btwHits.length < 300) {
+    const s = T.indexOf(A, i);
+    if (s < 0) break;
+    const from = s + A.length;
+    let e = -1, eEnd = -1;
+    if (!B) {
+      e = T.indexOf('\n', from);
+      if (e < 0) e = T.length;
+      eEnd = e;
+    } else if (!nest) {
+      e = T.indexOf(B, from);
+      if (e >= 0) eEnd = e + B.length;
+    } else {
+      let depth = 1, p = from;
+      while (depth > 0) {
+        const na = T.indexOf(A, p), nb = T.indexOf(B, p);
+        if (nb < 0) break;
+        if (na >= 0 && na < nb) { depth++; p = na + A.length; }
+        else {
+          depth--;
+          p = nb + B.length;
+          if (!depth) { e = nb; eEnd = p; }
+        }
+      }
+    }
+    if (e < 0) break;
+    btwHits.push({ s: s, e: eEnd, a: incl ? s : from, b: incl ? eEnd : e, line: 1 });
+    i = Math.max(eEnd, s + 1);
+  }
+  if (!btwHits.length) {
+    btwWhy = T.indexOf(A) < 0 ? 'start' : 'end';
+    return;
+  }
+  let ln = 1, pos = 0;
+  for (const h of btwHits) {
+    let k = splitText.indexOf('\n', pos);
+    while (k >= 0 && k < h.a) { ln++; pos = k + 1; k = splitText.indexOf('\n', pos); }
+    h.line = ln;
+  }
+}
+function btwText(h) {
+  const t = splitText.slice(h.a, h.b);
+  return $('btw-strip').checked ? stripMarks(t) : t;
+}
+function renderBtwResult() {
+  const box = $('btw-result');
+  if (!box) return;
+  if (!$('btw-a').value) {
+    box.innerHTML = '<div class="empty">Tapez le début, puis la fin : tout ce qui est entre les deux s\'affiche ici.</div>';
+  } else if (!btwHits.length) {
+    box.innerHTML = '<div class="empty">' + (btwWhy === 'end' ? 'Début trouvé, mais la fin est introuvable après lui.' : 'Début introuvable dans le code.') + '</div>';
+  } else {
+    const nb = btwHits.length;
+    box.innerHTML = '<div class="status">' + nb + ' passage' + (nb > 1 ? 's' : '') + (nb >= 300 ? ' (300 premiers)' : '') + '</div>' +
+      btwHits.map((h, i) => {
+        const t = btwText(h);
+        const first = (t.split('\n').find(l => l.trim()) || '').trim().slice(0, 90);
+        const nl = (t.match(/\n/g) || []).length + 1;
+        return '<div class="bk">' +
+          '<div class="bk-top"><label class="pick"><input type="checkbox" data-bts="' + i + '"' + (btwSel.has(i) ? ' checked' : '') + '><span class="bk-nm">#' + (i + 1) + ' · ligne ' + h.line + '</span></label></div>' +
+          '<div class="blk-snip">' + (esc(first) || '(vide)') + '</div>' +
+          '<div class="bk-bot"><div class="bk-info">' + nl + ' l. · ' + t.length + ' car.</div>' +
+          '<div class="acts" data-bi="' + i + '">' +
+          '<button class="ib" data-bt="copy" aria-label="Copier ce passage" title="Copier"><svg class="ic"><use href="#i-copy"/></svg></button>' +
+          '<button class="ib" data-bt="goto" aria-label="Aller au passage" title="Aller au passage"><svg class="ic"><use href="#i-goto"/></svg></button></div></div></div>';
+      }).join('');
+  }
+  updBtwBar();
+}
+function updBtwBar() {
+  const bar = $('btw-bar');
+  if (!bar) return;
+  bar.hidden = !btwHits.length;
+  $('btw-n').textContent = String(btwSel.size);
+  $('btw-copy').disabled = !btwSel.size;
+}
+/* Nouvelle recherche : tous les passages trouvés sont cochés */
+function btwRun() {
+  btwFind();
+  btwSel = new Set(btwHits.map((h, i) => i));
+  renderBtwResult();
+}
+/* Copie un passage (i) ou tous les passages cochés, séparés par une ligne vide */
+function btwCopy(i) {
+  const idx = typeof i === 'number' ? [i] : btwHits.map((h, k) => k).filter(k => btwSel.has(k));
+  if (!idx.length) { notify('Cochez d\'abord des passages', { kind: 'err' }); return; }
+  copyText(idx.map(k => btwText(btwHits[k])).join('\n\n'), idx.length > 1 ? idx.length + ' passages copiés ✓' : 'Passage copié ✓');
+}
+function btwGoto(i) {
+  const h = btwHits[i];
+  if (!h) return;
+  closeOv('splitdlg');
+  const ta = $('src');
+  const line = ta.value.slice(0, h.a).split('\n').length - 1;
+  ta.setSelectionRange(h.a, h.b);
+  ta.scrollTop = Math.max(0, line * codeFs * 1.5 - 30);
 }
 function openSplitDlg() {
   const v = $('src').value;
@@ -5802,6 +6016,32 @@ $('blk-q').addEventListener('input', () => {
   blkQuery = $('blk-q').value;
   blkRun();
 });
+/* Onglet « Entre » : la recherche se met à jour à la frappe */
+$('splitdlg').addEventListener('input', e => {
+  if (e.target.id === 'btw-a' || e.target.id === 'btw-b') btwRun();
+});
+$('splitdlg').addEventListener('click', e => {
+  const bt = e.target.closest('button[data-bt]');
+  if (bt) {
+    const i = +bt.parentElement.dataset.bi;
+    if (bt.dataset.bt === 'copy') btwCopy(i);
+    else if (bt.dataset.bt === 'goto') btwGoto(i);
+    return;
+  }
+  const btn = e.target.closest('#btw-all, #btw-none, #btw-copy');
+  if (!btn) return;
+  if (btn.id === 'btw-all') { btwSel = new Set(btwHits.map((h, i) => i)); renderBtwResult(); }
+  else if (btn.id === 'btw-none') { btwSel = new Set(); renderBtwResult(); }
+  else btwCopy();
+});
+$('splitdlg').addEventListener('change', e => {
+  const t = e.target;
+  if (t.matches && t.matches('input[data-bts]')) {
+    const k = +t.dataset.bts;
+    if (t.checked) btwSel.add(k); else btwSel.delete(k);
+    updBtwBar();
+  } else if (t.id === 'btw-incl' || t.id === 'btw-case' || t.id === 'btw-nest' || t.id === 'btw-strip') btwRun();
+});
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && isOpen('splitdlg')) closeOv('splitdlg');
 });
@@ -5823,10 +6063,58 @@ $('src').addEventListener('input', () => {
   const q = $('code-q');
   if (q && q.value) codeSearchUpdate(false);
 });
-$('qb-prompt').onclick = () => copyText(PROMPT_TEXT, 'Prompt copié ✓');
+$('qb-prompt').onclick = () => {
+  /* Premier clic : déploie Index / Rappel ; clic alors que les choix sont déployés : prompt seul */
+  if (qbPopEl) { qbPopClose(); copyText(PROMPT_TEXT, 'Prompt copié ✓'); }
+  else qbPopOpen();
+};
 $('qb-all').onclick = () => copyAllForAI();
 $('qb-proj').onclick = () => { closeOv('adv'); renderCloudDialog(); openOv('clouddlg'); };
 $('qb-need').onclick = copyRequested;
+let qbPopEl = null;
+function qbPopClose() {
+  if (qbPopEl) { qbPopEl.remove(); qbPopEl = null; }
+  const b = $('qb-prompt');
+  if (b) b.setAttribute('aria-expanded', 'false');
+}
+/* Déploie « Index » et « Rappel » juste au-dessus du raccourci Prompt */
+function qbPopOpen() {
+  const b = $('qb-prompt');
+  const r = b.getBoundingClientRect();
+  qbPopEl = document.createElement('div');
+  qbPopEl.className = 'qb-pop';
+  qbPopEl.innerHTML =
+    '<button class="qb cyan" data-q="index" aria-label="Copier l\'index des blocs"><svg class="ic"><use href="#i-braces"/></svg>Index</button>' +
+    '<button class="qb" data-q="remind" aria-label="Copier le rappel court"><svg class="ic"><use href="#i-paste"/></svg>Rappel</button>';
+  qbPopEl.style.left = r.left + 'px';
+  qbPopEl.style.width = r.width + 'px';
+  if (r.top < 130) qbPopEl.style.top = (r.bottom + 6) + 'px';
+  else qbPopEl.style.bottom = (window.innerHeight - r.top + 6) + 'px';
+  document.body.appendChild(qbPopEl);
+  b.setAttribute('aria-expanded', 'true');
+  qbPopEl.querySelector('[data-q="index"]').onclick = () => {
+    qbPopClose();
+    const v = $('src').value;
+    if (!parseMarks(v).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'err' }); return; }
+    copyText(buildIndex(v), 'Index copié ✓');
+  };
+  qbPopEl.querySelector('[data-q="remind"]').onclick = () => {
+    qbPopClose();
+    copyText(REMIND_TEXT, 'Rappel copié ✓');
+  };
+}
+/* Le menu se referme au toucher ailleurs, à Échap, au défilement ou au redimensionnement */
+function qbPopInit() {
+  document.addEventListener('pointerdown', e => {
+    if (!qbPopEl) return;
+    if (qbPopEl.contains(e.target) || (e.target.closest && e.target.closest('#qb-prompt'))) return;
+    qbPopClose();
+  }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') qbPopClose(); });
+  document.addEventListener('scroll', () => { if (qbPopEl) qbPopClose(); }, true);
+  window.addEventListener('resize', qbPopClose);
+}
+qbPopInit();
 /* Dessine la liste des projets dans la modale de sélection (cartes cliquables) */
 function renderProjSel() {
   $('plist3').innerHTML = projects.list.map(p =>
@@ -5878,6 +6166,14 @@ $('projsel').addEventListener('click', e => { if (e.target === $('projsel')) clo
 /* Légende des icônes de la modale Projets */
 $('cloud-projects').addEventListener('click', e => {
   if (e.target.closest('#pj-help')) openOv('legend');
+});
+/* Modale Projets : bouton « Dupliquer » */
+$('cloud-projects').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-proj-dup]');
+  if (!b) return;
+  b.disabled = true;
+  try { await duplicateProject(b.dataset.projDup); } finally { b.disabled = false; }
+  if (isOpen('clouddlg')) await renderCloudDialog();
 });
 /* Recherche de projets : filtre la liste de la modale Projets par nom */
 $('pj-q').addEventListener('input', () => renderProjectList(cloudIdx.list));
@@ -6556,6 +6852,7 @@ if (pq && !rows.length && !trash.length) html += '<div class="empty">Aucun proje
     '<div class="pj-acts"' + (open ? '' : ' hidden') + '>' +
     (r.inCloud ? '<button class="sm" data-cloud-versions="' + pid + '">Versions</button>' : '') +
     '<button class="sm" data-proj-ren="' + pid + '">Renommer</button>' +
+    '<button class="sm" data-proj-dup="' + pid + '">Dupliquer</button>' +
     (r.hasLocal || !r.inCloud ? '<button class="sm" data-proj-del="' + pid + '">' + (r.inCloud || connected ? 'Retirer' : 'Supprimer') + '</button>' : '') +
     (r.inCloud ? '<button class="sm" data-trash="' + pid + '">Corbeille</button>' : '') +
     '<button class="sm danger" data-purge="' + pid + '">Supprimer partout</button>' +
