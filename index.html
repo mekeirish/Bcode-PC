@@ -1645,6 +1645,7 @@ body.multi .workspace > .left-rail, html.is-pane .workspace > .left-rail { grid-
 body.multi .workspace > .editor-column, html.is-pane .workspace > .editor-column { grid-column: 1 !important; grid-row: 2 !important; order: 0 !important; height: auto !important; min-height: 0; }
 body.multi .editor-column .code, html.is-pane .editor-column .code { flex: none !important; height: 55vh !important; height: 55dvh !important; min-height: 300px !important; max-height: none !important; }
 body.multi #b-flip, html.is-pane #b-flip { display: none !important; }
+/* Raccourcis sur une seule ligne, boutons plus compacts */
 body.multi .left-rail .quick, html.is-pane .left-rail .quick { flex-wrap: nowrap !important; }
 body.multi .left-rail .qb, html.is-pane .left-rail .qb { flex: 1 1 0 !important; min-height: 50px; }
 body.multi .left-rail .btn.hero, html.is-pane .left-rail .btn.hero { min-height: 48px; }
@@ -1726,6 +1727,7 @@ body.multi .app.pane-narrow .workspace > #tdlg.open.fullscreen, html.is-pane .ap
 <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></symbol>
 <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
 <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h13"/><path d="m14 5 3 3-3 3"/><path d="M20 16H7"/><path d="m10 13-3 3 3 3"/></symbol>
+<symbol id="i-split" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/></symbol>
   </defs>
 </svg>
 
@@ -1735,6 +1737,7 @@ body.multi .app.pane-narrow .workspace > #tdlg.open.fullscreen, html.is-pane .ap
     <button class="iconbtn" id="b-undo-top" aria-label="Annuler la dernière action"><svg class="ic"><use href="#i-undo"/></svg></button>
     <button class="iconbtn" id="b-redo-top" aria-label="Rétablir" disabled><svg class="ic"><use href="#i-redo"/></svg></button>
     <button class="iconbtn" id="b-adv"><svg class="ic"><use href="#i-sliders"/></svg>Avancé</button>
+<button class="iconbtn" id="b-multi" aria-label="Ajouter un espace Bcode" title="Ajouter un espace Bcode (écran partagé)" aria-pressed="false"><svg class="ic"><use href="#i-split"/></svg></button>
     <button class="iconbtn" id="b-cloud" title="Cloud GitHub (non connecté)" aria-label="Cloud GitHub"><svg class="ic"><use href="#i-cloud"/></svg></button>
   </header>
 
@@ -3314,7 +3317,26 @@ function buildIndex(text) {
    ================================================================ */
 
 const $ = id => document.getElementById(id);
-const STORE_KEY = 'blocs.v1';
+/* ---------- Espaces multiples : l'espace principal (PANE vide) affiche 1 ou 2 autres espaces Bcode (cette même page dans un cadre nommé bcode-pane-2 ou bcode-pane-3) ---------- */
+const PANE = (() => {
+  try {
+    const m = /^bcode-pane-([23])$/.exec(window.name || '');
+    if (m) return m[1];
+    const n = new URLSearchParams(location.search).get('pane');
+    return n === '2' || n === '3' ? n : '';
+  } catch (e) { return ''; }
+})();
+/* Un espace secondaire est vertical dès le départ, avant le premier dessin */
+if (PANE) {
+  document.documentElement.classList.add('is-pane');
+  document.body.classList.add('multi');
+}
+const MULTI_KEY = 'blocs.multi';
+/* Canal entre les espaces : un projet écrit ici est relu par les autres */
+const paneBus = (() => {
+  try { return typeof BroadcastChannel === 'function' ? new BroadcastChannel('bcode-multi') : null; } catch (e) { return null; }
+})();
+const STORE_KEY = 'blocs.v1' + (PANE ? '.' + PANE : '');
 const MAX_HIST = 30;
 let hist = [];
 let dlgMode = null, dlgName = null, lastMarkErr = '';
@@ -3353,13 +3375,33 @@ const PROJ_KEY = 'blocs.projects';
 function loadProjects() {
   try {
     const p = JSON.parse(localStorage.getItem(PROJ_KEY) || 'null');
-    if (p && Array.isArray(p.list) && p.list.length && p.list.some(x => x.id === p.cur)) return p;
+    if (p && Array.isArray(p.list) && p.list.length) {
+      if (PANE) {
+        /* Espace secondaire : son projet ouvert est mémorisé à part (« cur » reste celui de l'espace principal) */
+        const c = localStorage.getItem('blocs.cur.' + PANE);
+        if (c && p.list.some(x => x.id === c)) p.cur = c;
+      }
+      if (p.list.some(x => x.id === p.cur)) return p;
+    }
   } catch (e) { /* stockage indisponible */ }
   return { cur: 'p1', list: [{ id: 'p1', name: 'Projet 1' }] };
 }
 let projects = loadProjects();
 function saveProjects() {
-  try { localStorage.setItem(PROJ_KEY, JSON.stringify(projects)); } catch (e) { /* quota */ }
+  try {
+    if (PANE) {
+      /* Espace secondaire : la liste est partagée, mais « cur » de l'espace principal n'est jamais modifié */
+      let hostCur = projects.cur;
+      try {
+        const s = JSON.parse(localStorage.getItem(PROJ_KEY) || 'null');
+        if (s && s.cur) hostCur = s.cur;
+      } catch (e) { /* valeur illisible */ }
+      localStorage.setItem('blocs.cur.' + PANE, projects.cur);
+      localStorage.setItem(PROJ_KEY, JSON.stringify({ cur: hostCur, list: projects.list }));
+    } else {
+      localStorage.setItem(PROJ_KEY, JSON.stringify(projects));
+    }
+  } catch (e) { /* quota */ }
 }
 const pKey = id => 'blocs.p.' + id;
 /* Projets de l'appareil : copie en mémoire (lecture synchrone), écrite dans IndexedDB ; localStorage seulement si IndexedDB est indisponible */
@@ -3410,7 +3452,7 @@ function freeLocalSpace(keepId, target) {
   let n = 0;
   for (const p of projects.list) {
     if (typeof target === 'number' && estimateLocalStorageSize() <= target) break;
-    if (p.id === projects.cur || p.id === keepId) continue;
+    if (p.id === projects.cur || p.id === keepId || openElsewhere(p.id)) continue;
     if (!projCache.has(p.id) || !projSynced(p.id)) continue;
     projDrop(p.id);
     n++;
@@ -3458,7 +3500,10 @@ async function projFlush() {
           continue;
         }
       }
-      if (projPending.get(id) === rec) projPending.delete(id);
+      if (projPending.get(id) === rec) {
+        projPending.delete(id);
+        paneNotify('p', id);
+      }
       if (!projCache.has(id)) idbDel('p:' + id).catch(() => { });
     }
   } finally {
@@ -3472,6 +3517,7 @@ function projDrop(id) {
   projHashMemo.delete(id);
   try { localStorage.removeItem(pKey(id)); } catch (e) { /* stockage indisponible */ }
   if (!projUseLS) idbDel('p:' + id).catch(() => { });
+  paneNotify('d', id);
 }
 /* Chargement des projets au démarrage : lit IndexedDB, migre l'ancien localStorage, demande le stockage persistant */
 async function projBoot() {
@@ -3531,8 +3577,8 @@ function cloudMarkSynced(id, updatedAt, text) {
 function fmtSize(n) {
   return n >= 1073741824 ? (n / 1073741824).toFixed(1) + ' Go' : (n / 1048576).toFixed(1) + ' Mo';
 }
-/* ---------- Ce que l'IA connaît : empreinte du contenu propre de chaque bloc ---------- */
-const SNAP_KEY = 'blocs.snap';
+/* ---------- Ce que l'IA connaît : empreinte du contenu propre de chaque bloc (une clé par espace) ---------- */
+const SNAP_KEY = 'blocs.snap' + (PANE ? '.' + PANE : '');
 let aiSnap = {};
 try { aiSnap = JSON.parse(localStorage.getItem(SNAP_KEY) || '{}') || {}; } catch (e) { /* stockage indisponible */ }
 /* Empreinte rapide (FNV-1a 32 bits + longueur) */
@@ -4136,7 +4182,7 @@ try { localStorage.setItem(STORE_KEY, JSON.stringify(meta)); } catch (e) { /* qu
 const sig = histSig();
 if (sig === lastHistSig) return true;
 lastHistSig = sig;
-idbSet('hist', hist).catch(() => { idbOK = false; saveLegacy(meta); });
+idbSet(histKey(), hist).catch(() => { idbOK = false; saveLegacy(meta); });
 return true;
 }
 
@@ -4509,6 +4555,7 @@ $('plist').innerHTML = projects.list.map(p => {
 async function switchProject(id, skipSave = false) {
   if (switchProject._busy) return;
   if (id === projects.cur || !projects.list.some(p => p.id === id)) { renderProjects(); return; }
+  if (paneBlocked(id)) return;
   switchProject._busy = true;
 try {
   /* Sauvegarde locale sauf si l'appelant (ex. newProject) s'en est déjà occupé */
@@ -4642,6 +4689,7 @@ cloudRenameProject(p.id, p.name);
 async function deleteProject(id) {
   const p = projects.list.find(x => x.id === id);
   if (!p) return;
+  if (paneBlocked(id)) return;
   if (projects.list.length < 2) { notify('Impossible de supprimer le seul projet', { kind: 'err' }); return; }
   
 const s0 = projLocal(id);
@@ -5073,6 +5121,11 @@ try {
 projBoot().then(() => {
   const p = projLocal(projects.cur);
   let txt = p ? (p.text || '') : '';
+  if (PANE) {
+    /* Espace secondaire : ce que l'IA connaît vient du projet ouvert, et ce projet a toujours un enregistrement local */
+    if (p && p.snap) { aiSnap = p.snap; saveSnap(); }
+    if (!p) projPut(projects.cur, { text: '', level: '2', snap: {}, _cloudUpdatedAt: 0, _cloudHash: '' });
+  }
   if (!p) {
     try {
       const ls = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
@@ -5195,8 +5248,8 @@ $('blist').addEventListener('change', e => {
   $('t-rerun').onclick = runTest;
   $('t-copy').onclick = () => copyText(testMessage(), 'Message copié ✓ — collez-le à l\'IA');
 
-  /* historique : IndexedDB, fusionné avec l'ancien historique localStorage éventuel */
-  idbGet('hist').then(h => {
+  /* historique : IndexedDB (un espace secondaire garde l'historique par projet), fusionné avec l'ancien historique localStorage éventuel */
+  idbGet(histKey()).then(h => {
     const old = Array.isArray(h) ? h : [];
     const cur = hist.filter(x => !old.some(y => y.t === x.t));
     hist = old.concat(cur).sort((a, b) => a.t - b.t).slice(-MAX_HIST);
@@ -6225,6 +6278,8 @@ for (let i = 0; i < list.length; i++) {
     const s = projLocal(rp.id);
     /* Absent de l'appareil : récupéré à la demande (Projets › Récupérer et ouvrir) */
     if (!s) continue;
+    /* Ouvert dans un autre espace : c'est cet espace qui le met à jour */
+    if (openElsewhere(rp.id)) continue;
     const newer = rp.updatedAt > (s._cloudUpdatedAt || 0);
     if (projNeedsBackup(rp.id)) {
       if (newer) errors.push(rp.id + ' : modifié ici ET sur le Cloud, version de l\'appareil conservée');
@@ -6983,8 +7038,8 @@ async function resolveConflict(mode) {
 async function cloudAutoBackup(all) {
   if (!autoCloudOn || !projBooted || !cloudToken.get() || !navigator.onLine) return;
   if (cloudAutoBackup._busy) return;
-  const todo = (all ? projects.list.map(p => p.id) : [projects.cur])
-    .filter(id => !cloudConflicts.has(id) && projNeedsBackup(id));
+  const todo = (all && !PANE ? projects.list.map(p => p.id) : [projects.cur])
+    .filter(id => !cloudConflicts.has(id) && projNeedsBackup(id) && !openElsewhere(id));
   if (!todo.length) return;
   cloudAutoBackup._busy = true;
   let failed = false;
@@ -7040,6 +7095,7 @@ function updateCloudIcon() {
 async function cloudTrashProject(id) {
   const p = projects.list.find(x => x.id === id);
   if (!p) return;
+  if (paneBlocked(id)) return;
   const yes = await askDialog({
     title: 'Mettre à la corbeille',
     msg: '« ' + p.name + ' » ira dans la corbeille du Cloud (restaurable à tout moment) et sera retiré de cet appareil.',
@@ -7133,6 +7189,7 @@ async function ghPurgeProject(id) {
 }
 /* Suppression définitive : appareil + Cloud (irréversible) */
 async function cloudPurgeProject(id) {
+  if (paneBlocked(id)) return false;
   const p = projects.list.find(x => x.id === id);
   const rp = cloudIdx.list && cloudIdx.list.find(r => r.id === id);
   const name = p ? p.name : ((rp && rp.name) || id);
@@ -7207,6 +7264,205 @@ function initSync() {
   updateCloudIcon();
 }
 initSync();
+/* Historique du projet ouvert : clé unique pour l'espace principal, une clé par projet dans les espaces secondaires */
+function histKey() {
+  return PANE ? 'hist:' + projects.cur : 'hist';
+}
+/* Prévient les autres espaces : t = « p » (projet écrit) ou « d » (projet retiré de l'appareil) */
+function paneNotify(t, id) {
+  if (!paneBus) return;
+  try { paneBus.postMessage({ t: t, id: id, from: PANE || '0' }); } catch (e) { /* canal fermé */ }
+}
+/* Espaces secondaires ouverts (« 2 », « 3 ») */
+function paneList() {
+  try {
+    const a = JSON.parse(localStorage.getItem(MULTI_KEY) || '[]');
+    return Array.isArray(a) ? a.filter(n => n === '2' || n === '3') : [];
+  } catch (e) { return []; }
+}
+function paneSetList(a) {
+  try { localStorage.setItem(MULTI_KEY, JSON.stringify(a)); } catch (e) { /* stockage indisponible */ }
+}
+/* Le projet est-il ouvert dans un autre espace ? */
+function openElsewhere(id) {
+  try {
+    const ids = [];
+    if (PANE) {
+      const s = JSON.parse(localStorage.getItem(PROJ_KEY) || 'null');
+      if (s && s.cur) ids.push(s.cur);
+    }
+    paneList().forEach(n => { if (n !== PANE) ids.push(localStorage.getItem('blocs.cur.' + n)); });
+    return ids.includes(id);
+  } catch (e) { return false; }
+}
+function paneBlocked(id) {
+  if (!openElsewhere(id)) return false;
+  notify('Ce projet est ouvert dans un autre espace Bcode. Changez-en d\'abord là-bas.', { kind: 'warn' });
+  return true;
+}
+/* Projets déjà ouverts (espace principal + espaces secondaires, sauf skip) */
+function paneTaken(skip) {
+  const s = new Set([projects.cur]);
+  paneList().forEach(k => {
+    if (k === skip) return;
+    const c = localStorage.getItem('blocs.cur.' + k);
+    if (c) s.add(c);
+  });
+  return s;
+}
+/* Choisit le projet d'un espace : un projet pas encore ouvert, sinon un nouveau projet */
+function paneAssign(n, taken) {
+  let p = projects.list.find(x => !taken.has(x.id));
+  if (!p) {
+    p = { id: 'p' + Date.now().toString(36) + n, name: 'Projet ' + (projects.list.length + 1) };
+    projects.list.push(p);
+    saveProjects();
+    projPut(p.id, { text: '', level: '2', snap: {}, _cloudUpdatedAt: 0, _cloudHash: '' });
+    renderProjects();
+  }
+  try { localStorage.setItem('blocs.cur.' + n, p.id); } catch (e) { /* stockage indisponible */ }
+  return p.id;
+}
+function paneBuild(n) {
+  if ($('pane-' + n)) return;
+  const col = document.createElement('div');
+  col.className = 'pane-col';
+  col.id = 'pane-' + n;
+  col.innerHTML = '<div class="pane-bar"><span class="pane-t">Espace ' + n + '</span><button class="pane-x" aria-label="Fermer cet espace" title="Fermer cet espace">×</button></div>';
+  const fr = document.createElement('iframe');
+  fr.className = 'pane-frame';
+  fr.title = 'Espace Bcode ' + n;
+  fr.name = 'bcode-pane-' + n;
+  fr.setAttribute('allow', 'clipboard-read; clipboard-write; fullscreen');
+  fr.setAttribute('allowfullscreen', '');
+  col.appendChild(fr);
+  col.querySelector('.pane-x').onclick = () => paneClose(n);
+  document.body.appendChild(col);
+  /* On relit le code de cette page et on le charge dans le cadre : aucune adresse à deviner */
+  const base = location.href.split('#')[0].split('?')[0];
+  fetch(base, { cache: 'no-store' })
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(html => { fr.srcdoc = html; })
+    .catch(() => { fr.src = base + '?pane=' + n; });
+}
+function paneLayout() {
+  const n = paneList().length;
+  document.body.classList.toggle('multi', n > 0);
+  const b = $('b-multi');
+  if (!b) return;
+  b.setAttribute('aria-pressed', n ? 'true' : 'false');
+  b.title = n >= 2 ? 'Trois espaces ouverts (maximum)' : 'Ajouter un espace Bcode (écran partagé)';
+}
+function paneAdd() {
+  if (PANE) return;
+  const used = paneList();
+  if (used.length >= 2) { notify('Trois espaces au maximum', { kind: 'warn' }); return; }
+  const n = used.includes('2') ? '3' : '2';
+  save();
+  paneAssign(n, paneTaken(n));
+  paneSetList(used.concat(n).sort());
+  paneBuild(n);
+  paneLayout();
+  notify('Espace ' + n + ' ajouté', { kind: 'ok', ms: 1500 });
+}
+/* Ferme un espace : son projet est sauvegardé sur l'appareil, puis relu ici et envoyé au Cloud si besoin */
+async function paneClose(n) {
+  const col = $('pane-' + n);
+  if (!col) return;
+  let id = '';
+  try { id = localStorage.getItem('blocs.cur.' + n) || ''; } catch (e) { /* stockage indisponible */ }
+  const fr = col.querySelector('iframe');
+  try {
+    const w = fr && fr.contentWindow;
+    if (w && typeof w.save === 'function') {
+      w.save();
+      await w.projFlush();
+    }
+  } catch (e) { /* espace déjà fermé */ }
+  await new Promise(r => setTimeout(r, 300));
+  col.remove();
+  paneSetList(paneList().filter(k => k !== n));
+  try { localStorage.removeItem('blocs.cur.' + n); } catch (e) { /* stockage indisponible */ }
+  paneLayout();
+  const done = () => cloudAutoBackup(true);
+  if (id) {
+    idbGet('p:' + id).then(r => {
+      if (r && typeof r === 'object' && id !== projects.cur && !projPending.has(id)) {
+        projCache.set(id, r);
+        projHashMemo.delete(id);
+        renderProjects();
+      }
+    }).catch(() => { }).then(done);
+  } else done();
+}
+/* Au rechargement de la page : les espaces qui étaient ouverts reviennent avec leurs projets */
+function paneRestore() {
+  if (PANE) return;
+  const list = paneList();
+  if (!list.length) return;
+  let tries = 0;
+  const t = setInterval(() => {
+    if (!projBooted && ++tries < 50) return;
+    clearInterval(t);
+    list.forEach(n => {
+      const c = localStorage.getItem('blocs.cur.' + n);
+      const taken = paneTaken(n);
+      if (!(c && projects.list.some(x => x.id === c) && !taken.has(c))) paneAssign(n, taken);
+    });
+    list.forEach(paneBuild);
+    paneLayout();
+  }, 100);
+}
+/* La liste des projets (noms, ajouts, retraits) est partagée en direct entre les espaces */
+window.addEventListener('storage', e => {
+  if (e.key !== PROJ_KEY || !e.newValue) return;
+  try {
+    const p = JSON.parse(e.newValue);
+    if (!p || !Array.isArray(p.list) || !p.list.length) return;
+    const mine = projects.list.find(x => x.id === projects.cur);
+    projects.list = p.list;
+    if (mine && !projects.list.some(x => x.id === mine.id)) projects.list.push(mine);
+    renderProjects();
+    if (isOpen('clouddlg')) renderProjectList(cloudIdx.list);
+  } catch (err) { /* valeur illisible */ }
+});
+if (paneBus) {
+  paneBus.onmessage = ev => {
+    const m = ev.data;
+    if (!m || !m.id || m.from === (PANE || '0') || m.id === projects.cur) return;
+    const refresh2 = () => {
+      if (['adv', 'clouddlg', 'projsel', 'projdlg'].some(isOpen)) {
+        renderProjects();
+        if (isOpen('clouddlg')) renderProjectList(cloudIdx.list);
+      }
+    };
+    if (m.t === 'p') {
+      if (projPending.has(m.id)) return;
+      idbGet('p:' + m.id).then(r => {
+        if (!r || typeof r !== 'object' || projPending.has(m.id) || m.id === projects.cur) return;
+        projCache.set(m.id, r);
+        projHashMemo.delete(m.id);
+        refresh2();
+      }).catch(() => { });
+    } else if (m.t === 'd') {
+      projCache.delete(m.id);
+      projPending.delete(m.id);
+      projHashMemo.delete(m.id);
+      refresh2();
+    }
+  };
+}
+if (PANE) {
+  document.documentElement.classList.add('is-pane');
+  try { localStorage.setItem('blocs.cur.' + PANE, projects.cur); } catch (e) { /* stockage indisponible */ }
+} else {
+  $('b-multi').onclick = paneAdd;
+  paneLayout();
+  paneRestore();
+}
 /* Un espace de moins de 640 px de large passe en une seule colonne (le rendu reste sous les outils) */
 (function () {
   const app = document.querySelector('.app');
