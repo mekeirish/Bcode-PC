@@ -2855,6 +2855,29 @@ function tagEnd(src, i) {
   }
   return -1;
 }
+/* Vraie fermeture d'un script JS : une balise de fermeture située dans une chaîne, un gabarit, un commentaire ou une regex est ignorée (signalée dans .bad) */
+function scriptClose(src, from) {
+  const re = /<\/script\s*>/ig;
+  re.lastIndex = from;
+  const cands = [];
+  let m;
+  while ((m = re.exec(src))) cands.push(m);
+  if (!cands.length) return null;
+  if (cands.length === 1) return cands[0];
+  const last = cands[cands.length - 1];
+  let toks;
+  try { toks = lex(src, from, last.index + 1, false).toks; } catch (e) { return cands[0]; }
+  const bad = [];
+  let k = 0;
+  for (const c of cands) {
+    while (k < toks.length && toks[k].e <= c.index) k++;
+    const t = toks[k];
+    const inside = !!t && t.s < c.index && (t.t === 'str' || t.t === 'tpl' || t.t === 'com' || t.t === 're');
+    if (!inside) return { index: c.index, 0: c[0], bad: bad };
+    bad.push(c.index);
+  }
+  return cands[0];
+}
 
 function parseHTML(src) {
   const root = { name: '#root', children: [] };
@@ -2891,15 +2914,20 @@ function parseHTML(src) {
     const selfClose = /\/\s*>$/.test(raw) || VOID_TAGS.has(nm);
     stack[stack.length - 1].children.push(node);
     if (RAW_TAGS.has(nm) && !selfClose) {
-      const re = new RegExp('</' + nm + '\\s*>', 'ig');
-      re.lastIndex = te + 1;
-      const cm = re.exec(src);
-      const cs = te + 1, ce = cm ? cm.index : src.length;
-      node.e = cm ? cm.index + cm[0].length : src.length;
       const ty = (/\btype\s*=\s*["']?([^"'\s>]+)/i.exec(node.attrs) || [])[1];
       const t = ty ? ty.toLowerCase() : '';
-      if (nm === 'script' && (!t || /^(module|text\/(javascript|babel|jsx)|application\/(javascript|ecmascript))$/.test(t)) && src.slice(cs, ce).trim())
-        segs.push({ type: 'js', a: cs, b: ce });
+      const isJs = nm === 'script' && (!t || /^(module|text\/(javascript|babel|jsx)|application\/(javascript|ecmascript))$/.test(t));
+      /* Script JS : on ignore une balise de fermeture écrite dans une chaîne (le navigateur s'y arrêterait, mais le découpage doit rester juste) */
+      let cm = isJs ? scriptClose(src, te + 1) : null;
+      if (!cm) {
+        const re = new RegExp('<' + '/' + nm + '\\s*>', 'ig');
+        re.lastIndex = te + 1;
+        cm = re.exec(src);
+      }
+      const cs = te + 1, ce = cm ? cm.index : src.length;
+      node.e = cm ? cm.index + cm[0].length : src.length;
+      if (isJs && src.slice(cs, ce).trim())
+        segs.push({ type: 'js', a: cs, b: ce, bad: (cm && cm.bad) || [] });
       if (nm === 'style' && (!t || t === 'text/css') && src.slice(cs, ce).trim())
         segs.push({ type: 'css', a: cs, b: ce });
       i = node.e;
@@ -2990,6 +3018,8 @@ function analyze(srcRaw, opt) {
     n++;
     if (sg.type === 'js') {
       const r = jsBlocks(src, sg.a, sg.b, maxLevel);
+      if (sg.bad && sg.bad.length)
+        warnings.push('Script n°' + n + ' : une balise de fermeture de script est écrite dans une chaîne ou un gabarit (ligne ' + sg.bad.slice(0, 3).map(p => countLines(src, 0, p)).join(', ') + '). Le navigateur ferme le script à cet endroit : écrire <\\/script>. Le découpage a ignoré cette fausse fermeture.');
       if (r.unbalanced) warnings.push('Script n°' + n + ' : parenthèses/accolades non équilibrées (' + r.unbalanced + ') — découpage approximatif.');
       all = all.concat(r.blocks);
     } else {
@@ -3012,6 +3042,7 @@ function analyze(srcRaw, opt) {
     warnings.push('Erreur interne : le retrait des marqueurs ne redonne pas le code d\'origine. Code renvoyé sans marqueurs.');
     return { text: src, blocks: [], warnings };
   }
+  checkStructure(text).forEach(w => warnings.push(w));
   return { text, blocks: flat, warnings };
 }
 /* ================================================================
@@ -3321,6 +3352,27 @@ function checkGlobal(text) {
     if (/^\s*(import|export)\s/m.test(code)) continue;
     try { new Function(code); } catch (e) { out.push('Script JS n°' + n + ' : ' + e.message); }
   }
+  checkStructure(text).forEach(s => out.push(s));
+  return out;
+}
+/* Contrôle du balisage : bloc HTML dans un bloc JS (souvent une balise de fermeture de script écrite dans une chaîne) et bloc JS aux accolades/parenthèses non équilibrées */
+function checkStructure(text) {
+  const out = [];
+  const stack = [], nested = [], unbal = [];
+  parseMarks(text).blocks.forEach(b => {
+    while (stack.length && stack[stack.length - 1].depth >= b.depth) stack.pop();
+    if (b.lang === 'html' && stack.some(a => a.lang === 'js')) nested.push(b.name);
+    stack.push(b);
+    if (b.lang !== 'js') return;
+    const code = stripMarks(text.slice(b.innerStart, b.innerEnd));
+    if (!code.trim()) return;
+    try {
+      if (buildSig(lex(code, 0, code.length, false).toks).unbalanced) unbal.push(b.name);
+    } catch (e) { /* analyse impossible : ignoré */ }
+  });
+  const list = a => a.slice(0, 4).join(', ') + (a.length > 4 ? ' … (+' + (a.length - 4) + ')' : '');
+  if (nested.length) out.push('Structure : bloc HTML à l\'intérieur d\'un bloc JS (' + list(nested) + '). Probable balise de fermeture de script écrite dans une chaîne : écrire <\\/script>.');
+  if (unbal.length) out.push('Structure : bloc(s) mal délimité(s), accolades ou parenthèses non équilibrées (' + list(unbal) + '). Ne pas les modifier avant de relancer « Analyser ».');
   return out;
 }
 
@@ -3344,6 +3396,9 @@ RÈGLES DE RÉPONSE (strictes) :
 8. Garde un code lisible et bien indenté (jamais minifié).
 9. FORMAT DE SORTIE : toute ta réponse contient UN SEUL bloc de code, clôturé par 4 backticks (\`\`\`\`). Tous les blocs modifiés ou ajoutés y figurent à la suite, dans l'ordre, même en mélangeant HTML, CSS et JS, même avec plusieurs #APRES / #AVANT / #SUPPRIMER. Jamais un bloc de code par langage ni par bloc. Aucun texte entre les blocs ni dans le bloc de code ; une courte phrase avant ou après suffit. Je copie ce bloc de code d'un seul geste : tout ce qui est en dehors est perdu.
 10. Si le bloc à modifier n'est pas dans ce que je t'ai envoyé, demande-le-moi par son nom.
+11. Pour me demander du code, cite uniquement des NOMS DE BLOCS exacts de l'index (un nom par ligne), jamais un nom de fonction seul ni un fragment défini par des numéros de ligne.
+12. Si un bloc te paraît mal délimité (il commence ou finit au milieu d'une fonction, accolades ou parenthèses non équilibrées, marqueur html: au milieu de code JS), ne le modifie pas : réponds seulement « BLOC MAL DÉLIMITÉ : nom », je relancerai l'analyse.
+13. Dans une chaîne, un gabarit ou un commentaire JS, écris la balise de fermeture de script sous la forme <\\/script> (avec une barre oblique inverse) et n'écris jamais de marqueur #BLOC / #FIN dans une chaîne.
 
 Forme exacte de ta réponse (exemple de structure) :
 \`\`\`\`html
@@ -4482,6 +4537,8 @@ function copyAllForAI() {
   snapMark(code);
   copyText(head + '\n\nVoici mon code balisé. Réponds simplement « Prêt », puis attends ma demande.\n\n' + f + 'html\n' + code + '\n' + f,
     'Prompt + code copiés ✓ — collez-les dans l\'IA');
+  const st = checkStructure(code);
+  if (st.length) notify('⚠ ' + st.join(' '), { kind: 'warn', ms: 0, key: 'struct' });
 }
 /* Colle la demande de l'IA (qui cite des noms de blocs) et copie ces blocs prêts à renvoyer */
 async function copyRequested() {
@@ -4501,6 +4558,28 @@ async function copyRequested() {
       i = work.indexOf(b.name);
     }
   });
+  if (!hit.length) {
+    /* Repli 1 : extrait de code entre accents graves (le plus petit bloc qui le contient) */
+    const snips = (t.match(/`([^`\n]{6,200})`/g) || []).slice(0, 10)
+      .map(s => s.slice(1, -1).trim())
+      .filter(s => s.length >= 6 && !/^[\w$.]+$/.test(s));
+    snips.forEach(sn => {
+      let best = null;
+      blocks.forEach(b => {
+        if (src.slice(b.innerStart, b.innerEnd).includes(sn) && (!best || b.innerEnd - b.innerStart < best.innerEnd - best.innerStart)) best = b;
+      });
+      if (best && !hit.includes(best)) hit.push(best);
+    });
+  }
+  if (!hit.length) {
+    /* Repli 2 : nom sans préfixe (« pushProject » pour fn:pushProject) */
+    blocks.forEach(b => {
+      const m = /^(?:fn|class|method):(.+?)(?:#\d+)?$/.exec(b.name);
+      if (!m || m[1].length < 4 || !/^[\w$.]+$/.test(m[1])) return;
+      const re = new RegExp('(^|[^\\w$.])' + m[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\w$])');
+      if (re.test(t)) hit.push(b);
+    });
+  }
   const list = topBlocks(hit);
   if (!list.length) { notify('Aucun nom de bloc reconnu dans le texte collé', { kind: 'err' }); return; }
   const code = list.map(b => src.slice(b.outerStart, b.outerEnd)).join('').replace(/\n$/, '');
