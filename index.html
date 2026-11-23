@@ -4044,6 +4044,7 @@ function dismissKey(key) {
 /* o : { kind: ok|warn|err, ms (0 = reste affichée), key, actions: [{label, fn}] } */
 function notify(msg, o) {
   o = o || {};
+  notifySound(msg, o);
   if (o.kind === 'err') buzz([35, 60, 35]);
   else if (o.kind === 'warn') buzz(45);
   else if (o.key === 'apply') buzz(28);
@@ -5271,6 +5272,76 @@ function tick(strong) {
     g.connect(audioCtx.destination);
     o.start(t);
     o.stop(t + 0.09);
+  } catch (e) { /* audio indisponible */ }
+}
+/* ---------- Sons des notifications : chaque note = [fréquence Hz, début s, durée s, onde, volume, fréquence finale (glissando)] ---------- */
+const NOTIF_SOUNDS = {
+  ok: [[659, 0, .09, 'sine', .06], [880, .08, .16, 'sine', .06]],
+  copy: [[1180, 0, .035, 'triangle', .05], [1580, .045, .05, 'triangle', .05]],
+  share: [[880, 0, .07, 'sine', .05], [1320, .06, .12, 'sine', .05]],
+  apply: [[523, 0, .08, 'sine', .06], [659, .07, .08, 'sine', .06], [784, .14, .08, 'sine', .06], [1046, .21, .24, 'sine', .07]],
+  cloud: [[784, 0, .14, 'sine', .045], [1175, .1, .28, 'sine', .045], [392, 0, .32, 'sine', .02]],
+  warn: [[587, 0, .12, 'triangle', .07], [440, .13, .22, 'triangle', .07]],
+  err: [[196, 0, .14, 'sawtooth', .05, 150], [165, .17, .24, 'sawtooth', .05, 120]],
+  conflict: [[660, 0, .09, 'triangle', .06], [880, .12, .09, 'triangle', .06], [660, .24, .09, 'triangle', .06], [880, .36, .16, 'triangle', .06]],
+  undo: [[700, 0, .08, 'sine', .06, 520], [520, .09, .14, 'sine', .06, 420]],
+  redo: [[520, 0, .08, 'sine', .06, 700], [700, .09, .14, 'sine', .06, 880]],
+  del: [[520, 0, .2, 'triangle', .06, 180]],
+  tick: [[900, 0, .03, 'sine', .04]],
+  info: [[540, 0, .1, 'sine', .05, 480]]
+};
+/* Filtre passe-bas (Hz) pour adoucir certains sons */
+const NOTIF_LP = { err: 900, warn: 2600 };
+/* Choisit le son d'une notification : clé spéciale, puis type (erreur / avertissement), puis texte du message */
+function notifSoundName(msg, o) {
+  const k = o.key || '';
+  if (k === 'apply') return o.kind === 'warn' ? 'warn' : 'apply';
+  if (k === 'fs') return 'tick';
+  if (k === 'autocloud' || k === 'pull' || k === 'purge') return 'cloud';
+  if (k.indexOf('conflict-') === 0) return 'conflict';
+  if (o.kind === 'err') return 'err';
+  if (o.kind === 'warn') return 'warn';
+  const m = String(msg || '');
+  if (/^↶/.test(m)) return 'undo';
+  if (/^↷/.test(m)) return 'redo';
+  if (/^☁/.test(m)) return 'cloud';
+  if (/partag/i.test(m)) return 'share';
+  if (/copi[ée]/i.test(m)) return 'copy';
+  if (/vidé|supprimé|retiré|corbeille|oublié/i.test(m)) return 'del';
+  return o.kind === 'ok' ? 'ok' : 'info';
+}
+/* Joue le son d'une notification (respecte le bouton « Sons » ; jamais deux fois le même son en moins de 150 ms) */
+function notifySound(msg, o) {
+  try {
+    if (!soundOn) return;
+    const name = notifSoundName(msg, o || {});
+    const now = Date.now();
+    if (notifySound._n === name && now - notifySound._t < 150) return;
+    notifySound._n = name;
+    notifySound._t = now;
+    const notes = NOTIF_SOUNDS[name];
+    if (!notes) return;
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const t0 = audioCtx.currentTime + 0.01;
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = NOTIF_LP[name] || 6000;
+    lp.connect(audioCtx.destination);
+    notes.forEach(n => {
+      const f = n[0], st = t0 + n[1], d = n[2], vol = n[4] || .05;
+      const osc = audioCtx.createOscillator(), g = audioCtx.createGain();
+      osc.type = n[3] || 'sine';
+      osc.frequency.setValueAtTime(f, st);
+      if (n[5]) osc.frequency.exponentialRampToValueAtTime(n[5], st + d);
+      g.gain.setValueAtTime(0.0001, st);
+      g.gain.exponentialRampToValueAtTime(vol, st + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, st + d);
+      osc.connect(g);
+      g.connect(lp);
+      osc.start(st);
+      osc.stop(st + d + 0.03);
+    });
   } catch (e) { /* audio indisponible */ }
 }
 
